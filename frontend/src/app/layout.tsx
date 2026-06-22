@@ -6,8 +6,25 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title:       "SusDevOS",
-  description: "GHG reporting and ecosystem tracking for development projects.",
+  title: {
+    default:  "SusDevOS — GHG Reporting & Ecosystem Tracking",
+    template: "%s | SusDevOS",
+  },
+  description:
+    "Calculate Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate audit-ready GHG inventory reports. Aligned to GHG Protocol, SBTi, CDP and TNFD.",
+  metadataBase: new URL("https://susdevos.com"),
+  openGraph: {
+    siteName: "SusDevOS",
+    type:     "website",
+    locale:   "en_GB",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  robots: {
+    index:  true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
