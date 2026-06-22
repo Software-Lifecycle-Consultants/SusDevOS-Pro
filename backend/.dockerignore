@@ -1,0 +1,27 @@
+# Development artifacts
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Dev environment files
+.env
+.env.local
+*.env.*
+
+# Tests (not needed in production image)
+apps/*/tests/
+conftest.py
+
+# Docs and specs
+*.md
+docs/
+
+# Git
+.git/
+.gitignore

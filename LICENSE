@@ -1,0 +1,81 @@
+Functional Source License, Version 1.1, Apache 2.0 Future License
+
+Copyright (c) 2024–present SusDevOS Ltd
+
+Parameters
+
+Licensor:             SusDevOS Ltd
+Licensed Work:        SusDevOS
+                      The Licensed Work is (c) 2024–present SusDevOS Ltd
+Change Date:          Two years from the date each version is first publicly
+                      distributed. For this initial release: 2027-01-01.
+Change License:       Apache License, Version 2.0
+
+For information about alternative licensing arrangements for the Licensed Work,
+please contact: hello@susdevos.com
+
+───────────────────────────────────────────────────────────────────────────────
+
+Grant of Rights
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor also grants you the right to make production use of the Licensed Work,
+provided that such use is not a Competing Use.
+
+Competing Use
+
+A "Competing Use" means making the Licensed Work available, directly or
+indirectly, to third parties as a software-as-a-service, hosted service,
+managed service, or any other service that substitutes for or competes with any
+SusDevOS product or service offered by the Licensor.
+
+Examples that are NOT a Competing Use (and are therefore permitted):
+  - Running SusDevOS for your own organisation's internal GHG reporting
+  - Self-hosting SusDevOS for a single client you are engaged by
+  - Building integrations, connectors, or tooling on top of SusDevOS
+  - Contributing to or forking SusDevOS for non-commercial or research purposes
+  - Running SusDevOS in a test, staging, or development environment
+
+Examples that ARE a Competing Use (and are therefore prohibited):
+  - Operating a multi-tenant GHG/ESG reporting platform that uses SusDevOS
+    code and charges customers for access
+  - Reselling or white-labelling SusDevOS as a managed service to clients
+
+Conditions
+
+The above grant of rights in this licence is conditional on you:
+
+1. Not removing or obscuring any licensing, copyright, or other notices in the
+   Licensed Work.
+
+2. Including this licence notice in all copies or substantial portions of the
+   Licensed Work.
+
+Termination
+
+If you use the Licensed Work in violation of these terms, your licence
+terminates automatically. If the Licensor notifies you of your violation and
+you cure the violation within 30 days, your licence is reinstated.
+
+No Warranty
+
+THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THE USE OR OTHER DEALINGS
+IN THE LICENSED WORK.
+
+───────────────────────────────────────────────────────────────────────────────
+
+After the Change Date
+
+On the Change Date (or two years after each version's release, whichever is
+later), the Licensed Work is automatically relicensed under the Apache License,
+Version 2.0. A copy of the Apache License is available at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+This means that on the Change Date, all restrictions on Competing Use
+disappear, and the Licensed Work becomes fully open source under Apache 2.0.

@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    // Python / Django
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.mypy-type-checker",
+    "charliermarsh.ruff",
+    "batisteo.vscode-django",
+
+    // JS / TS / Next.js
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+
+    // Docker
+    "ms-azuretools.vscode-docker",
+
+    // Git / DX
+    "eamodio.gitlens",
+    "github.copilot",
+
+    // REST testing (inline)
+    "humao.rest-client",
+
+    // Markdown
+    "yzhang.markdown-all-in-one"
+  ]
+}

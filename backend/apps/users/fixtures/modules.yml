@@ -1,0 +1,166 @@
+modules:
+  - key: entity_management
+    name: Entity Management
+    interfaces:
+      - key: view_entities
+        name: View Entities
+      - key: create_entity
+        name: Create Entity
+      - key: edit_entity
+        name: Edit Entity
+      - key: delete_entity
+        name: Delete Entity (Soft)
+      - key: manage_entity_api_keys
+        name: Manage API Keys
+
+  - key: user_management
+    name: User Management
+    interfaces:
+      - key: view_users
+        name: View Users
+      - key: create_user
+        name: Create User
+      - key: edit_user
+        name: Edit User
+      - key: delete_user
+        name: Delete User (Soft)
+      - key: manage_privileges
+        name: Manage User Privileges
+
+  - key: projects
+    name: Development Projects
+    interfaces:
+      - key: view_projects
+        name: View Projects
+      - key: create_project
+        name: Create Project
+      - key: edit_project
+        name: Edit Project
+      - key: delete_project
+        name: Delete Project
+      - key: manage_phases
+        name: Manage Phases
+
+  - key: land_parcels
+    name: Land Parcels
+    interfaces:
+      - key: view_land_parcels
+        name: View Land Parcels
+      - key: create_land_parcel
+        name: Create Land Parcel
+      - key: edit_land_parcel
+        name: Edit Land Parcel
+      - key: delete_land_parcel
+        name: Delete Land Parcel
+
+  - key: ecosystem
+    name: Ecosystem & Species
+    interfaces:
+      - key: view_ecosystem
+        name: View Ecosystem
+      - key: create_ecosystem
+        name: Create Ecosystem
+      - key: edit_ecosystem
+        name: Edit Ecosystem
+      - key: view_species
+        name: View Species
+      - key: create_species
+        name: Create Species
+      - key: edit_species
+        name: Edit Species
+
+  - key: tree_removals
+    name: Tree Removals
+    interfaces:
+      - key: view_tree_removals
+        name: View Tree Removals
+      - key: create_tree_removal
+        name: Create Tree Removal
+      - key: edit_tree_removal
+        name: Edit Tree Removal
+      - key: delete_tree_removal
+        name: Delete Tree Removal
+
+  - key: restorations
+    name: Restorations
+    interfaces:
+      - key: view_restorations
+        name: View Restorations
+      - key: create_restoration
+        name: Create Restoration
+      - key: edit_restoration
+        name: Edit Restoration
+      - key: delete_restoration
+        name: Delete Restoration
+
+  - key: emissions
+    name: Emissions
+    interfaces:
+      - key: view_emissions
+        name: View Emissions Records
+      - key: create_emissions
+        name: Create Emissions Record
+      - key: edit_emissions
+        name: Edit Emissions Record
+      - key: delete_emissions
+        name: Delete Emissions Record
+      - key: verify_emissions
+        name: Verify Emissions Record
+      - key: unlock_emissions
+        name: Unlock Verified Record (SuperAdmin)
+      - key: import_emissions
+        name: Bulk Import Emissions
+
+  - key: reports
+    name: Reports
+    interfaces:
+      - key: view_reports
+        name: View Reports
+      - key: generate_report
+        name: Generate Report
+
+  - key: blog
+    name: Blog
+    interfaces:
+      - key: view_blog
+        name: View Blog (CMS)
+      - key: create_blog_post
+        name: Create Blog Post
+      - key: edit_blog_post
+        name: Edit Blog Post
+      - key: publish_blog_post
+        name: Publish Blog Post
+
+  - key: notifications
+    name: Notifications
+    interfaces:
+      - key: view_notifications
+        name: View Notifications
+
+  - key: audit
+    name: Audit Logs
+    interfaces:
+      - key: view_audit_logs
+        name: View Audit Logs
+
+  - key: settings
+    name: Settings
+    interfaces:
+      - key: view_settings
+        name: View Settings
+      - key: edit_settings
+        name: Edit Settings
+
+roles:
+  - key: super_admin
+    name: SuperAdmin
+    description: Full system access. Bypasses all privilege checks.
+  - key: admin
+    name: Admin
+    description: Full access within their entity and related branches.
+  - key: manager
+    name: Manager
+    description: CRUD on all domain data; cannot verify emissions or manage entity settings.
+  - key: staff
+    name: Staff
+    description: CRUD on domain data; no user management or entity settings access.

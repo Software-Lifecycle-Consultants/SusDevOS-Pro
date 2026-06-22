@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django: runserver",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["runserver", "0.0.0.0:8000"],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.local",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "django": true,
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "name": "Django: shell",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["shell"],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.local"
+      },
+      "django": true,
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "name": "pytest (backend)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-x", "-v"],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.local"
+      },
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/backend"
+    }
+  ]
+}

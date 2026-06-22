@@ -1,0 +1,128 @@
+"""
+GHG inventory maintenance tasks.
+
+Nightly tasks that keep GHGInventory totals current and link milestone actuals.
+These run after business hours (01:00–01:30 UTC) to avoid contention.
+"""
+import logging
+from datetime import date, timedelta
+from decimal import Decimal
+
+from celery import shared_task
+from django.db import models
+from django.utils.timezone import now
+
+logger = logging.getLogger(__name__)
+
+
+@shared_task(name="tasks.emissions.recompute_stale_inventory_totals")
+def recompute_stale_inventory_totals():
+    """
+    Find GHGInventories whose scope totals haven't been recomputed in 24h
+    and refresh them. Catches any records that missed an inline invalidation.
+    """
+    from apps.emissions.models import EmissionsData, GHGInventories
+
+    stale_cutoff = now() - timedelta(hours=24)
+    # Inventories with no TotalsLastComputedAt field — recompute via NetEmissionsTonnes being null
+    stale = GHGInventories.objects.filter(
+        models.Q(NetEmissionsTonnes__isnull=True),
+        DeletedAt__isnull=True,
+        VerificationStatus__lt=3,  # don't touch verified inventories
+    )
+
+    updated = 0
+    errors = 0
+    for inventory in stale:
+        try:
+            _compute_inventory_totals(inventory)
+            updated += 1
+        except Exception as exc:
+            logger.error("Failed to recompute inventory %s: %s", inventory.InventoryId, exc)
+            errors += 1
+
+    logger.info(
+        "recompute_stale_inventory_totals: %d updated, %d errors",
+        updated, errors,
+    )
+    return {"updated": updated, "errors": errors}
+
+
+def _compute_inventory_totals(inventory):
+    """Aggregate EmissionsData records for the inventory's entity + year."""
+    from apps.emissions.models import EmissionsData, EmissionsOffsets
+
+    base_qs = EmissionsData.objects.filter(
+        EntityId=inventory.EntityId,
+        ReportingYear=inventory.ReportingYear,
+        Status__lt=4,
+    )
+
+    def _sum(scope, field="EmissionsAmountTonnes"):
+        result = base_qs.filter(Scope=scope).aggregate(t=models.Sum(field))["t"]
+        return Decimal(str(result or 0))
+
+    scope1  = _sum(1)
+    scope2l = _sum(2, "EmissionsAmountLocationBased") / Decimal("1000")
+    scope2m = _sum(2, "EmissionsAmountMarketBased")   / Decimal("1000")
+    scope3  = _sum(3)
+
+    offsets = EmissionsOffsets.objects.filter(
+        EntityId=inventory.EntityId,
+        Status__lt=4,
+    ).aggregate(t=models.Sum("OffsetAmountTonnes"))["t"]
+    total_offsets = Decimal(str(offsets or 0))
+
+    net = scope1 + scope2l + scope3 - total_offsets
+
+    inventory.TotalScope1Tonnes          = scope1
+    inventory.TotalScope2LocationTonnes  = scope2l
+    inventory.TotalScope2MarketTonnes    = scope2m
+    inventory.TotalScope3Tonnes          = scope3
+    inventory.TotalOffsetsTonnes         = total_offsets
+    inventory.NetEmissionsTonnes         = net
+    inventory.save(update_fields=[
+        "TotalScope1Tonnes", "TotalScope2LocationTonnes", "TotalScope2MarketTonnes",
+        "TotalScope3Tonnes", "TotalOffsetsTonnes", "NetEmissionsTonnes",
+    ])
+
+
+@shared_task(name="tasks.emissions.link_milestone_actuals")
+def link_milestone_actuals():
+    """
+    For each TargetMilestone where MilestoneYear has passed and actuals not yet linked,
+    find the matching GHGInventory and populate ActualEmissionsTonnes + IsAchieved.
+    """
+    from apps.emissions.models import GHGInventories, TargetMilestones
+
+    current_year = date.today().year
+
+    milestones = TargetMilestones.objects.filter(
+        MilestoneYear__lt=current_year,
+        ActualEmissionsTonnes__isnull=True,
+        Status__lt=4,
+    ).select_related("TargetId__EntityId")
+
+    linked = 0
+    for milestone in milestones:
+        entity = milestone.TargetId.EntityId
+
+        inventory = GHGInventories.objects.filter(
+            EntityId=entity,
+            ReportingYear=milestone.MilestoneYear,
+            NetEmissionsTonnes__isnull=False,
+        ).first()
+
+        if not inventory:
+            continue
+
+        actual = inventory.NetEmissionsTonnes or Decimal("0")
+        target = milestone.TargetEmissionsTonnes
+
+        milestone.ActualEmissionsTonnes = actual
+        milestone.IsAchieved = bool(target and actual <= target)
+        milestone.save(update_fields=["ActualEmissionsTonnes", "IsAchieved"])
+        linked += 1
+
+    logger.info("link_milestone_actuals: %d milestones linked", linked)
+    return {"linked": linked}
