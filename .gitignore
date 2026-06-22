@@ -65,6 +65,10 @@ htmlcov/
 # ── Docker ────────────────────────────────────────────────────────────────────
 docker-compose.override.yml
 
+# ── Production secrets (never commit) ────────────────────────────────────────
+backend/.env.prod
+nginx/ssl/dhparam.pem
+
 # ── IDEs ──────────────────────────────────────────────────────────────────────
 .vscode/settings.json
 .idea/

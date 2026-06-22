@@ -24,6 +24,12 @@ Role-specific guides covering the core workflows for each user type.
 | [Pricing](../spec/pricing.md) | Plan tiers, feature gate matrix |
 | [Compliance](../spec/compliance.md) | GDPR, Cyber Essentials, ISO 27001 roadmap |
 
+## Deployment
+
+| Document | Covers |
+|----------|--------|
+| [Deployment Guide](deployment.md) | Hetzner VPS setup, Docker Compose prod config, SSL, GitHub Actions deploy, backups, monitoring |
+
 ## Developer Setup
 
 See the main [README](../README.md) for Docker-based local setup, seed commands, and running tests.

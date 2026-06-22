@@ -1,0 +1,163 @@
+# Production Docker Compose — Hetzner VPS
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# First-time setup: see docs/deployment.md
+#
+# Environment: ./backend/.env.prod  (copy from backend/.env.prod.example)
+
+services:
+
+  # ── PostgreSQL + PostGIS ────────────────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    restart: always
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django API (gunicorn) ──────────────────────────────────────────────────
+  # CMD from Dockerfile: gunicorn 4 workers, gthread
+  # No bind mount: code is baked into the image at build time
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    env_file: ./backend/.env.prod
+    expose:
+      - "8000"
+    volumes:
+      - static_files:/app/staticfiles
+    depends_on:
+      db:    { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/schema/')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+
+  # ── Celery worker (default queue) ─────────────────────────────────────────
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    command: >
+      celery -A config.celery worker
+      -Q default
+      -c 4
+      --loglevel=warning
+    env_file: ./backend/.env.prod
+    depends_on:
+      db:    { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # ── Celery worker (integrations queue) ───────────────────────────────────
+  celery_integrations:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    command: >
+      celery -A config.celery worker
+      -Q integrations
+      -c 2
+      --loglevel=warning
+    env_file: ./backend/.env.prod
+    depends_on:
+      db:    { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # ── Celery worker (reports queue) ─────────────────────────────────────────
+  celery_reports:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    command: >
+      celery -A config.celery worker
+      -Q reports
+      -c 2
+      --max-tasks-per-child=10
+      --loglevel=warning
+    env_file: ./backend/.env.prod
+    depends_on:
+      db:    { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # ── Celery beat (scheduler) ───────────────────────────────────────────────
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    command: >
+      celery -A config.celery beat
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      --loglevel=warning
+    env_file: ./backend/.env.prod
+    depends_on:
+      db:    { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # ── Nginx (reverse proxy + SSL termination) ────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro        # dhparam.pem (generated on server)
+      - static_files:/var/www/static:ro      # Django collectstatic output
+      - certbot_www:/var/www/certbot:ro      # ACME challenge webroot
+      - certbot_certs:/etc/letsencrypt:ro    # Let's Encrypt certs
+    depends_on:
+      - api
+
+  # ── Certbot (Let's Encrypt) ────────────────────────────────────────────────
+  # First-time cert issuance — see docs/deployment.md §3
+  # Renewal handled by host cron (see docs/deployment.md §7)
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_files:
+  certbot_www:
+  certbot_certs:
