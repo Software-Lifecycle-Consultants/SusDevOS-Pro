@@ -208,6 +208,21 @@ These are enforced in the code and verified by tests. Do not break them:
 
 ---
 
+## User guides
+
+Role-themed guides covering the core workflows for each user type:
+
+| Guide | For |
+|-------|-----|
+| [Admin Guide](docs/user-guide-admin.md) | Entity setup, user management, inventory verification, billing |
+| [Sustainability Manager Guide](docs/user-guide-sustainability-manager.md) | GHG inventories, Scope 1/2/3, SBTi targets, offsets, CDP export |
+| [ESG Consultant Guide](docs/user-guide-esg-consultant.md) | Multi-client management, white-label reports, client portal (Agency plan) |
+| [Project Manager Guide](docs/user-guide-project-manager.md) | Projects, land parcels, ecosystem surveys, tree removals, restorations |
+
+See [docs/index.md](docs/index.md) for the full documentation index.
+
+---
+
 ## Specifications
 
 Full design specifications live in `spec/`:
