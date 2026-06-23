@@ -16,12 +16,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from rest_framework.filters import OrderingFilter, SearchFilter
+
 from apps.shared.views import TenantViewSetMixin
 from .models import (
+    EmissionFactorSets, EmissionFactors,
     EmissionsData, EmissionsDetails, EmissionsOffsets,
     GHGInventories, GwpDatasets, Targets, TargetMilestones,
 )
 from .serializers import (
+    EmissionFactorSetsSerializer, EmissionFactorsSerializer,
     EmissionsDataListSerializer, EmissionsDataSerializer,
     EmissionsDetailsSerializer, EmissionsOffsetsSerializer,
     GHGInventoriesSerializer, GwpDatasetsSerializer,
@@ -223,3 +227,64 @@ class TargetsViewSet(TenantViewSetMixin, ModelViewSet):
         m = s.save(TargetId=target, EntityId_id=request.entity_id,
                    CreatedBy=request.user.UserId)
         return Response(TargetMilestonesSerializer(m).data, status=status.HTTP_201_CREATED)
+
+
+# ── Emission factor library (global reference data — no tenant scope) ──────────
+
+class EmissionFactorSetsViewSet(ReadOnlyModelViewSet):
+    """
+    Read-only list of emission factor sets (DEFRA, EPA eGRID, Climatiq, etc.).
+    GET /api/emission-factor-sets/
+    """
+    queryset         = EmissionFactorSets.objects.filter(IsActive=True, Status=1)
+    serializer_class = EmissionFactorSetsSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field     = "SetId"
+    filter_backends  = [OrderingFilter]
+    ordering_fields  = ["SetName", "Publisher", "ApplicableYear"]
+    ordering         = ["-ApplicableYear", "SetName"]
+
+
+class EmissionFactorsViewSet(ReadOnlyModelViewSet):
+    """
+    Browsable emission factor library.
+
+    GET /api/emission-factors/
+    Supports:
+      ?search=       full-text search on ActivityName and ActivityCategory
+      ?scope=        filter by Scope (1, 2, 3)
+      ?scope3=       filter by Scope3Category (1–15)
+      ?set_id=       filter by EmissionFactorSets.SetId
+      ?gas=          filter by Gas (CO2, CH4, N2O …)
+      ?country=      filter by CountryCode (ISO2)
+      ?year=         filter by ApplicableYear
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class   = EmissionFactorsSerializer
+    lookup_field       = "FactorId"
+    filter_backends    = [SearchFilter, OrderingFilter]
+    search_fields      = ["ActivityName", "ActivityCategory"]
+    ordering_fields    = ["ActivityName", "FactorValue", "ApplicableYear"]
+    ordering           = ["ActivityName"]
+
+    def get_queryset(self):
+        qs = EmissionFactors.objects.filter(
+            Status=1,
+            SetId__IsActive=True,
+            SetId__Status=1,
+        ).select_related("SetId", "InputUnitId")
+
+        p = self.request.query_params
+        if p.get("scope"):
+            qs = qs.filter(Scope=p["scope"])
+        if p.get("scope3"):
+            qs = qs.filter(Scope3Category=p["scope3"])
+        if p.get("set_id"):
+            qs = qs.filter(SetId=p["set_id"])
+        if p.get("gas"):
+            qs = qs.filter(Gas__iexact=p["gas"])
+        if p.get("country"):
+            qs = qs.filter(CountryCode__iexact=p["country"])
+        if p.get("year"):
+            qs = qs.filter(ApplicableYear=p["year"])
+        return qs

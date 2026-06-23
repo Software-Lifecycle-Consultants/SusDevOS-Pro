@@ -1,8 +1,44 @@
 ﻿from rest_framework import serializers
 from .models import (
+    EmissionFactorSets, EmissionFactors,
     EmissionsData, EmissionsDetails, EmissionsOffsets,
     GwpDatasets, GwpValues, GHGInventories, Targets, TargetMilestones,
 )
+
+
+class EmissionFactorSetsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = EmissionFactorSets
+        fields = (
+            "SetId", "SetName", "Publisher", "Version",
+            "ApplicableYear", "GeographicScope", "IsActive",
+        )
+
+
+class EmissionFactorsSerializer(serializers.ModelSerializer):
+    unit          = serializers.SerializerMethodField()
+    set_name      = serializers.SerializerMethodField()
+    set_publisher = serializers.SerializerMethodField()
+
+    class Meta:
+        model  = EmissionFactors
+        fields = (
+            "FactorId", "SetId", "set_name", "set_publisher",
+            "ActivityName", "ActivityCategory",
+            "Scope", "Scope3Category",
+            "Gas", "GasSubtype",
+            "FactorValue", "unit",
+            "CountryCode", "ApplicableYear",
+        )
+
+    def get_unit(self, obj):
+        return obj.InputUnitId.UnitName if obj.InputUnitId_id else None
+
+    def get_set_name(self, obj):
+        return obj.SetId.SetName if obj.SetId_id else None
+
+    def get_set_publisher(self, obj):
+        return obj.SetId.Publisher if obj.SetId_id else None
 
 # Fields the server always computes — never writable from client
 CALCULATED_FIELDS = (

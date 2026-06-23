@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth";
 import axiosInstance from "@/lib/axios-instance";
 import { EmptyState } from "@/components/EmptyState";
+import { EFPicker, type EmissionFactor } from "@/components/emissions/EFPicker";
 
 interface EmissionsRecord {
   EmissionsId:           number;
@@ -33,11 +34,11 @@ const GWP_DATASET_ID = 1; // IPCC AR6 — seeded on first deploy
 function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; entityId: number }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
-    Title: "", Scope: "1", QuantityOrCost: "", Unit: "litres",
-    EmissionFactor: "", EmissionFactorSource: "DEFRA 2024",
+    Title: "", Scope: "1", QuantityOrCost: "", Unit: "",
     Gas: "CO2", GasSubtype: "", Scope3Category: "",
     ReportingYear: String(new Date().getFullYear()),
   });
+  const [selectedEF, setSelectedEF] = useState<EmissionFactor | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
@@ -63,21 +64,37 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
 
   function set(k: string, v: string) { setForm((f) => ({ ...f, [k]: v })); }
 
+  function handleEFSelect(ef: EmissionFactor | null) {
+    setSelectedEF(ef);
+    if (ef) {
+      setForm((f) => ({
+        ...f,
+        Gas:      ef.Gas,
+        GasSubtype: ef.GasSubtype ?? "",
+        Unit:     ef.unit ?? f.Unit,
+        Scope:    String(ef.Scope),
+        Scope3Category: ef.Scope3Category ? String(ef.Scope3Category) : f.Scope3Category,
+      }));
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!selectedEF) { setError("Please select an emission factor from the library."); return; }
     mutation.mutate({
-      Title:               form.Title,
-      Scope:               Number(form.Scope),
-      QuantityOrCost:      form.QuantityOrCost,
-      Unit:                form.Unit,
-      EmissionFactor:      form.EmissionFactor,
-      EmissionFactorSource: form.EmissionFactorSource,
-      Gas:                 form.Gas,
-      GasSubtype:          form.GasSubtype || null,
-      Scope3Category:      form.Scope === "3" && form.Scope3Category ? Number(form.Scope3Category) : null,
-      ReportingYear:       form.ReportingYear ? Number(form.ReportingYear) : null,
-      GwpDatasetId:        GWP_DATASET_ID,
+      Title:                form.Title,
+      Scope:                Number(form.Scope),
+      QuantityOrCost:       form.QuantityOrCost,
+      Unit:                 form.Unit || selectedEF.unit || "unit",
+      EmissionFactor:       selectedEF.FactorValue,
+      EmissionFactorSource: `${selectedEF.set_name}${selectedEF.ApplicableYear ? ` ${selectedEF.ApplicableYear}` : ""}`,
+      EmissionFactorId:     selectedEF.FactorId,
+      Gas:                  form.Gas,
+      GasSubtype:           form.GasSubtype || null,
+      Scope3Category:       form.Scope === "3" && form.Scope3Category ? Number(form.Scope3Category) : null,
+      ReportingYear:        form.ReportingYear ? Number(form.ReportingYear) : null,
+      GwpDatasetId:         GWP_DATASET_ID,
     });
   }
 
@@ -139,37 +156,22 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label mb-1">Emission factor (kg CO₂e/unit)</label>
-              <input className="input" type="number" step="any" required
-                value={form.EmissionFactor} onChange={(e) => set("EmissionFactor", e.target.value)} />
-            </div>
-            <div>
-              <label className="label mb-1">Factor source</label>
-              <input className="input" value={form.EmissionFactorSource}
-                onChange={(e) => set("EmissionFactorSource", e.target.value)} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label mb-1">Gas</label>
-              <select className="input" value={form.Gas} onChange={(e) => set("Gas", e.target.value)}>
-                {["CO2","CH4","N2O","SF6","HFC-134a","HFC-32","NF3"].map((g) => (
-                  <option key={g}>{g}</option>
-                ))}
-              </select>
-            </div>
-            {(form.Gas === "CH4") && (
-              <div>
-                <label className="label mb-1">Gas subtype</label>
-                <select className="input" value={form.GasSubtype} onChange={(e) => set("GasSubtype", e.target.value)}>
-                  <option value="">— select —</option>
-                  <option value="fossil">Fossil</option>
-                  <option value="biogenic">Biogenic</option>
-                </select>
-              </div>
+          <div>
+            <label className="label mb-1">
+              Emission factor
+              <span className="ml-1 text-surface-400 font-normal text-xs">(kg CO₂e/unit)</span>
+            </label>
+            <EFPicker
+              scope={form.Scope ? Number(form.Scope) : undefined}
+              value={selectedEF}
+              onChange={handleEFSelect}
+            />
+            {selectedEF && (
+              <p className="mt-1 text-xs text-surface-400">
+                Gas: <span className="font-medium text-surface-600">{selectedEF.Gas}</span>
+                {selectedEF.GasSubtype && ` (${selectedEF.GasSubtype})`}
+                {" · "}Value: <span className="font-mono font-medium text-surface-600">{selectedEF.FactorValue}</span>
+              </p>
             )}
           </div>
 
