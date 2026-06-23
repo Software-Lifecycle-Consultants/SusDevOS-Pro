@@ -15,14 +15,16 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { href: "/dashboard",    label: "Dashboard",   icon: "📊" },
-  { href: "/emissions",    label: "Emissions",   icon: "🏭" },
-  { href: "/inventories",  label: "Inventories", icon: "📋" },
-  { href: "/projects",     label: "Projects",    icon: "📁" },
-  { href: "/ecosystem",    label: "Ecosystem",   icon: "🌿" },
-  { href: "/targets",      label: "Targets",     icon: "🎯" },
-  { href: "/reports",      label: "Reports",     icon: "📄" },
-  { href: "/settings",     label: "Settings",    icon: "⚙️" },
+  { href: "/dashboard",    label: "Dashboard",    icon: "📊" },
+  { href: "/emissions",    label: "Emissions",    icon: "🏭" },
+  { href: "/inventories",  label: "Inventories",  icon: "📋" },
+  { href: "/targets",      label: "Targets",      icon: "🎯" },
+  { href: "/projects",     label: "Projects",     icon: "📁" },
+  { href: "/land-parcels", label: "Land Parcels", icon: "🗺️" },
+  { href: "/ecosystem",    label: "Ecosystem",    icon: "🌿" },
+  { href: "/restorations", label: "Restorations", icon: "🌳" },
+  { href: "/reports",      label: "Reports",      icon: "📄" },
+  { href: "/settings",     label: "Settings",     icon: "⚙️" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
