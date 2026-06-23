@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, ChevronDown, ChevronRight, X, TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, X, TrendingDown } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
 import { useAuthStore } from "@/store/auth";
 

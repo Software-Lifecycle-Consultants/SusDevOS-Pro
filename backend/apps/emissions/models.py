@@ -10,8 +10,6 @@ Critical rules (CLAUDE.md):
   3. Scope 2 requires both location-based and market-based methods.
   4. VerificationStatus >= 3 -> immutable (enforced in serializer).
 """
-from decimal import Decimal
-
 from django.db import models
 
 from apps.shared.models import BaseAuditMixin

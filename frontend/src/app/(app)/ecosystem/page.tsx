@@ -178,7 +178,7 @@ function CreateSpeciesModal({ onClose, entityId }: { onClose: () => void; entity
             </div>
             <div>
               <label className="label mb-1">Scientific name</label>
-              <input className="input" placeholder="Tyto alba" className="input italic"
+              <input className="input italic" placeholder="Tyto alba"
                 value={form.ScientificName} onChange={(e) => set("ScientificName", e.target.value)} />
             </div>
           </div>

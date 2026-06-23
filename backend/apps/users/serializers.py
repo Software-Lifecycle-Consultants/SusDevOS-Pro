@@ -1,10 +1,5 @@
 """Auth serializers for SusDevOS."""
-import uuid
-from datetime import timedelta
-
 from django.contrib.auth import authenticate
-from django.conf import settings
-from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 
