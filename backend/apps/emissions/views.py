@@ -174,6 +174,30 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class EmissionsOffsetsViewSet(TenantViewSetMixin, ModelViewSet):
+    """
+    Standalone offset management — GET /api/emissions-offsets/
+    Lists all offsets for the entity regardless of which emissions record they
+    belong to, so the sustainability manager has a single place to review them.
+    The nested actions on EmissionsDataViewSet remain for record-level access.
+    """
+    queryset         = EmissionsOffsets.objects.all()
+    serializer_class = EmissionsOffsetsSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field     = "OffsetId"
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def perform_create(self, serializer):
+        serializer.save(
+            EntityId_id = self.request.entity_id,
+            CreatedBy   = self.request.user.UserId,
+        )
+
+    def perform_destroy(self, instance):
+        instance.Status = 4
+        instance.save()
+
+
 class GwpDatasetsViewSet(ReadOnlyModelViewSet):
     """GWP datasets are read-only — seeded, not user-created."""
     queryset = GwpDatasets.objects.filter(Status=1)
