@@ -95,11 +95,8 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         if instance.VerificationStatus >= VERIFIED:
             return Response({"code": "already_verified", "detail": "Already verified."},
                             status=status.HTTP_400_BAD_REQUEST)
-        instance.VerificationStatus = VERIFIED
-        instance.VerifiedBy = request.user
-        instance.VerifiedAt = timezone.now()
-        instance.VerificationNotes = request.data.get("notes", "")
-        instance.save()
+        from apps.emissions.services import verify_record
+        verify_record(instance, verified_by=request.user, notes=request.data.get("notes", ""))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # ── Unlock (SuperAdmin only) ───────────────────────────────────────────────
@@ -116,20 +113,8 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             return Response({"code": "reason_required",
                              "detail": "A reason is required to unlock a verified record."},
                             status=status.HTTP_400_BAD_REQUEST)
-        instance.VerificationStatus = 1
-        instance.save()
-        # Write mandatory audit log entry
-        from apps.shared.models import AuditLog
-        AuditLog.objects.create(
-            EntityId_id=request.entity_id,
-            ChangedBy=request.user,
-            ChangedByUsername=request.user.username,
-            Action="Unlock_Verified",
-            TableName="emissions_data",
-            RecordId=instance.EmissionsId,
-            Description=f"Unlocked verified record. Reason: {reason}",
-            RetentionTier=3,  # 7-year regulatory retention
-        )
+        from apps.emissions.services import unlock_record
+        unlock_record(instance, reason=reason, unlocked_by=request.user, entity_id=request.entity_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # ── Details (line items) ───────────────────────────────────────────────────

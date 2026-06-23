@@ -1,7 +1,4 @@
-﻿import hashlib
-import secrets
-
-from django.shortcuts import get_object_or_404
+﻿from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -177,32 +174,21 @@ class EntitiesViewSet(ModelViewSet):
             )
             return Response(ApiKeyListSerializer(keys, many=True).data)
 
-        # Generate key — raw value returned once, never stored
-        raw_key = secrets.token_urlsafe(32)
-        hashed  = hashlib.sha256(raw_key.encode()).hexdigest()
-        prefix  = raw_key[:8]
-
-        key = EntityApiKeys.objects.create(
-            EntityId=entity.EntityId,
-            HashedApiKey=hashed,
-            KeyPrefix=prefix,
-            ExpiryDate=request.data.get("ExpiryDate"),
-            AuthorizedByFor=request.data.get("AuthorizedByFor", ""),
-            CreatedBy=request.user.UserId,
+        from apps.entities.services import generate_api_key
+        result = generate_api_key(
+            entity          = entity,
+            created_by_user_id = request.user.UserId,
+            name            = request.data.get("AuthorizedByFor", ""),
+            expiry_date     = request.data.get("ExpiryDate"),
         )
-        EntityApiKeysIntermediary.objects.create(EntityId=entity, ApiKeyId=key)
-        return Response(
-            {"ApiKeyId": key.ApiKeyId, "KeyPrefix": prefix, "RawKey": raw_key,
-             "ExpiryDate": key.ExpiryDate},
-            status=status.HTTP_201_CREATED,
-        )
+        return Response(result, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["delete"], url_path=r"api-keys/(?P<key_id>\d+)")
     def revoke_api_key(self, request, pk=None, key_id=None):
+        from apps.entities.services import revoke_api_key
         entity = self.get_object()
         key = get_object_or_404(EntityApiKeys, ApiKeyId=key_id, entity_links__EntityId=entity)
-        key.Status = 4
-        key.save()
+        revoke_api_key(key=key)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # ── Settings ──────────────────────────────────────────────────────────────

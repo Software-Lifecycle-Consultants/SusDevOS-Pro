@@ -176,38 +176,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        from .models import Roles, UserRoles, PasswordResetTokens
-        from django.conf import settings
-        from django.core.mail import send_mail
-        from django.utils import timezone
-        from datetime import timedelta
-        import secrets
-
-        role_key = validated_data.pop("role_key")
+        from apps.users.services import invite_user
+        role_key  = validated_data.pop("role_key")
         entity_id = self.context["request"].entity_id
-
-        user = Users.objects.create_user(
-            password=secrets.token_urlsafe(32),
-            EntityId_id=entity_id,
-            **validated_data,
+        return invite_user(
+            entity_id   = entity_id,
+            email       = validated_data["email"],
+            username    = validated_data.get("username", validated_data["email"].split("@")[0]),
+            first_name  = validated_data.get("FirstName", ""),
+            last_name   = validated_data.get("LastName", ""),
+            designation = validated_data.get("Designation"),
+            role_key    = role_key,
         )
-        role = Roles.objects.filter(RoleKey=role_key).first()
-        if role:
-            UserRoles.objects.create(UserId=user, RoleId=role)
-
-        token = PasswordResetTokens.objects.create(
-            UserId=user,
-            ExpiresAt=timezone.now() + timedelta(days=7),
-        )
-        onboard_url = f"{settings.ONBOARDING_URL}?token={token.Token}"
-        send_mail(
-            subject="You've been invited to SusDevOS",
-            message=f"Set up your account:\n\n{onboard_url}",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=True,
-        )
-        return user
 
 
 class SignupSerializer(serializers.Serializer):
@@ -238,81 +218,15 @@ class SignupSerializer(serializers.Serializer):
             )
         return value
 
-    @staticmethod
-    def _unique_username(base: str) -> str:
-        """Derive a unique username from the email local-part."""
-        import random, string
-        username = base[:50]
-        if not Users.objects.filter(username=username).exists():
-            return username
-        for _ in range(10):
-            suffix = "".join(random.choices(string.digits, k=4))
-            candidate = f"{base[:45]}_{suffix}"
-            if not Users.objects.filter(username=candidate).exists():
-                return candidate
-        return f"{base[:40]}_{uuid.uuid4().hex[:8]}"
-
-    @transaction.atomic
     def create(self, validated_data):
-        from apps.entities.models import Entities
-        from apps.billing.models import EntitySubscriptions, Plans
-        from .models import Roles, UserRoles
-
-        email        = validated_data["email"]
-        first_name   = validated_data["first_name"]
-        last_name    = validated_data["last_name"]
-        company_name = validated_data["company_name"]
-        password     = validated_data["password"]
-
-        # 1. Entity
-        entity = Entities.objects.create(EntityName=company_name)
-
-        # 2. User — active immediately (no invite flow)
-        base_username = email.split("@")[0]
-        user = Users(
-            email       = email,
-            username    = self._unique_username(base_username),
-            FirstName   = first_name,
-            LastName    = last_name,
-            EntityId_id = entity.EntityId,
-            is_active   = True,
+        from apps.users.services import register_new_entity
+        return register_new_entity(
+            first_name   = validated_data["first_name"],
+            last_name    = validated_data["last_name"],
+            email        = validated_data["email"],
+            company_name = validated_data["company_name"],
+            password     = validated_data["password"],
         )
-        user.set_password(password)
-        user.save()
-
-        # 3. Role — Admin of their own entity
-        admin_role = Roles.objects.filter(RoleKey="admin", Status=1).first()
-        if admin_role:
-            UserRoles.objects.create(UserId=user, RoleId=admin_role)
-
-        # 4. Free plan subscription
-        free_plan = Plans.objects.filter(PlanKey="free").first()
-        if free_plan:
-            EntitySubscriptions.objects.create(
-                EntityId_id = entity.EntityId,
-                PlanId      = free_plan,
-                Status      = "active",
-            )
-
-        # 5. Welcome email (fire-and-forget — failure must not abort signup)
-        try:
-            from django.core.mail import send_mail
-            send_mail(
-                subject    = "Welcome to SusDevOS",
-                message    = (
-                    f"Hi {first_name},\n\n"
-                    "Your SusDevOS account is ready. You're on the Free plan — "
-                    "you can upgrade any time from Settings → Billing.\n\n"
-                    f"{getattr(settings, 'SITE_URL', 'https://susdevos.com')}/dashboard"
-                ),
-                from_email = settings.DEFAULT_FROM_EMAIL,
-                recipient_list = [email],
-                fail_silently  = True,
-            )
-        except Exception:
-            pass
-
-        return user
 
 
 class MeUpdateSerializer(serializers.ModelSerializer):

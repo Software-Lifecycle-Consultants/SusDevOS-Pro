@@ -30,39 +30,23 @@ class FeatureGateMixin:
             self._check_feature_gate(request)
 
     def _check_feature_gate(self, request):
-        user = request.user
-        if getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+        if getattr(request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             return
 
         entity_id = getattr(request, "entity_id", None)
         if not entity_id:
             self._deny(self.required_feature)
 
-        from apps.billing.models import EntitySubscriptions, PlanFeatures
-        try:
-            sub = EntitySubscriptions.objects.get(EntityId_id=entity_id, Status="active")
-        except EntitySubscriptions.DoesNotExist:
-            self._deny(self.required_feature)
-
-        enabled = PlanFeatures.objects.filter(
-            PlanId=sub.PlanId,
-            FeatureKey=self.required_feature,
-            IsEnabled=True,
-        ).exists()
-        if not enabled:
+        from apps.billing.services import is_feature_enabled
+        if not is_feature_enabled(entity_id=entity_id, feature_key=self.required_feature):
             self._deny(self.required_feature)
 
     def _deny(self, feature_key: str):
-        from rest_framework.exceptions import PermissionDenied
-
-        # Get the upgrade message from the plan features table if available
-        from apps.billing.models import PlanFeatures
-        feature = PlanFeatures.objects.filter(
-            FeatureKey=feature_key
-        ).order_by("PlanId").first()
-        message = feature.UpgradeMessage if feature else f"Feature '{feature_key}' requires a higher plan."
-
-        raise FeatureGatedException(feature_key=feature_key, message=message)
+        from apps.billing.services import get_upgrade_message
+        raise FeatureGatedException(
+            feature_key = feature_key,
+            message     = get_upgrade_message(feature_key=feature_key),
+        )
 
 
 class FeatureGatedException(Exception):

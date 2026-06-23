@@ -257,36 +257,9 @@ class EmissionsData(BaseAuditMixin):
         ]
 
     def save(self, *args, **kwargs):
-        if self.QuantityOrCost is not None and self.EmissionFactor is not None:
-            self._apply_unit_conversion()
-            self._compute_emissions()
+        from apps.emissions.services import compute_emissions
+        compute_emissions(self)
         super().save(*args, **kwargs)
-
-    def _apply_unit_conversion(self):
-        if self.InputUnitId_id and self.InputUnitId and self.InputUnitId.ConversionFactor:
-            self.QuantityCanonical = self.QuantityOrCost * self.InputUnitId.ConversionFactor
-        else:
-            self.QuantityCanonical = self.QuantityOrCost
-
-    def _compute_emissions(self):
-        qty = self.QuantityCanonical or self.QuantityOrCost
-        ef = self.EmissionFactor
-        gwp = self._get_gwp_factor()
-        kg = qty * ef * gwp
-        self.EmissionsAmount = kg.quantize(Decimal("0.0001"))
-        self.EmissionsAmountTonnes = (kg / Decimal("1000")).quantize(Decimal("0.000001"))
-        if self.Scope == 2:
-            self.EmissionsAmountLocationBased = self.EmissionsAmount
-            if self.EmissionsAmountMarketBased is None:
-                self.EmissionsAmountMarketBased = self.EmissionsAmount
-
-    def _get_gwp_factor(self) -> Decimal:
-        try:
-            return self.GwpDatasetId.gwp_values.get(
-                Gas=self.Gas, GasSubtype=self.GasSubtype or None
-            ).GwpFactor
-        except Exception:
-            return Decimal("1")
 
     def __str__(self):
         return self.Title
