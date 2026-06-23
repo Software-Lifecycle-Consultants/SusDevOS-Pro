@@ -31,8 +31,33 @@ from .serializers import (
     LoginSerializer,
     OnboardSerializer,
     ResetPasswordSerializer,
+    SignupSerializer,
     UserProfileSerializer,
 )
+
+
+class SignupView(APIView):
+    """
+    POST /api/auth/signup
+    Self-service registration: creates Entity + User + Free plan subscription.
+    Returns an access token and sets the refresh cookie — user is logged in immediately.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = SignupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        access, refresh = issue_tokens(user)
+        user_data = UserProfileSerializer(user).data
+
+        response = Response(
+            {"access_token": access, "user": user_data},
+            status=status.HTTP_201_CREATED,
+        )
+        set_refresh_cookie(response, refresh)
+        return response
 
 
 class LoginView(APIView):

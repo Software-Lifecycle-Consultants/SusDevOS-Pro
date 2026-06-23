@@ -188,3 +188,92 @@ class TestResetPassword:
             "new_password": "SomeNewPass99!",
         })
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestSignup:
+    URL = "/api/auth/signup"
+
+    @pytest.fixture(autouse=True)
+    def seed_required_data(self, db):
+        """Ensure Free plan and Admin role exist (idempotent with seed commands)."""
+        from apps.billing.models import Plans
+        from apps.users.models import Roles
+
+        Plans.objects.get_or_create(
+            PlanKey="free",
+            defaults={
+                "PlanName": "Free", "PriceMonthlyGBP": 0, "PriceAnnualGBP": 0,
+                "MaxEntities": 1, "MaxUsersPerEntity": 1, "MaxReportingYears": 1,
+                "SupportTier": "docs",
+            },
+        )
+        Roles.objects.get_or_create(
+            RoleKey="admin",
+            defaults={"RoleName": "Admin", "Description": "Organisation admin"},
+        )
+
+    VALID = {
+        "first_name":     "Alice",
+        "last_name":      "Green",
+        "email":          "alice@newco.com",
+        "company_name":   "NewCo Ltd",
+        "password":       "SecurePass99!",
+        "accepted_terms": True,
+    }
+
+    def test_creates_entity_user_and_subscription(self, db):
+        from apps.entities.models import Entities
+        from apps.billing.models import EntitySubscriptions
+        from apps.users.models import Users
+
+        resp = APIClient().post(self.URL, self.VALID)
+        assert resp.status_code == 201
+        assert "access_token" in resp.data
+
+        user = Users.objects.get(email="alice@newco.com")
+        assert user.FirstName == "Alice"
+        assert user.is_active is True
+        assert Entities.objects.filter(EntityName="NewCo Ltd").exists()
+        assert EntitySubscriptions.objects.filter(EntityId_id=user.EntityId_id).exists()
+
+    def test_response_sets_refresh_cookie(self, db):
+        resp = APIClient().post(self.URL, self.VALID)
+        assert resp.status_code == 201
+        assert "refresh_token" in resp.cookies
+
+    def test_user_gets_admin_role(self, db):
+        from apps.users.models import Users
+        APIClient().post(self.URL, self.VALID)
+        user = Users.objects.get(email="alice@newco.com")
+        role = user.user_roles.filter(Status=1).select_related("RoleId").first()
+        assert role is not None
+        assert role.RoleId.RoleKey == "admin"
+
+    def test_subscription_is_free_plan(self, db):
+        from apps.users.models import Users
+        from apps.billing.models import EntitySubscriptions
+        APIClient().post(self.URL, self.VALID)
+        user = Users.objects.get(email="alice@newco.com")
+        sub = EntitySubscriptions.objects.get(EntityId_id=user.EntityId_id)
+        assert sub.PlanId.PlanKey == "free"
+        assert sub.Status == "active"
+
+    def test_duplicate_email_rejected(self, db):
+        APIClient().post(self.URL, self.VALID)
+        resp = APIClient().post(self.URL, self.VALID)
+        assert resp.status_code == 400
+
+    def test_terms_not_accepted_rejected(self, db):
+        payload = {**self.VALID, "email": "b@test.com", "accepted_terms": False}
+        resp = APIClient().post(self.URL, payload)
+        assert resp.status_code == 400
+
+    def test_short_password_rejected(self, db):
+        payload = {**self.VALID, "email": "c@test.com", "password": "short"}
+        resp = APIClient().post(self.URL, payload)
+        assert resp.status_code == 400
+
+    def test_missing_fields_rejected(self, db):
+        resp = APIClient().post(self.URL, {"email": "d@test.com", "password": "SecurePass99!"})
+        assert resp.status_code == 400
