@@ -1,4 +1,4 @@
-# Production Docker Compose — Hetzner VPS
+# Production Docker Compose — Contabo VPS (susdevos.com)
 #
 # Usage:
 #   docker compose -f docker-compose.prod.yml up -d
@@ -130,6 +130,23 @@ services:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
 
+  # ── Next.js frontend ─────────────────────────────────────────────────────────
+  nextjs:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL:  ${NEXT_PUBLIC_API_URL:-http://api:8000}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://susdevos.com}
+    restart: always
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      api:
+        condition: service_healthy
+
   # ── Nginx (reverse proxy + SSL termination) ────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
@@ -145,6 +162,7 @@ services:
       - certbot_certs:/etc/letsencrypt:ro    # Let's Encrypt certs
     depends_on:
       - api
+      - nextjs
 
   # ── Certbot (Let's Encrypt) ────────────────────────────────────────────────
   # First-time cert issuance — see docs/deployment.md §3

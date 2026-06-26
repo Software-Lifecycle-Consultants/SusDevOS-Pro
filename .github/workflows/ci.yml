@@ -144,6 +144,18 @@ jobs:
           cache-from: type=gha
           cache-to:   type=gha,mode=max
 
+      - name: Build frontend image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          tags: susdevos-web:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://api:8000
+            NEXT_PUBLIC_SITE_URL=https://susdevos.com
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+
   # ── Deploy to VPS ──────────────────────────────────────────────────────────
   deploy:
     name: Deploy to VPS
@@ -167,13 +179,13 @@ jobs:
             echo "==> Pulling latest code"
             git pull origin main
 
-            echo "==> Rebuilding app image"
+            echo "==> Rebuilding app images"
             docker compose -f docker-compose.prod.yml build \
-              api celery_worker celery_integrations celery_reports celery_beat
+              api celery_worker celery_integrations celery_reports celery_beat nextjs
 
             echo "==> Restarting app services (DB and Redis untouched)"
             docker compose -f docker-compose.prod.yml up -d --no-deps \
-              api celery_worker celery_integrations celery_reports celery_beat
+              api celery_worker celery_integrations celery_reports celery_beat nextjs
 
             echo "==> Waiting for API to become healthy"
             timeout 60 sh -c \

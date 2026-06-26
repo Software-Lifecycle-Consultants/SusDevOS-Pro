@@ -9,6 +9,8 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone", // produces .next/standalone/server.js for Docker
+
   async rewrites() {
     return [
       {
