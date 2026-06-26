@@ -1,13 +1,25 @@
-﻿from django.utils import timezone
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Blogs
 from .serializers import BlogsDetailSerializer, BlogsListSerializer, PublicBlogSerializer
+
+
+class PublicReadThrottle(AnonRateThrottle):
+    """
+    Permissive throttle for public read-only endpoints.
+    Allows search engines and legitimate readers without tripping the
+    tighter global anon limit (10/min in production).
+    """
+    scope = "public_read"
 
 
 class BlogsViewSet(ModelViewSet):
@@ -58,23 +70,34 @@ class BlogsViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# ── Public (no auth) ───────────────────────────────────────────────────────────
+# ── Public (no auth) ──────────────────────────────────────────────────────────
+
+BLOG_CACHE_SECONDS = 300  # 5 minutes
+
 
 class PublicBlogListView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes   = [PublicReadThrottle]
 
+    @method_decorator(cache_page(BLOG_CACHE_SECONDS))
     def get(self, request):
         posts = Blogs.objects.filter(BlogStatus=2, Status__lt=4).order_by("-PublishedAt")
-        return Response(PublicBlogSerializer(posts, many=True).data)
+        response = Response(PublicBlogSerializer(posts, many=True).data)
+        response["Cache-Control"] = f"public, max-age={BLOG_CACHE_SECONDS}, stale-while-revalidate=3600"
+        return response
 
 
 class PublicBlogDetailView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes   = [PublicReadThrottle]
 
+    @method_decorator(cache_page(BLOG_CACHE_SECONDS))
     def get(self, request, slug):
         try:
             post = Blogs.objects.get(Slug=slug, BlogStatus=2, Status__lt=4)
         except Blogs.DoesNotExist:
             return Response({"code": "not_found", "detail": "Post not found."},
                             status=status.HTTP_404_NOT_FOUND)
-        return Response(PublicBlogSerializer(post).data)
+        response = Response(PublicBlogSerializer(post).data)
+        response["Cache-Control"] = f"public, max-age={BLOG_CACHE_SECONDS}, stale-while-revalidate=86400"
+        return response

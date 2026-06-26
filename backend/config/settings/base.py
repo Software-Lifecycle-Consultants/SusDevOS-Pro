@@ -149,6 +149,12 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "apps.shared.exceptions.custom_exception_handler",
+    # Base throttle rates (production.py overrides anon/user and adds production limits)
+    "DEFAULT_THROTTLE_RATES": {
+        "anon":        "60/min",   # production.py tightens this to 10/min
+        "user":        "300/min",  # production.py tightens this to 100/min
+        "public_read": "60/min",   # public blog/sitemap — permissive for crawlers
+    },
 }
 
 # ── JWT ───────────────────────────────────────────────────────────────────────

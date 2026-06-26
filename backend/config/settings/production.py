@@ -51,7 +51,7 @@ EMAIL_BACKEND = config(  # noqa: F405
 # ── Logging ───────────────────────────────────────────────────────────────────
 
 try:
-    import pythonjsonlogger  # noqa: F401
+    import pythonjsonlogger  # noqa: F401  # type: ignore[import-untyped]
     _LOG_FORMATTER = "json"
     _LOG_FORMATTER_CONFIG = {
         "json": {
@@ -98,8 +98,9 @@ REST_FRAMEWORK.update({  # noqa: F405
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": config("RATE_LIMIT_UNAUTHENTICATED", default="10/min"),  # noqa: F405
-        "user": config("RATE_LIMIT_AUTHENTICATED",   default="100/min"),  # noqa: F405
+        "anon":        config("RATE_LIMIT_UNAUTHENTICATED", default="10/min"),   # noqa: F405
+        "user":        config("RATE_LIMIT_AUTHENTICATED",   default="100/min"),  # noqa: F405
+        "public_read": config("RATE_LIMIT_PUBLIC_READ",     default="60/min"),   # noqa: F405 — crawlers + readers
     },
 })
 

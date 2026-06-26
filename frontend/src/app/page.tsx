@@ -10,19 +10,68 @@ import { Footer }          from "@/components/marketing/Footer";
 import { FeatureTabs }     from "@/components/marketing/FeatureTabs";
 import { CarbonEstimator } from "@/components/marketing/CarbonEstimator";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://susdevos.com";
+
 export const metadata: Metadata = {
   title: "SusDevOS — GHG Reporting & Ecosystem Tracking for Development Projects",
   description:
     "Calculate your Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate GHG Protocol-conformant reports. Free to start. Built for SBTi, CDP and TNFD.",
   keywords:
     "GHG reporting software, carbon footprint calculator, Scope 3 emissions, SBTi target tracking, TNFD biodiversity, emissions inventory",
+  alternates: {
+    canonical: SITE_URL,
+    types: { "application/rss+xml": `${SITE_URL}/rss.xml` },
+  },
   openGraph: {
     title:       "SusDevOS — GHG Reporting & Ecosystem Tracking",
     description: "Calculate Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate audit-ready GHG reports. Free to start.",
     type:        "website",
-    url:         "https://susdevos.com",
+    url:         SITE_URL,
+    siteName:    "SusDevOS",
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "SusDevOS — GHG Reporting & Ecosystem Tracking",
+    description: "Calculate Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate audit-ready GHG reports.",
   },
 };
+
+function OrganizationJsonLd() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type":       "Organization",
+        "@id":         `${SITE_URL}/#organization`,
+        "name":        "SusDevOS",
+        "url":         SITE_URL,
+        "description": "GHG reporting and ecosystem tracking software built on GHG Protocol, SBTi, CDP and TNFD.",
+        "sameAs": [
+          "https://linkedin.com/company/susdevos",
+          "https://github.com/susdevos",
+        ],
+      },
+      {
+        "@type":           "WebSite",
+        "@id":             `${SITE_URL}/#website`,
+        "url":             SITE_URL,
+        "name":            "SusDevOS",
+        "publisher":       { "@id": `${SITE_URL}/#organization` },
+        "potentialAction": {
+          "@type":       "SearchAction",
+          "target":      { "@type": "EntryPoint", "urlTemplate": `${SITE_URL}/blog?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hero
@@ -755,6 +804,7 @@ function CTABanner() {
 export default function HomePage() {
   return (
     <>
+      <OrganizationJsonLd />
       <NavBar />
       <main>
         <Hero />
