@@ -173,9 +173,9 @@ function RegisterForm() {
           {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
         </div>
 
-        {/* Company */}
+        {/* Organisation */}
         <div>
-          <label htmlFor="company_name" className="label mb-1">Company name</label>
+          <label htmlFor="company_name" className="label mb-1">Organisation name</label>
           <input
             id="company_name"
             type="text"

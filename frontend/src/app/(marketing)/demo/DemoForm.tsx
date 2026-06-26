@@ -4,13 +4,16 @@ import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 const ROLES = [
+  "Ecologist / Environmental Scientist",
+  "Land Manager / Land Agent",
+  "Conservation Manager",
+  "Development Project Manager",
+  "Project Director (Restoration / Development)",
   "Sustainability Manager / ESG Lead",
   "ESG Consultant",
-  "Development Project Manager",
-  "Finance / CFO",
-  "Head of Reporting",
-  "IT / Data",
   "C-Suite / Director",
+  "IT / Data",
+  "Finance / CFO",
   "Other",
 ];
 

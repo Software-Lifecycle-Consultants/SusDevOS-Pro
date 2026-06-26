@@ -7,14 +7,18 @@ import axiosInstance from "@/lib/axios-instance";
 import { useAuthStore } from "@/store/auth";
 
 const ENTITY_TYPES = [
-  { value: 1, label: "Limited Company" },
-  { value: 2, label: "PLC" },
-  { value: 3, label: "LLP" },
-  { value: 4, label: "Partnership" },
-  { value: 5, label: "Sole Trader" },
-  { value: 6, label: "Charity" },
-  { value: 7, label: "Public Body" },
-  { value: 8, label: "Other" },
+  { value: 1,  label: "Limited Company" },
+  { value: 2,  label: "PLC" },
+  { value: 3,  label: "LLP" },
+  { value: 4,  label: "Partnership" },
+  { value: 5,  label: "Sole Trader" },
+  { value: 6,  label: "Charity" },
+  { value: 7,  label: "Public Body" },
+  { value: 9,  label: "Trust" },
+  { value: 10, label: "NGO / Non-profit" },
+  { value: 11, label: "Community Interest Company (CIC)" },
+  { value: 12, label: "Academic Institution" },
+  { value: 8,  label: "Other" },
 ];
 
 const CONSOLIDATION = [
@@ -149,9 +153,14 @@ export default function EntitySettingsPage() {
           </div>
           <div>
             <label className="label mb-1">Base currency</label>
-            <input className={inputCls} maxLength={3} placeholder="GBP"
+            <select className={inputCls}
               value={form.BaseCurrency ?? "GBP"}
-              onChange={(e) => set("BaseCurrency", e.target.value.toUpperCase())} />
+              onChange={(e) => set("BaseCurrency", e.target.value)}>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="AUD">AUD — Australian Dollar</option>
+            </select>
           </div>
         </div>
 

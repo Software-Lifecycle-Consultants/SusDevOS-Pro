@@ -39,11 +39,15 @@ interface LandParcel {
 }
 
 const LAND_USE_TYPES = [
-  "Greenfield", "Brownfield", "Agricultural", "Woodland",
-  "Grassland", "Wetland", "Urban", "Mixed", "Other",
+  "Woodland", "Grassland", "Wetland", "Peatland",
+  "Heathland / Moorland", "Coastal / Marine",
+  "Agricultural", "Greenfield", "Brownfield", "Urban", "Mixed", "Other",
 ];
 
-const TENURES = ["Freehold", "Leasehold", "Licensed", "Other"];
+const TENURES = [
+  "Freehold", "Leasehold", "Licensed",
+  "Management Agreement", "Conservation Easement", "Other",
+];
 
 type Tab = "details" | "location";
 

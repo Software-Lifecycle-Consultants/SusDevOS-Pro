@@ -572,9 +572,12 @@ function EstimatorSection() {
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600">Quick estimate</p>
           <h2 className="text-3xl font-bold text-surface-900 sm:text-4xl">
-            How big is your carbon footprint?
+            How much carbon will your project sequester?
           </h2>
-          <p className="mt-4 text-surface-500">Find out in 60 seconds. Three questions — we do the maths.</p>
+          <p className="mt-4 text-surface-500">
+            Select your ecosystem type and project area. We apply IPCC Tier 1 parameters
+            to estimate 10, 20 and 30-year sequestration.
+          </p>
         </div>
         <CarbonEstimator />
       </div>
