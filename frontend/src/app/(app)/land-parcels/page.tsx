@@ -3,12 +3,11 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Map, List, X } from "lucide-react";
+import { Plus, Map, List, X, MapPin, FileText } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
 import { useAuthStore } from "@/store/auth";
 import { EmptyState } from "@/components/EmptyState";
 
-// Leaflet requires no SSR
 const LandMap = dynamic(() => import("@/components/land/LandMap"), {
   ssr: false,
   loading: () => (
@@ -18,16 +17,25 @@ const LandMap = dynamic(() => import("@/components/land/LandMap"), {
   ),
 });
 
+const MapPicker = dynamic(() => import("@/components/land/MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[280px] rounded-lg border border-surface-200 bg-surface-50 flex items-center justify-center text-sm text-surface-400">
+      Loading map…
+    </div>
+  ),
+});
+
 interface LandParcel {
-  LandParcelId:    number;
-  ParcelName:      string;
-  ParcelReference: string | null;
-  AreaHectares:    string | null;
-  LandUseType:     string | null;
-  Tenure:          string | null;
+  LandParcelId:      number;
+  ParcelName:        string;
+  ParcelReference:   string | null;
+  AreaHectares:      string | null;
+  LandUseType:       string | null;
+  Tenure:            string | null;
   PlanningReference: string | null;
-  BoundaryGeoJSON: object | null;
-  Status:          number;
+  BoundaryGeoJSON:   object | null;
+  Status:            number;
 }
 
 const LAND_USE_TYPES = [
@@ -37,15 +45,23 @@ const LAND_USE_TYPES = [
 
 const TENURES = ["Freehold", "Leasehold", "Licensed", "Other"];
 
+type Tab = "details" | "location";
+
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "details",  label: "Parcel Details",      icon: <FileText className="h-3.5 w-3.5" /> },
+  { id: "location", label: "Location & Boundary", icon: <MapPin   className="h-3.5 w-3.5" /> },
+];
+
 function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityId: number }) {
   const queryClient = useQueryClient();
+  const [tab, setTab] = useState<Tab>("details");
   const [form, setForm] = useState({
     ParcelName: "", ParcelReference: "", AreaHectares: "",
     LandUseType: "", Tenure: "", PlanningReference: "", Description: "",
     BoundaryGeoJSON: "",
   });
   const [geoError, setGeoError] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]       = useState<string | null>(null);
   const headers = { "X-Entity-ID": String(entityId) };
 
   const mutation = useMutation({
@@ -56,14 +72,14 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
         catch { throw new Error("Invalid GeoJSON"); }
       }
       return axiosInstance.post("/api/land-parcels/", {
-        ParcelName:       form.ParcelName,
-        ParcelReference:  form.ParcelReference  || null,
-        AreaHectares:     form.AreaHectares      ? Number(form.AreaHectares) : null,
-        LandUseType:      form.LandUseType       || null,
-        Tenure:           form.Tenure            || null,
-        PlanningReference:form.PlanningReference || null,
-        Description:      form.Description       || null,
-        BoundaryGeoJSON:  boundary,
+        ParcelName:        form.ParcelName,
+        ParcelReference:   form.ParcelReference   || null,
+        AreaHectares:      form.AreaHectares       ? Number(form.AreaHectares) : null,
+        LandUseType:       form.LandUseType        || null,
+        Tenure:            form.Tenure             || null,
+        PlanningReference: form.PlanningReference  || null,
+        Description:       form.Description        || null,
+        BoundaryGeoJSON:   boundary,
       }, { headers });
     },
     onSuccess: () => {
@@ -72,12 +88,13 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
     },
     onError: (err: unknown) => {
       if (err instanceof Error && err.message === "Invalid GeoJSON") {
-        setGeoError("Invalid GeoJSON. Paste a valid GeoJSON Polygon or MultiPolygon.");
+        setGeoError("Invalid GeoJSON — paste a valid Polygon, MultiPolygon, or Point.");
+        setTab("location");
         return;
       }
       const d = (err as { response?: { data?: Record<string, unknown> } })?.response?.data;
       const first = d ? Object.values(d)[0] : null;
-      setError(Array.isArray(first) ? first[0] as string : "Failed to create parcel.");
+      setError(Array.isArray(first) ? (first[0] as string) : "Failed to create parcel.");
     },
   });
 
@@ -86,81 +103,176 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
     if (k === "BoundaryGeoJSON") setGeoError(null);
   }
 
+  function handleMapChange(geojson: string) {
+    set("BoundaryGeoJSON", geojson);
+  }
+
+  const hasLocation = !!form.BoundaryGeoJSON.trim();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="card w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-surface-900">New land parcel</h2>
-          <button onClick={onClose} className="btn-ghost btn-sm"><X className="h-4 w-4" /></button>
-        </div>
-        {error && <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
-        <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }} className="space-y-4">
+      <div className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl max-h-[90vh]">
+        {/* Header */}
+        <div className="flex shrink-0 items-start justify-between border-b border-surface-100 px-6 py-4">
           <div>
-            <label className="label mb-1">Parcel name</label>
-            <input className="input" required value={form.ParcelName}
-              onChange={(e) => set("ParcelName", e.target.value)}
-              placeholder="e.g. Site A — Development footprint" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label mb-1">Reference <span className="font-normal text-surface-400">optional</span></label>
-              <input className="input" value={form.ParcelReference}
-                onChange={(e) => set("ParcelReference", e.target.value)} />
-            </div>
-            <div>
-              <label className="label mb-1">Area (ha)</label>
-              <input className="input" type="number" step="any" min="0"
-                value={form.AreaHectares} onChange={(e) => set("AreaHectares", e.target.value)} />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label mb-1">Land use type</label>
-              <select className="input" value={form.LandUseType} onChange={(e) => set("LandUseType", e.target.value)}>
-                <option value="">— select —</option>
-                {LAND_USE_TYPES.map((t) => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label mb-1">Tenure</label>
-              <select className="input" value={form.Tenure} onChange={(e) => set("Tenure", e.target.value)}>
-                <option value="">— select —</option>
-                {TENURES.map((t) => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="label mb-1">Planning reference <span className="font-normal text-surface-400">optional</span></label>
-            <input className="input" placeholder="e.g. 22/01234/FUL"
-              value={form.PlanningReference} onChange={(e) => set("PlanningReference", e.target.value)} />
-          </div>
-          <div>
-            <label className="label mb-1">
-              Boundary GeoJSON{" "}
-              <span className="font-normal text-surface-400">optional — paste a Polygon or MultiPolygon</span>
-            </label>
-            <textarea
-              className={`input font-mono text-xs resize-y min-h-[90px] ${geoError ? "border-red-400" : ""}`}
-              placeholder='{"type":"Polygon","coordinates":[[[...]]]}' rows={4}
-              value={form.BoundaryGeoJSON} onChange={(e) => set("BoundaryGeoJSON", e.target.value)}
-            />
-            {geoError && <p className="mt-1 text-xs text-red-600">{geoError}</p>}
-            <p className="mt-1 text-xs text-surface-400">
-              Use QGIS, geojson.io, or export from OS Maps. Polygon drawing UI is available on Professional plan.
+            <h2 className="text-base font-semibold text-surface-900">Add Land Parcel</h2>
+            <p className="mt-0.5 text-xs text-surface-400">
+              Land parcels are geographic references used by Projects, Tree Removals, and Restorations.
             </p>
           </div>
-          <div>
-            <label className="label mb-1">Description <span className="font-normal text-surface-400">optional</span></label>
-            <textarea className="input resize-y min-h-[60px]" rows={2}
-              value={form.Description} onChange={(e) => set("Description", e.target.value)} />
-          </div>
-          <div className="flex justify-end gap-2 pt-1">
+          <button onClick={onClose} className="btn-ghost btn-sm mt-0.5">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex shrink-0 border-b border-surface-100 px-6">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex items-center gap-1.5 border-b-2 -mb-px py-2.5 px-3 text-sm font-medium transition-colors ${
+                tab === t.id
+                  ? "border-brand-600 text-brand-700"
+                  : "border-transparent text-surface-500 hover:text-surface-700"
+              }`}
+            >
+              {t.icon}
+              {t.label}
+              {t.id === "location" && hasLocation && (
+                <span className="ml-1 h-1.5 w-1.5 rounded-full bg-brand-500" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          {error && (
+            <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          )}
+
+          <form id="parcel-form" onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }}>
+            {/* Details tab */}
+            {tab === "details" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="label mb-1">Parcel name <span className="text-red-400">*</span></label>
+                  <input className="input" required placeholder="e.g. Site A — Development footprint"
+                    value={form.ParcelName} onChange={(e) => set("ParcelName", e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label mb-1">
+                      Reference <span className="font-normal text-surface-400">optional</span>
+                    </label>
+                    <input className="input" placeholder="e.g. PARCEL-001"
+                      value={form.ParcelReference} onChange={(e) => set("ParcelReference", e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="label mb-1">Area (hectares)</label>
+                    <input className="input" type="number" step="any" min="0" placeholder="0.00"
+                      value={form.AreaHectares} onChange={(e) => set("AreaHectares", e.target.value)} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label mb-1">Land use type</label>
+                    <select className="input" value={form.LandUseType} onChange={(e) => set("LandUseType", e.target.value)}>
+                      <option value="">— select —</option>
+                      {LAND_USE_TYPES.map((t) => <option key={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label mb-1">Tenure</label>
+                    <select className="input" value={form.Tenure} onChange={(e) => set("Tenure", e.target.value)}>
+                      <option value="">— select —</option>
+                      {TENURES.map((t) => <option key={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="label mb-1">
+                    Planning reference <span className="font-normal text-surface-400">optional</span>
+                  </label>
+                  <input className="input" placeholder="e.g. 22/01234/FUL"
+                    value={form.PlanningReference} onChange={(e) => set("PlanningReference", e.target.value)} />
+                </div>
+                <div>
+                  <label className="label mb-1">
+                    Description <span className="font-normal text-surface-400">optional</span>
+                  </label>
+                  <textarea className="input resize-y min-h-[72px]" rows={3}
+                    placeholder="Describe the parcel — ownership context, ecological notes, planning history…"
+                    value={form.Description} onChange={(e) => set("Description", e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {/* Location tab */}
+            {tab === "location" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="label mb-1.5">Click the map to pin this parcel&apos;s location</label>
+                  <MapPicker value={form.BoundaryGeoJSON} onChange={handleMapChange} />
+                  <p className="mt-1.5 text-xs text-surface-400">
+                    Click anywhere on the map to drop a pin. For precise polygon boundaries, paste GeoJSON below.
+                  </p>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center" aria-hidden>
+                    <div className="w-full border-t border-surface-100" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-white px-2 text-xs text-surface-400">or paste GeoJSON polygon</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label mb-1">Boundary GeoJSON</label>
+                  <textarea
+                    className={`input font-mono text-xs resize-y min-h-[100px] ${geoError ? "border-red-400" : ""}`}
+                    placeholder='{"type":"Polygon","coordinates":[[[lng,lat],[lng,lat],…]]}'
+                    rows={5}
+                    value={form.BoundaryGeoJSON}
+                    onChange={(e) => set("BoundaryGeoJSON", e.target.value)}
+                  />
+                  {geoError && <p className="mt-1 text-xs text-red-600">{geoError}</p>}
+                  {!geoError && (
+                    <p className="mt-1 text-xs text-surface-400">
+                      Export from QGIS, geojson.io, or OS Maps. Supports Polygon, MultiPolygon, or Point.
+                    </p>
+                  )}
+                </div>
+
+                {hasLocation && !geoError && (
+                  <div className="flex items-center gap-2 rounded-md bg-brand-50 border border-brand-100 px-3 py-2">
+                    <MapPin className="h-3.5 w-3.5 text-brand-600 shrink-0" />
+                    <span className="text-xs text-brand-700">Location captured — will be saved with this parcel.</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="shrink-0 flex items-center justify-between border-t border-surface-100 bg-surface-50 px-6 py-4">
+          <button
+            type="button"
+            onClick={() => setTab(tab === "details" ? "location" : "details")}
+            className="btn-secondary btn-sm"
+          >
+            {tab === "details" ? "Next: Location →" : "← Back to Details"}
+          </button>
+          <div className="flex gap-2">
             <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" disabled={mutation.isPending} className="btn-primary">
+            <button form="parcel-form" type="submit" disabled={mutation.isPending} className="btn-primary">
               {mutation.isPending ? "Saving…" : "Save parcel"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
@@ -186,13 +298,17 @@ export default function LandParcelsPage() {
   });
 
   const parcels = (data?.results ?? []).filter((p) => p.Status < 4);
+  const mappedCount = parcels.filter((p) => p.BoundaryGeoJSON).length;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Land Parcels</h1>
-          <p className="page-subtitle">{parcels.length} parcel{parcels.length !== 1 ? "s" : ""}</p>
+          <p className="page-subtitle">
+            {parcels.length} parcel{parcels.length !== 1 ? "s" : ""}
+            {mappedCount > 0 && ` · ${mappedCount} mapped`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {/* View toggle */}
@@ -252,9 +368,10 @@ export default function LandParcelsPage() {
                     <td className="text-right tabular-nums">
                       {p.AreaHectares ? parseFloat(p.AreaHectares).toFixed(2) : "—"}
                     </td>
-                    <td>{p.LandUseType
-                      ? <span className="badge badge-slate text-xs">{p.LandUseType}</span>
-                      : <span className="text-surface-400 text-xs">—</span>}
+                    <td>
+                      {p.LandUseType
+                        ? <span className="badge badge-slate text-xs">{p.LandUseType}</span>
+                        : <span className="text-surface-400 text-xs">—</span>}
                     </td>
                     <td className="text-surface-500 text-xs">{p.Tenure ?? "—"}</td>
                     <td className="text-surface-500 text-xs">{p.PlanningReference ?? "—"}</td>

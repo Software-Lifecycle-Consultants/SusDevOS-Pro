@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { X, Upload } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import axiosInstance from "@/lib/axios-instance";
 import { EmptyState } from "@/components/EmptyState";
@@ -20,6 +21,11 @@ interface EmissionsRecord {
   CreatedAt:             string;
 }
 
+interface Project {
+  ProjectId:   number;
+  ProjectName: string;
+}
+
 const SCOPE_LABELS: Record<number, string> = { 1: "Scope 1", 2: "Scope 2", 3: "Scope 3" };
 const VERIF_LABELS: Record<number, { label: string; cls: string }> = {
   1: { label: "Unverified", cls: "badge-slate" },
@@ -29,23 +35,43 @@ const VERIF_LABELS: Record<number, { label: string; cls: string }> = {
   5: { label: "CDP",        cls: "badge-blue" },
 };
 
-const GWP_DATASET_ID = 1; // IPCC AR6 — seeded on first deploy
+const SUPPLIER_CATEGORIES = [
+  "Energy", "Transport", "Waste", "Water", "Materials",
+  "Purchased Goods", "Capital Goods", "Business Travel", "Other",
+];
+
+const GWP_DATASET_ID = 1;
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 pb-1 mb-3 border-b border-surface-100">
+      <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">{children}</span>
+    </div>
+  );
+}
 
 function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; entityId: number }) {
   const queryClient = useQueryClient();
+  const headers = { "X-Entity-ID": String(entityId) };
+
   const [form, setForm] = useState({
     Title: "", Scope: "1", QuantityOrCost: "", Unit: "",
-    Gas: "CO2", GasSubtype: "", Scope3Category: "",
-    ReportingYear: String(new Date().getFullYear()),
+    Gas: "CO2", GasSubtype: "", Scope3Category: "", ReportingYear: String(new Date().getFullYear()),
+    ProjectId: "", DateFrom: "", DateTo: "", Supplier: "", SupplierCategory: "", Remarks: "",
   });
   const [selectedEF, setSelectedEF] = useState<EmissionFactor | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+
+  const { data: projectsData } = useQuery<{ results: Project[] }>({
+    queryKey: ["projects-dropdown", entityId],
+    queryFn: () => axiosInstance.get("/api/projects/", { headers }).then((r) => r.data),
+  });
+  const projects = projectsData?.results ?? [];
 
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      axiosInstance.post("/api/emissions/", data, {
-        headers: { "X-Entity-ID": String(entityId) },
-      }).then((r) => r.data),
+      axiosInstance.post("/api/emissions/", data, { headers }).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emissions", entityId] });
       onClose();
@@ -69,10 +95,10 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
     if (ef) {
       setForm((f) => ({
         ...f,
-        Gas:      ef.Gas,
-        GasSubtype: ef.GasSubtype ?? "",
-        Unit:     ef.unit ?? f.Unit,
-        Scope:    String(ef.Scope),
+        Gas:          ef.Gas,
+        GasSubtype:   ef.GasSubtype ?? "",
+        Unit:         ef.unit ?? f.Unit,
+        Scope:        String(ef.Scope),
         Scope3Category: ef.Scope3Category ? String(ef.Scope3Category) : f.Scope3Category,
       }));
     }
@@ -95,93 +121,194 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
       Scope3Category:       form.Scope === "3" && form.Scope3Category ? Number(form.Scope3Category) : null,
       ReportingYear:        form.ReportingYear ? Number(form.ReportingYear) : null,
       GwpDatasetId:         GWP_DATASET_ID,
+      ProjectId:            form.ProjectId ? Number(form.ProjectId) : null,
+      DateFrom:             form.DateFrom || null,
+      DateTo:               form.DateTo   || null,
+      Supplier:             form.Supplier || null,
+      SupplierCategory:     form.SupplierCategory || null,
+      Remarks:              form.Remarks || null,
     });
   }
 
+  const estTonnes = selectedEF && form.QuantityOrCost
+    ? (parseFloat(form.QuantityOrCost) * selectedEF.FactorValue / 1000).toFixed(4)
+    : null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="card w-full max-w-lg p-6">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-surface-900">New emissions record</h2>
-          <button onClick={onClose} className="btn-ghost btn-sm">✕</button>
+    <div className="fixed inset-0 z-50 flex items-end justify-end bg-black/40 p-0">
+      <div className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl">
+        {/* Header */}
+        <div className="flex shrink-0 items-start justify-between border-b border-surface-200 px-6 py-4">
+          <div>
+            <h2 className="text-base font-semibold text-surface-900">Add GHG Emission Details</h2>
+            <p className="mt-0.5 text-xs text-surface-400">Enter emissions or reduction data from project activities.</p>
+          </div>
+          <button onClick={onClose} className="btn-ghost btn-sm mt-0.5"><X className="h-4 w-4" /></button>
         </div>
 
-        {error && (
-          <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
-        )}
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          {error && (
+            <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="label mb-1">Title</label>
-            <input className="input" required value={form.Title}
-              onChange={(e) => set("Title", e.target.value)} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+          <form id="emission-form" onSubmit={handleSubmit} className="space-y-6">
+            {/* Activity & Timing */}
             <div>
-              <label className="label mb-1">Scope</label>
-              <select className="input" value={form.Scope} onChange={(e) => set("Scope", e.target.value)}>
-                <option value="1">Scope 1 — Direct</option>
-                <option value="2">Scope 2 — Electricity</option>
-                <option value="3">Scope 3 — Value chain</option>
-              </select>
-            </div>
-            {form.Scope === "3" && (
-              <div>
-                <label className="label mb-1">Category (1–15)</label>
-                <input className="input" type="number" min={1} max={15}
-                  value={form.Scope3Category} onChange={(e) => set("Scope3Category", e.target.value)} />
+              <SectionHeading>Activity &amp; Timing</SectionHeading>
+              <div className="space-y-3">
+                <div>
+                  <label className="label mb-1">Title <span className="text-red-400">*</span></label>
+                  <input className="input" required placeholder="e.g. Natural gas — boiler room"
+                    value={form.Title} onChange={(e) => set("Title", e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label mb-1">Project <span className="font-normal text-surface-400">optional</span></label>
+                    <select className="input" value={form.ProjectId} onChange={(e) => set("ProjectId", e.target.value)}>
+                      <option value="">— no project —</option>
+                      {projects.map((p) => (
+                        <option key={p.ProjectId} value={p.ProjectId}>{p.ProjectName}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label mb-1">Reporting year</label>
+                    <input className="input" type="number" min={2000} max={2100}
+                      value={form.ReportingYear} onChange={(e) => set("ReportingYear", e.target.value)} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label mb-1">Date from <span className="font-normal text-surface-400">optional</span></label>
+                    <input className="input" type="date" value={form.DateFrom} onChange={(e) => set("DateFrom", e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="label mb-1">Date to <span className="font-normal text-surface-400">optional</span></label>
+                    <input className="input" type="date" value={form.DateTo} onChange={(e) => set("DateTo", e.target.value)} />
+                  </div>
+                </div>
               </div>
-            )}
-            <div>
-              <label className="label mb-1">Reporting year</label>
-              <input className="input" type="number" min={2000} max={2100}
-                value={form.ReportingYear} onChange={(e) => set("ReportingYear", e.target.value)} />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
+            {/* Scope */}
             <div>
-              <label className="label mb-1">Quantity</label>
-              <input className="input" type="number" step="any" required
-                value={form.QuantityOrCost} onChange={(e) => set("QuantityOrCost", e.target.value)} />
+              <SectionHeading>GHG Scope</SectionHeading>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label mb-1">Scope <span className="text-red-400">*</span></label>
+                  <select className="input" value={form.Scope} onChange={(e) => set("Scope", e.target.value)}>
+                    <option value="1">Scope 1 — Direct</option>
+                    <option value="2">Scope 2 — Electricity</option>
+                    <option value="3">Scope 3 — Value chain</option>
+                  </select>
+                </div>
+                {form.Scope === "3" && (
+                  <div>
+                    <label className="label mb-1">Category (1–15)</label>
+                    <input className="input" type="number" min={1} max={15}
+                      value={form.Scope3Category} onChange={(e) => set("Scope3Category", e.target.value)} />
+                  </div>
+                )}
+              </div>
             </div>
-            <div>
-              <label className="label mb-1">Unit</label>
-              <input className="input" required
-                value={form.Unit} onChange={(e) => set("Unit", e.target.value)}
-                placeholder="litres, kWh, km…" />
-            </div>
-          </div>
 
-          <div>
-            <label className="label mb-1">
-              Emission factor
-              <span className="ml-1 text-surface-400 font-normal text-xs">(kg CO₂e/unit)</span>
+            {/* Supplier */}
+            <div>
+              <SectionHeading>Supplier <span className="font-normal normal-case text-surface-400">— optional</span></SectionHeading>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label mb-1">Supplier name</label>
+                  <input className="input" placeholder="e.g. National Grid"
+                    value={form.Supplier} onChange={(e) => set("Supplier", e.target.value)} />
+                </div>
+                <div>
+                  <label className="label mb-1">Supplier category</label>
+                  <select className="input" value={form.SupplierCategory} onChange={(e) => set("SupplierCategory", e.target.value)}>
+                    <option value="">— select —</option>
+                    {SUPPLIER_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Emission Factor */}
+            <div>
+              <SectionHeading>Emission Factor &amp; Quantity</SectionHeading>
+              <div className="space-y-3">
+                <div>
+                  <label className="label mb-1">
+                    Emission factor <span className="text-red-400">*</span>
+                    <span className="ml-1 font-normal text-surface-400 text-xs">(kg CO₂e / unit)</span>
+                  </label>
+                  <EFPicker
+                    scope={form.Scope ? Number(form.Scope) : undefined}
+                    value={selectedEF}
+                    onChange={handleEFSelect}
+                  />
+                  {selectedEF && (
+                    <p className="mt-1 text-xs text-surface-400">
+                      Gas: <span className="font-medium text-surface-600">{selectedEF.Gas}</span>
+                      {selectedEF.GasSubtype && ` (${selectedEF.GasSubtype})`}
+                      {" · "}Factor: <span className="font-mono font-medium text-surface-600">{selectedEF.FactorValue}</span>
+                      {" · "}Source: <span className="text-surface-600">{selectedEF.set_name}</span>
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label mb-1">Quantity <span className="text-red-400">*</span></label>
+                    <input className="input" type="number" step="any" required
+                      value={form.QuantityOrCost} onChange={(e) => set("QuantityOrCost", e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="label mb-1">Unit <span className="text-red-400">*</span></label>
+                    <input className="input" required placeholder="litres, kWh, km…"
+                      value={form.Unit} onChange={(e) => set("Unit", e.target.value)} />
+                  </div>
+                </div>
+
+                {/* Live estimate */}
+                {estTonnes && (
+                  <div className="flex items-center gap-2 rounded-md bg-brand-50 border border-brand-100 px-3 py-2">
+                    <span className="text-xs text-brand-700">Estimated emissions:</span>
+                    <span className="text-sm font-semibold font-mono text-brand-800">{estTonnes} tCO₂e</span>
+                    <span className="text-xs text-brand-500 ml-1">(server will recalculate on save)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <SectionHeading>Notes</SectionHeading>
+              <textarea className="input resize-y min-h-[72px]" rows={3} placeholder="Additional context, data source, assumptions…"
+                value={form.Remarks} onChange={(e) => set("Remarks", e.target.value)} />
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="shrink-0 border-t border-surface-200 bg-surface-50 px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Bulk upload stub */}
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-surface-500 hover:text-surface-700">
+              <Upload className="h-4 w-4" />
+              <span>Upload Excel</span>
+              <input type="file" accept=".xlsx,.xls,.csv" className="sr-only"
+                onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)} />
             </label>
-            <EFPicker
-              scope={form.Scope ? Number(form.Scope) : undefined}
-              value={selectedEF}
-              onChange={handleEFSelect}
-            />
-            {selectedEF && (
-              <p className="mt-1 text-xs text-surface-400">
-                Gas: <span className="font-medium text-surface-600">{selectedEF.Gas}</span>
-                {selectedEF.GasSubtype && ` (${selectedEF.GasSubtype})`}
-                {" · "}Value: <span className="font-mono font-medium text-surface-600">{selectedEF.FactorValue}</span>
-              </p>
+            {uploadFile && (
+              <span className="text-xs text-brand-600 truncate max-w-[140px]">{uploadFile.name}</span>
             )}
+            <div className="flex gap-2">
+              <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+              <button form="emission-form" type="submit" disabled={mutation.isPending} className="btn-primary">
+                {mutation.isPending ? "Saving…" : "Save record"}
+              </button>
+            </div>
           </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" disabled={mutation.isPending} className="btn-primary">
-              {mutation.isPending ? "Saving…" : "Save record"}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
@@ -221,7 +348,7 @@ export default function EmissionsPage() {
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Scope filters */}
       <div className="flex gap-2">
         {["", "1", "2", "3"].map((s) => (
           <button
