@@ -5,10 +5,16 @@ from django.db import models
 from django.utils import timezone
 
 REPORT_TYPE_CHOICES = [
-    ("emissions_summary", "Project Emissions Summary"),
-    ("ghg_inventory", "Entity GHG Inventory"),
-    ("phase_progress", "Phase Progress vs Goals"),
-    ("tree_log", "Tree Removal & Restoration Log"),
+    ("emissions_summary",  "Project Emissions Summary"),
+    ("ghg_inventory",      "Entity GHG Inventory"),
+    ("phase_progress",     "Phase Progress vs Goals"),
+    ("tree_log",           "Tree Removal & Restoration Log"),
+    # CDP Climate Change export — maps GHG inventory to CDP submission format.
+    # Updated annually to match current questionnaire. Current: CDP 2025.
+    # Sections covered: C4 (targets), C6 (Scope 1+2), C7 (breakdown), C10 (verification).
+    # CDP 2025 additions: ISSB S2 alignment flag, biogenic CO2 row, transition plan flag (C3).
+    # Feature-gated: requires plan feature "report_cdp_export" (Professional+).
+    ("cdp_climate",        "CDP Climate Change Export (2025)"),
 ]
 
 REPORT_FORMAT_CHOICES = [("pdf", "PDF"), ("csv", "CSV"), ("json", "JSON")]
