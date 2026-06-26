@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Features — SusDevOS",
   description:
-    "Full Scope 1, 2 and 3 GHG calculations, SBTi target tracking, CDP export, TNFD biodiversity, GIS land parcel mapping, verification workflow and more — built on GHG Protocol.",
+    "Full Scope 1, 2 and 3 GHG calculations, TNFD biodiversity reporting, Verra/Gold Standard credit validation, GIS land parcel mapping, verification workflow and more — built on GHG Protocol.",
   alternates: { canonical: "https://susdevos.com/features" },
 };
 
@@ -92,12 +92,12 @@ const FEATURE_GROUPS = [
     color:    "teal",
     features: [
       {
-        title: "SBTi target tracking",
-        body:  "Set 1.5°C-aligned absolute or intensity targets. Progress is tracked year-by-year against baseline. SBTi validation status syncs automatically from the Companies Taking Action registry monthly.",
+        title: "TNFD LEAP biodiversity reporting",
+        body:  "Structure biodiversity impact assessments using the TNFD LEAP (Locate, Evaluate, Assess, Prepare) framework. Species records include IUCN Red List conservation status for full TNFD v1.0 disclosure.",
       },
       {
-        title: "CDP-ready export",
-        body:  "Generate a structured CSV that maps directly to CDP Climate Change questionnaire sections C6, C7 and C10. No manual reformatting before submission.",
+        title: "Verra/Gold Standard credit validation",
+        body:  "Real-time registry check on carbon offset serial numbers against Verra VCS and Gold Standard registries. Unvalidated credits are never deducted from net inventory totals.",
       },
       {
         title: "Formal GHG Protocol PDF report",
@@ -109,7 +109,7 @@ const FEATURE_GROUPS = [
       },
       {
         title: "Intensity metrics",
-        body:  "Calculate emissions per revenue, per employee, per square metre, or any custom intensity denominator. Track intensity improvements against the same SBTi targets.",
+        body:  "Calculate emissions per revenue, per employee, per square metre, or any custom intensity denominator. Track intensity improvements against the same project restoration targets.",
       },
       {
         title: "CSV and JSON export",

@@ -114,7 +114,7 @@ export default function NotificationsPage() {
             </p>
             <p className="text-xs text-surface-400 max-w-xs">
               Notifications appear here when inventories are verified, reports finish generating,
-              SBTi milestones are due, or your team makes significant changes.
+              milestones are due, or your team makes significant changes.
             </p>
           </div>
         ) : (

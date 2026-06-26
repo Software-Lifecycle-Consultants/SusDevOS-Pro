@@ -32,7 +32,6 @@ const VERIF_LABELS: Record<number, { label: string; cls: string }> = {
   2: { label: "Pending",    cls: "badge-yellow" },
   3: { label: "Verified",   cls: "badge-green" },
   4: { label: "3rd Party",  cls: "badge-green" },
-  5: { label: "CDP",        cls: "badge-blue" },
 };
 
 const SUPPLIER_CATEGORIES = [

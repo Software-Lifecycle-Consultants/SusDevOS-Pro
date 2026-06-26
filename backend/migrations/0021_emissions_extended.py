@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
             model_name='EmissionsData',
             name='EFMarketBasedSource',
             field=models.CharField(max_length=200, null=True, blank=True,
-                help_text="Source: e.g. 'Supplier EF certificate', 'RE100 residual mix 2024', 'PPA contract'"
+                help_text="Source: e.g. 'Supplier EF certificate', 'Renewable energy certificate', 'PPA contract'"
             ),
         ),
         migrations.AddField(

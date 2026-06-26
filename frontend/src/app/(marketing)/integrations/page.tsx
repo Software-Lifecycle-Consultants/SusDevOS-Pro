@@ -117,7 +117,7 @@ const PATTERNS = [
       "Data parsed and upserted into platform tables",
       "New factors and rates available automatically",
     ],
-    examples: "DEFRA · EPA eGRID · Climatiq · SBTi · ECB · Verra cache",
+    examples: "DEFRA · EPA eGRID · Climatiq · ECB · Verra cache",
     note:    "Scheduled syncs run in the background without interrupting your work. You always have current data.",
   },
   {

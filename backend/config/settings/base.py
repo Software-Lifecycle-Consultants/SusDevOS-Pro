@@ -179,7 +179,7 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "SusDevOS API",
     "DESCRIPTION": (
         "GHG reporting, ecosystem tracking, and sustainable development platform. "
-        "Aligned to GHG Protocol, IPCC, SBTi, CDP, and TNFD."
+        "Aligned to GHG Protocol, IPCC, and TNFD."
     ),
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
@@ -242,7 +242,6 @@ COMPANIES_HOUSE_API_KEY     = config("COMPANIES_HOUSE_API_KEY", default="")
 OPENCORPORATES_API_KEY      = config("OPENCORPORATES_API_KEY", default="")
 OPEN_EXCHANGE_RATES_API_KEY = config("OPEN_EXCHANGE_RATES_API_KEY", default="")
 IUCN_API_KEY                = config("IUCN_API_KEY", default="")
-SBTI_COMPANIES_CSV_URL      = config("SBTI_COMPANIES_CSV_URL", default="")
 DEFRA_EF_SPREADSHEET_URL    = config("DEFRA_EF_SPREADSHEET_URL", default="")
 VERRA_CSV_URL               = config("VERRA_CSV_URL", default="")
 EPA_EGRID_URL               = config("EPA_EGRID_URL", default="")

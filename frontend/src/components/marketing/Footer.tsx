@@ -57,8 +57,8 @@ export function Footer() {
               <span className="font-semibold text-white text-[15px]">SusDevOS</span>
             </Link>
             <p className="text-sm leading-relaxed">
-              GHG reporting and ecosystem tracking built on GHG Protocol, SBTi,
-              CDP and TNFD.
+              GHG reporting and ecosystem tracking built on GHG Protocol, IPCC,
+              Verra, and TNFD.
             </p>
             {/* Social */}
             <div className="flex gap-3 mt-4">
@@ -109,7 +109,7 @@ export function Footer() {
         <div className="border-t border-surface-800 pt-6 flex flex-col sm:flex-row justify-between gap-3 text-xs text-surface-600">
           <p>© {new Date().getFullYear()} SusDevOS Ltd. All rights reserved.</p>
           <p>
-            GHG Protocol, SBTi, CDP, TNFD and IPCC are trademarks of their respective owners.
+            GHG Protocol, TNFD, Verra, Gold Standard and IPCC are trademarks of their respective owners.
             SusDevOS is not affiliated with or endorsed by these organisations.
           </p>
         </div>

@@ -5,7 +5,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 export const metadata: Metadata = {
   title: "Blog — SusDevOS",
   description:
-    "Practical guides on GHG reporting, Scope 3, SBTi target setting, TNFD biodiversity disclosure, and sustainable development — from the SusDevOS team.",
+    "Practical guides on GHG reporting, Scope 3, carbon credit validation, restoration MRV, TNFD biodiversity disclosure, and sustainable development — from the SusDevOS team.",
   alternates: {
     types: { "application/rss+xml": "/rss.xml" },
   },
@@ -81,7 +81,7 @@ function Hero() {
           SusDevOS Blog
         </h1>
         <p className="mx-auto max-w-xl text-lg text-surface-400">
-          Practical guides on GHG reporting, SBTi target setting, TNFD biodiversity disclosure,
+          Practical guides on GHG reporting, carbon credit validation, restoration MRV, TNFD biodiversity disclosure,
           and what the standards actually require — without the jargon.
         </p>
         <div className="mt-6 flex justify-center">
@@ -163,7 +163,7 @@ export default async function BlogListPage() {
               Stay up to date
             </h3>
             <p className="mb-6 text-sm text-surface-500">
-              New articles on GHG reporting, SBTi, TNFD and sustainable development —
+              New articles on GHG reporting, Verra/Gold Standard, TNFD and sustainable development —
               straight to your inbox.
             </p>
             <form className="flex gap-2">

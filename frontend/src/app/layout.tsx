@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | SusDevOS",
   },
   description:
-    "Calculate Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate audit-ready GHG inventory reports. Aligned to GHG Protocol, SBTi, CDP and TNFD.",
+    "Calculate Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate audit-ready GHG inventory reports. Aligned to GHG Protocol, IPCC, and TNFD.",
   metadataBase: new URL("https://susdevos.com"),
   openGraph: {
     siteName: "SusDevOS",

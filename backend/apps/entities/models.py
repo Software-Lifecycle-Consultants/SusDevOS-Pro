@@ -63,7 +63,6 @@ class Entities(BaseAuditMixin):
 
     # External registry IDs (ref: 0027_api_integration_fields)
     CompaniesHouseNumber = models.CharField(max_length=20, null=True, blank=True)
-    SBTiCompanyId = models.CharField(max_length=50, null=True, blank=True)
     SICCodes = models.JSONField(default=list, blank=True)
     IncorporationDate = models.DateField(null=True, blank=True)
     ExternalRegistryUrl = models.URLField(null=True, blank=True)

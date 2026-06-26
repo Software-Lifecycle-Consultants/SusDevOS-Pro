@@ -3,13 +3,11 @@ Migration: Targets and TargetMilestones
 App: apps.emissions
 Depends on: apps.entities, apps.users
 
-Targets model the entity's climate commitments (SBTi, NDC, internal).
-Without targets, the "Phase Progress vs Goals" report type has no goal to
-compare against, and SBTi progress tracking (a stated product goal) is impossible.
+Targets model the entity's project goals (hectares restored, tCO₂ sequestered/yr,
+internal reduction targets, net-zero commitments).
 
 Target types:
-  AbsoluteContraction — reduce total emissions by X% vs base year (most common SBTi target)
-  SectorDecarbonization — align to a sector-specific pathway (SBTi SDA method)
+  AbsoluteContraction — reduce total emissions by X% vs base year
   IntensityBased — reduce emissions per unit of output (revenue, m², employee etc.)
 
 Validation workflow:
@@ -27,17 +25,13 @@ import django.db.models.deletion
 
 TARGET_TYPE_CHOICES = [
     (1, 'Absolute Contraction — reduce total GHG by X% vs base year'),
-    (2, 'Sector Decarbonization Approach (SDA) — sector-specific pathway'),
-    (3, 'Intensity-Based — reduce GHG per unit of output'),
+    (2, 'Intensity-Based — reduce GHG per unit of output'),
 ]
 
 TARGET_FRAMEWORK_CHOICES = [
-    (1, 'SBTi — Science Based Targets initiative'),
-    (2, 'NDC — Nationally Determined Contribution'),
-    (3, 'Internal — company-set target'),
-    (4, 'CDP — Carbon Disclosure Project commitment'),
-    (5, 'RE100 — 100% renewable electricity'),
-    (6, 'Net Zero — aligned to IPCC 1.5°C pathway'),
+    (1, 'Internal target'),
+    (2, 'Net Zero'),
+    (3, 'Project / Credit goal'),
 ]
 
 TARGET_VALIDATION_STATUS = [
@@ -70,14 +64,14 @@ class Migration(migrations.Migration):
                     related_name='targets',
                 )),
                 ('TargetName', models.CharField(max_length=200,
-                    help_text="e.g. 'SBTi 1.5°C aligned — 50% Scope 1+2 reduction by 2030'"
+                    help_text="e.g. '50% Scope 1+2 reduction by 2030' or 'Restore 100 ha by 2035'"
                 )),
                 ('Framework', models.PositiveSmallIntegerField(choices=TARGET_FRAMEWORK_CHOICES)),
                 ('TargetType', models.PositiveSmallIntegerField(choices=TARGET_TYPE_CHOICES)),
                 # Which scopes this target covers (stored as JSON list: [1], [1,2], [1,2,3], [3])
                 ('ScopesCovered', models.JSONField(
                     default=list,
-                    help_text="List of scopes: e.g. [1, 2] or [1, 2, 3]. SBTi requires separate Scope 3 target if material."
+                    help_text="List of scopes: e.g. [1, 2] or [1, 2, 3]."
                 )),
                 # Base year
                 ('BaselineYear', models.PositiveSmallIntegerField(
@@ -107,8 +101,7 @@ class Migration(migrations.Migration):
                     null=True, blank=True,
                     help_text=(
                         "For AbsoluteContraction: % reduction vs base year. "
-                        "e.g. 50.0 = 50% reduction. "
-                        "For SDA: leave NULL, use SDAPathwayDescription."
+                        "e.g. 50.0 = 50% reduction."
                     )
                 )),
                 ('TargetEmissionsTonnesCO2e', models.DecimalField(
@@ -131,17 +124,13 @@ class Migration(migrations.Migration):
                     null=True, blank=True,
                     help_text="tCO2e per IntensityMetric unit in target year"
                 )),
-                # SDA pathway (only for TargetType=2)
-                ('SDAPathwayDescription', models.TextField(null=True, blank=True,
-                    help_text="SBTi Sector Decarbonization Approach pathway details"
-                )),
                 # Validation
                 ('ValidationStatus', models.PositiveSmallIntegerField(
                     default=1,
                     choices=TARGET_VALIDATION_STATUS,
                 )),
                 ('ValidatedBy', models.CharField(max_length=200, null=True, blank=True,
-                    help_text="External body name: e.g. 'SBTi', 'CDP'"
+                    help_text="External body name: e.g. 'Verra', 'Gold Standard'"
                 )),
                 ('ValidationReference', models.CharField(max_length=200, null=True, blank=True,
                     help_text="Validation certificate or reference number"

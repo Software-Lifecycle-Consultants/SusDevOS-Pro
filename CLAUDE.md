@@ -5,7 +5,7 @@
 SusDevOS is a multi-tenant SaaS platform for sustainable development tracking:
 - **GHG emissions** (Scope 1/2/3, GHG Protocol Corporate Standard)
 - **Ecosystem tracking** (tree removals, restorations, IPCC LULUCF biomass carbon)
-- **SBTi target tracking**, CDP export, TNFD-aligned reporting
+- **Verra/Gold Standard MRV**, TNFD-aligned biodiversity reporting
 
 Target users: sustainability managers, ESG consultants, development project managers.
 
@@ -19,7 +19,7 @@ All design decisions are documented in `spec/`. Read the relevant spec before im
 | `spec/endpoint_catalog.md` | ~100 REST endpoints, request/response shapes, auth requirements |
 | `spec/privilege_system_resolved.md` | RBAC: Modules → Interfaces → RolePrivileges. **Use this, not Features/PrivilegeID doc** |
 | `spec/ghg_calculation_spec.md` | All GHG formulas, unit conversion pipeline, IPCC biomass, Scope 2 dual method |
-| `spec/api_integrations.md` | Climatiq, Companies House, Verra, ECB FX, GBIF, SBTi, DEFRA integrations |
+| `spec/api_integrations.md` | Climatiq, Companies House, Verra, ECB FX, GBIF, DEFRA integrations |
 | `spec/celery_tasks.md` | All Celery tasks, schedules, retry policies, queue routing |
 | `spec/pricing.md` | Feature gate matrix, FeatureGateMixin, plan tiers |
 | `spec/compliance.md` | GDPR, Cyber Essentials, ISO 27001 roadmap, audit log retention |

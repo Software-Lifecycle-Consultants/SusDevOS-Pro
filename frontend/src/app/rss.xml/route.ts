@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL ?? "https://susdevos.com";
 const API_BASE  = process.env.NEXT_PUBLIC_API_URL  ?? "http://localhost:8000";
 const SITE_NAME = "SusDevOS Blog";
-const SITE_DESC = "Practical guides on GHG reporting, SBTi, TNFD and sustainable development.";
+const SITE_DESC = "Practical guides on GHG reporting, TNFD and sustainable development.";
 
 interface Post {
   BlogId:         number;

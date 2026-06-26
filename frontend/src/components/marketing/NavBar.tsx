@@ -21,7 +21,7 @@ export function NavBar() {
       <div className="hidden sm:flex items-center justify-center gap-3 bg-surface-900 py-2 text-xs text-surface-400">
         <span className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse" />
-          CDP 2025 Climate Change questionnaire export is now live
+          TNFD v1.0 LEAP framework — nature impact reporting now available
         </span>
         <Link
           href="/changelog"

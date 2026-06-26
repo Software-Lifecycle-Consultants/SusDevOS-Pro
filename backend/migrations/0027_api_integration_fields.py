@@ -12,7 +12,7 @@ New table:
   ExchangeRates — daily FX rates from ECB / Open Exchange Rates
 
 Fields added to existing models:
-  Entities          — CompaniesHouseNumber, SBTiCompanyId, SICCodes, IncorporationDate
+  Entities          — CompaniesHouseNumber, SICCodes, IncorporationDate
   EmissionFactors   — ClimatiqActivityId, GridSubregion, ExternalSyncedAt
   EmissionsData     — SpendCurrency, SpendAmountLocal, ExchangeRateToUSD,
                       ExchangeRateDate, SpendAmountUSD, GridSubregion
@@ -20,7 +20,6 @@ Fields added to existing models:
                       RegistryValidationStatus, RegistryProjectName,
                       RegistryProjectType, RegistryVintageYear,
                       RegistryRetirementBeneficiary
-  Targets           — SBTiCompanyId (mirror from entity), SBTiStatus, SBTiLastSyncedAt
   Species           — GBIFKey, ScientificName, IUCNStatus, IUCNSyncedAt
 """
 
@@ -116,24 +115,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='Entities',
-            name='SBTiCompanyId',
-            field=models.CharField(
-                max_length=50, null=True, blank=True,
-                help_text=(
-                    "SBTi company identifier from the SBTi Companies Taking Action registry. "
-                    "Used for exact matching during monthly SBTi sync task. "
-                    "If NULL, fuzzy name matching is used (requires manual review)."
-                )
-            ),
-        ),
-        migrations.AddField(
-            model_name='Entities',
             name='SICCodes',
             field=models.JSONField(
                 default=list, blank=True,
                 help_text=(
-                    "List of UK SIC codes from Companies House (e.g. ['35110', '35120']). "
-                    "Used to suggest the relevant SBTi sector decarbonization pathway."
+                    "List of UK SIC codes from Companies House (e.g. ['35110', '35120'])."
                 )
             ),
         ),
@@ -332,29 +318,6 @@ class Migration(migrations.Migration):
                     "Name of the retirement beneficiary from registry. "
                     "Should match the entity name to confirm the credit belongs to this inventory."
                 )
-            ),
-        ),
-
-        # ── Targets: SBTi registry sync fields ────────────────────────────────
-        migrations.AddField(
-            model_name='Targets',
-            name='SBTiStatus',
-            field=models.CharField(
-                max_length=50, null=True, blank=True,
-                help_text=(
-                    "SBTi status string from the Companies Taking Action registry. "
-                    "e.g. 'Targets Set', 'Committed', 'Achieved'. "
-                    "Auto-populated by monthly SBTi sync task. "
-                    "Maps to ValidationStatus on upsert."
-                )
-            ),
-        ),
-        migrations.AddField(
-            model_name='Targets',
-            name='SBTiLastSyncedAt',
-            field=models.DateTimeField(
-                null=True, blank=True,
-                help_text="Timestamp of last successful SBTi registry sync for this target."
             ),
         ),
 

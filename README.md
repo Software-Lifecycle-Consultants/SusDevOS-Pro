@@ -2,7 +2,7 @@
 
 **GHG reporting, ecosystem tracking, and sustainable development management for property and infrastructure projects.**
 
-SusDevOS is a multi-tenant SaaS platform that helps sustainability managers, ESG consultants, and development project managers track Scope 1/2/3 emissions, manage tree removals and habitat restorations, set SBTi targets, and produce audit-ready GHG inventory reports — all aligned to GHG Protocol, IPCC, SBTi, CDP, and TNFD.
+SusDevOS is a multi-tenant SaaS platform that helps sustainability managers, ESG consultants, and development project managers track Scope 1/2/3 emissions, manage tree removals and habitat restorations, validate carbon credits against Verra/Gold Standard, and produce audit-ready GHG inventory reports — all aligned to GHG Protocol, IPCC, and TNFD.
 
 ---
 
@@ -20,7 +20,7 @@ SusDevOS is a multi-tenant SaaS platform that helps sustainability managers, ESG
 | **RBAC** | `Modules → Interfaces → Roles → RolePrivileges → UserPrivilegeOverrides`. 4 roles (SuperAdmin, Admin, Manager, Staff), 13 modules, 46 interfaces, 56 default role privilege rows. |
 | **Feature gates** | `FeatureGateMixin.required_feature` checks `PlanFeatures` table → HTTP 402 `{"code": "feature_gated", "upgrade_url": "/pricing"}`. 5 billing plans, 37 feature keys. |
 | **12 Django apps** | shared · entities · users · projects · land · ecosystem · emissions · restorations · notifications · blog · reports · billing |
-| **Celery tasks** | ECB FX daily sync · Climatiq/DEFRA EF sync · SBTi registry monthly sync · Verra VCS daily validation · nightly inventory total recomputation · audit log retention purge · report file purge |
+| **Celery tasks** | ECB FX daily sync · Climatiq/DEFRA EF sync · Verra VCS daily validation · nightly inventory total recomputation · audit log retention purge · report file purge |
 | **Admin** | All 12 apps registered with search, filters, inlines, and `raw_id_fields`. |
 | **OpenAPI** | drf-spectacular → `GET /api/schema/` (229 KB) · Swagger UI at `/api/schema/swagger-ui/` |
 | **Tests** | 85 pytest tests: 37 model tests + 48 API tests covering auth flows, tenant scoping, GHG formula correctness, and verification immutability. |
@@ -46,7 +46,7 @@ Located in `content-engine/`. Three Claude-powered agents for the SusDevOS marke
 
 | Script | What it does |
 |--------|-------------|
-| `research.py` | **Weekly research agent.** Monitors 12 RSS feeds (GOV.UK, SBTi, GHG Protocol, CDP, Edie, Carbon Brief, TNFD, UNFCCC, and more). Claude picks the 5 most relevant stories for sustainability managers and produces a ready-to-use content brief with blog angle, LinkedIn hooks, and regulatory calendar. |
+| `research.py` | **Weekly research agent.** Monitors 12 RSS feeds (GOV.UK, GHG Protocol, TNFD, Verra, Carbon Brief, UNFCCC, and more). Claude picks the 5 most relevant stories for sustainability managers and produces a ready-to-use content brief with blog angle, LinkedIn hooks, and regulatory calendar. |
 | `draft.py` | **Blog draft agent.** Takes a topic (plus optional brief from `research.py`) and writes a complete, SEO-tagged blog post in the SusDevOS brand voice. Optionally publishes directly to Ghost CMS as a draft. |
 | `repurpose.py` | **Content repurposing agent.** Takes a finished blog post and produces: a 600–800 word LinkedIn article, 4 short LinkedIn posts, a 7–10 minute YouTube video script with B-roll cues, and YouTube metadata (3 title options, description with chapters, 10 tags). Optionally queues posts to Buffer for scheduled publishing. |
 
@@ -190,7 +190,6 @@ Copy `backend/.env.example` to `backend/.env`. Key variables:
 | `ANTHROPIC_API_KEY` | — | Content engine only |
 | `CLIMATIQ_API_KEY` | — | Emission factor sync |
 | `COMPANIES_HOUSE_API_KEY` | — | Entity auto-population |
-| `SBTI_COMPANIES_CSV_URL` | — | Monthly SBTi sync |
 | `VERRA_CSV_URL` | — | Daily offset validation |
 
 ---
@@ -215,7 +214,7 @@ Role-themed guides covering the core workflows for each user type:
 | Guide | For |
 |-------|-----|
 | [Admin Guide](docs/user-guide-admin.md) | Entity setup, user management, inventory verification, billing |
-| [Sustainability Manager Guide](docs/user-guide-sustainability-manager.md) | GHG inventories, Scope 1/2/3, SBTi targets, offsets, CDP export |
+| [Sustainability Manager Guide](docs/user-guide-sustainability-manager.md) | GHG inventories, Scope 1/2/3, carbon goals, Verra/Gold Standard offsets |
 | [ESG Consultant Guide](docs/user-guide-esg-consultant.md) | Multi-client management, white-label reports, client portal (Agency plan) |
 | [Project Manager Guide](docs/user-guide-project-manager.md) | Projects, land parcels, ecosystem surveys, tree removals, restorations |
 
@@ -233,7 +232,7 @@ Full design specifications live in `spec/`:
 | `spec/endpoint_catalog.md` | ~100 REST endpoints, request/response shapes, permissions |
 | `spec/privilege_system_resolved.md` | RBAC model — canonical reference |
 | `spec/ghg_calculation_spec.md` | GHG formulas, unit conversion, IPCC biomass, dual Scope 2 |
-| `spec/api_integrations.md` | Climatiq, Companies House, ECB FX, Verra, SBTi, GBIF, IUCN |
+| `spec/api_integrations.md` | Climatiq, Companies House, ECB FX, Verra, GBIF, IUCN |
 | `spec/celery_tasks.md` | All Celery tasks, schedules, retry policies, queue routing |
 | `spec/pricing.md` | Feature gate matrix, plan tier definitions |
 | `spec/compliance.md` | GDPR, Cyber Essentials, ISO 27001 roadmap, audit log retention |

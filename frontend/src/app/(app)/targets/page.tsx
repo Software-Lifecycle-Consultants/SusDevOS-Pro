@@ -15,7 +15,6 @@ interface Target {
   BaselineEmissionsTonnes: string | null;
   ReductionPercent:        string | null;
   Scope:                   number | null;
-  SBTiStatus:              string | null;
   ValidationStatus:        number;
   Notes:                   string | null;
 }
@@ -34,15 +33,6 @@ const TARGET_TYPE_LABELS: Record<string, string> = {
   long_term:  "Long-term",
   net_zero:   "Net-zero",
   intensity:  "Intensity",
-  sda:        "SDA",
-};
-
-const SBTI_STATUS_BADGES: Record<string, string> = {
-  committed:    "badge-yellow",
-  submitted:    "badge-blue",
-  approved:     "badge-green",
-  not_committed:"badge-slate",
-  removed:      "badge-red",
 };
 
 const VALIDATION_LABELS: Record<number, { label: string; badge: string }> = {
@@ -97,12 +87,12 @@ function MilestonesRow({ target, headers }: { target: Target; headers: Record<st
   });
 
   if (isLoading) return (
-    <tr><td colSpan={7} className="px-4 py-3 text-xs text-surface-400">Loading milestones…</td></tr>
+    <tr><td colSpan={6} className="px-4 py-3 text-xs text-surface-400">Loading milestones…</td></tr>
   );
 
   const milestones = Array.isArray(data) ? data : [];
   if (milestones.length === 0) return (
-    <tr><td colSpan={7} className="px-4 py-3 text-xs text-surface-400 italic">
+    <tr><td colSpan={6} className="px-4 py-3 text-xs text-surface-400 italic">
       No milestones. The nightly task links verified inventories to milestones automatically.
     </td></tr>
   );
@@ -110,7 +100,7 @@ function MilestonesRow({ target, headers }: { target: Target; headers: Record<st
   return (
     <>
       <tr className="bg-brand-50">
-        <td colSpan={7} className="px-8 py-2">
+        <td colSpan={6} className="px-8 py-2">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-600">
             Milestones — {target.TargetName}
           </p>
@@ -193,7 +183,7 @@ function CreateTargetModal({ onClose, entityId }: { onClose: () => void; entityI
         <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }} className="space-y-4">
           <div>
             <label className="label mb-1">Target name</label>
-            <input className="input" required placeholder="e.g. SBTi near-term 50% reduction by 2030"
+            <input className="input" required placeholder="e.g. 50% Scope 1+2 reduction by 2030"
               value={form.TargetName} onChange={(e) => set("TargetName", e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -277,17 +267,11 @@ export default function TargetsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Targets</h1>
-          <p className="page-subtitle">Science-based targets and annual milestone tracking.</p>
+          <p className="page-subtitle">Project goals and annual milestone tracking.</p>
         </div>
         <button className="btn-primary flex items-center gap-2" onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4" /> New target
         </button>
-      </div>
-
-      {/* SBTi info banner */}
-      <div className="rounded-lg border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-700">
-        <strong>SBTi sync:</strong> Commitment status is updated monthly from the SBTi Companies Taking Action registry.
-        Milestone actuals are linked nightly from verified GHG inventories.
       </div>
 
       <div className="card overflow-hidden">
@@ -309,7 +293,6 @@ export default function TargetsPage() {
                 <th>Type</th>
                 <th>Period</th>
                 <th>Reduction</th>
-                <th>SBTi status</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -345,13 +328,6 @@ export default function TargetsPage() {
                             {parseFloat(t.ReductionPercent).toFixed(1)}%
                           </span>
                         ) : "—"}
-                      </td>
-                      <td>
-                        {t.SBTiStatus ? (
-                          <span className={`badge ${SBTI_STATUS_BADGES[t.SBTiStatus] ?? "badge-slate"} text-xs capitalize`}>
-                            {t.SBTiStatus.replace("_", " ")}
-                          </span>
-                        ) : <span className="text-surface-400 text-xs">Not linked</span>}
                       </td>
                       <td><span className={`badge ${vl.badge} text-xs`}>{vl.label}</span></td>
                     </tr>

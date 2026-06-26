@@ -124,7 +124,7 @@ class TargetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Targets
         fields = "__all__"
-        read_only_fields = ("TargetId", "EntityId", "SBTiLastSyncedAt", "CreatedAt", "UpdatedAt")
+        read_only_fields = ("TargetId", "EntityId", "CreatedAt", "UpdatedAt")
 
 
 class TargetMilestonesSerializer(serializers.ModelSerializer):

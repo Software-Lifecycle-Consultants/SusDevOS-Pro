@@ -37,7 +37,6 @@ class Migration(migrations.Migration):
                 ("ParentEntityId", models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="subsidiaries")),
                 ("OwnershipSharePercent", models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)),
                 ("CompaniesHouseNumber", models.CharField(max_length=20, null=True, blank=True)),
-                ("SBTiCompanyId", models.CharField(max_length=50, null=True, blank=True)),
                 ("SICCodes", models.JSONField(default=list, blank=True)),
                 ("IncorporationDate", models.DateField(null=True, blank=True)),
                 ("ExternalRegistryUrl", models.URLField(null=True, blank=True)),

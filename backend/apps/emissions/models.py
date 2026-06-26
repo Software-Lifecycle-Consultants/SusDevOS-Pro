@@ -126,7 +126,7 @@ class GHGInventories(BaseAuditMixin):
     """Formal versioned GHG inventory. VerificationStatus >= 3 -> immutable."""
     VERIFICATION_STATUS_CHOICES = [
         (1, "Unverified"), (2, "Pending"), (3, "Verified - First Party"),
-        (4, "Verified - Third Party"), (5, "Submitted to CDP"),
+        (4, "Verified - Third Party"),
     ]
 
     InventoryId = models.AutoField(primary_key=True)
@@ -242,7 +242,6 @@ class EmissionsData(BaseAuditMixin):
     VerifiedAt = models.DateTimeField(null=True, blank=True)
     VerificationNotes = models.TextField(null=True, blank=True)
     CountsTowardNDC = models.BooleanField(default=False)
-    CountsTowardSBTi = models.BooleanField(default=False)
 
     class Meta:
         db_table = "emissions_data"
@@ -340,8 +339,6 @@ class Targets(BaseAuditMixin):
     BaselineEmissionsTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     ReductionPercent = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     Scope = models.PositiveSmallIntegerField(null=True, blank=True)
-    SBTiStatus = models.CharField(max_length=50, null=True, blank=True)
-    SBTiLastSyncedAt = models.DateTimeField(null=True, blank=True)
     ValidationStatus = models.PositiveSmallIntegerField(default=1)
     Notes = models.TextField(blank=True, null=True)
 

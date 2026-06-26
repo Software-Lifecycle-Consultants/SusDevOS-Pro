@@ -101,20 +101,6 @@ const INTEGRATIONS: Integration[] = [
     tag:         "Registry",
     stat:        "1,500+ projects",
   },
-  {
-    id:          "sbti",
-    name:        "SBTi Registry",
-    fullName:    "Science Based Targets initiative",
-    category:    "Registries & Standards",
-    pattern:     "scheduled",
-    cadence:     "Monthly — 1st of month",
-    dot:         "bg-brand-600",
-    description: "Monthly sync of the SBTi Companies Taking Action registry. Auto-updates your target validation status when SBTi publishes new commitments and achieved statuses — no manual registry checking required.",
-    enables:     "Auto-sync of SBTi target validation status",
-    tag:         "Registry",
-    stat:        "7,000+ companies",
-  },
-
   // ── Biodiversity ─────────────────────────────────────────────────────────
   {
     id:          "gbif",

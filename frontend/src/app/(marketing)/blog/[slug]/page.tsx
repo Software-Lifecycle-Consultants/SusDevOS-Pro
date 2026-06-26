@@ -276,7 +276,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             Ready to build your GHG inventory?
           </h3>
           <p className="mb-6 text-sm text-surface-500">
-            SusDevOS calculates Scope 1, 2 and 3 emissions and generates audit-ready reports aligned to GHG Protocol, SBTi, CDP and TNFD. Free to start.
+            SusDevOS calculates Scope 1, 2 and 3 emissions and generates audit-ready reports aligned to GHG Protocol, Verra, and TNFD. Free to start.
           </p>
           <Link
             href="/register"

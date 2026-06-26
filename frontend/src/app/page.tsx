@@ -15,9 +15,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://susdevos.com";
 export const metadata: Metadata = {
   title: "SusDevOS — GHG Reporting & Ecosystem Tracking for Development Projects",
   description:
-    "Calculate your Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate GHG Protocol-conformant reports. Free to start. Built for SBTi, CDP and TNFD.",
+    "Calculate your Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate GHG Protocol-conformant reports. Free to start. Built for TNFD, ecosystem MRV, and nature-based carbon.",
   keywords:
-    "GHG reporting software, carbon footprint calculator, Scope 3 emissions, SBTi target tracking, TNFD biodiversity, emissions inventory",
+    "GHG reporting software, carbon footprint calculator, Scope 3 emissions, TNFD biodiversity, ecosystem MRV, nature-based carbon, emissions inventory",
   alternates: {
     canonical: SITE_URL,
     types: { "application/rss+xml": `${SITE_URL}/rss.xml` },
@@ -45,7 +45,7 @@ function OrganizationJsonLd() {
         "@id":         `${SITE_URL}/#organization`,
         "name":        "SusDevOS",
         "url":         SITE_URL,
-        "description": "GHG reporting and ecosystem tracking software built on GHG Protocol, SBTi, CDP and TNFD.",
+        "description": "GHG reporting and ecosystem tracking software built on GHG Protocol, IPCC, Verra, and TNFD.",
         "sameAs": [
           "https://linkedin.com/company/susdevos",
           "https://github.com/susdevos",
@@ -109,7 +109,7 @@ function Hero() {
               className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm text-brand-300 transition-colors hover:bg-brand-500/20"
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-400" />
-              CDP 2025 Climate questionnaire export is live
+              TNFD v1.0 LEAP framework support now available →
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
 
@@ -129,7 +129,7 @@ function Hero() {
 
             <p className="mb-8 max-w-lg text-lg leading-relaxed text-surface-300">
               Calculate Scope 1, 2 and 3 emissions. Track ecosystem impacts.
-              Generate audit-ready reports aligned to GHG Protocol, SBTi, CDP and TNFD.
+              Generate audit-ready reports aligned to GHG Protocol, Verra/Gold Standard, and TNFD.
             </p>
 
             <div className="mb-6 flex flex-wrap gap-3">
@@ -221,12 +221,12 @@ function Hero() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div className="rounded-lg border border-white/5 bg-surface-900/40 p-3">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-surface-500">SBTi Target</p>
-                    <p className="mt-0.5 text-xs font-semibold text-white">On track · 1.5°C pathway</p>
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-surface-500">Net Zero target</p>
+                    <p className="mt-0.5 text-xs font-semibold text-white">On track · 2040 goal</p>
                   </div>
                   <div className="rounded-lg border border-white/5 bg-surface-900/40 p-3">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-surface-500">Report ready</p>
-                    <p className="mt-0.5 text-xs font-semibold text-white">CDP · PDF · CSV export</p>
+                    <p className="mt-0.5 text-xs font-semibold text-white">TNFD · Verra · GHG Protocol</p>
                   </div>
                 </div>
               </div>
@@ -266,10 +266,10 @@ function Hero() {
 
 const STANDARDS = [
   { abbr: "GHG Protocol", note: "All 15 Scope 3 categories"    },
-  { abbr: "SBTi",         note: "1.5°C pathway targets"        },
-  { abbr: "CDP",          note: "Questionnaire-ready export"   },
   { abbr: "TNFD",         note: "LEAP framework aligned"       },
   { abbr: "IPCC AR6",     note: "GWP100 & LULUCF biomass"     },
+  { abbr: "Verra VCS",    note: "Carbon credit validation"     },
+  { abbr: "Gold Standard",note: "Credit registry validation"   },
   { abbr: "UN SDGs",      note: "SDG 13, 15, 7 & 11 mapping"  },
 ];
 
@@ -396,12 +396,12 @@ const STEPS = [
   {
     number: "02",
     title:  "Review your calculated inventory",
-    body:   "See Scope 1, 2 and 3 totals in real time. Both Scope 2 methods calculated simultaneously. Track SBTi progress. Flag data quality issues before they become audit findings.",
+    body:   "See Scope 1, 2 and 3 totals in real time. Both Scope 2 methods calculated simultaneously. Track restoration sequestration and TNFD metrics. Flag data quality issues before they become audit findings.",
   },
   {
     number: "03",
     title:  "Generate and submit your report",
-    body:   "One click produces a GHG Protocol-conformant PDF, ready for CDP, your verifier, or internal disclosure. Every emission factor and GWP value is included and documented.",
+    body:   "One click produces a GHG Protocol-conformant PDF, ready for your verifier, Verra/Gold Standard, or TNFD disclosure. Every emission factor and GWP value is included and documented.",
   },
 ];
 
@@ -468,7 +468,7 @@ const COMPARISON = [
   { before: "No calculation audit trail",                      after: "Full methodology documented for every record"  },
   { before: "Scope 3 guesswork and partial coverage",          after: "All 15 categories guided, relevance documented"},
   { before: "Annual copy-paste from previous year's workbook", after: "One-click year-on-year rollover"               },
-  { before: "PDF reports built manually over days",            after: "CDP-ready export in seconds"                   },
+  { before: "PDF reports built manually over days",            after: "Verra/Gold Standard credit validation in seconds" },
   { before: "Formula errors found during verification",        after: "Server-side calculation, no client formulas"   },
 ];
 
@@ -526,7 +526,6 @@ const DATA_SOURCES = [
   { name: "Verra VCS",   desc: "Voluntary carbon credit registry — retirement validation",       dot: "bg-emerald-600" },
   { name: "GBIF / IUCN", desc: "Biodiversity taxonomy and species conservation status",          dot: "bg-lime-600"    },
   { name: "ECB",         desc: "Daily FX rates for spend-based multi-currency Scope 3",         dot: "bg-amber-500"   },
-  { name: "SBTi",        desc: "Monthly sync of the Companies Taking Action registry",           dot: "bg-brand-600"   },
 ];
 
 function DataSources() {
@@ -651,7 +650,7 @@ const PLANS = [
       "1 entity · 5 users",
       "All scopes — full Scope 3",
       "All emission factor libraries",
-      "Formal inventory + SBTi target",
+      "Formal inventory + carbon goals",
       "CSV / JSON export",
     ],
     cta: { label: "Start 14-day trial", href: "/register?plan=starter" },
@@ -663,7 +662,7 @@ const PLANS = [
     highlight: false,
     features:  [
       "5 entities · 20 users",
-      "Verification workflow + CDP",
+      "Verification workflow + TNFD",
       "GIS land parcel mapping",
       "IPCC Tier 2/3 biomass",
       "API access · bulk import",

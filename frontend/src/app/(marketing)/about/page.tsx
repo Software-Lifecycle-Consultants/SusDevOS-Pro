@@ -23,12 +23,12 @@ const PRINCIPLES = [
   {
     Icon:  Target,
     title: "Standards-aligned means actually aligned",
-    body:  "We implement GHG Protocol, IPCC AR6, TNFD LEAP, and SBTi at the calculation and data model level — not just in the report title. The methodology is documented, not assumed.",
+    body:  "We implement GHG Protocol, IPCC AR6, and TNFD LEAP at the calculation and data model level — not just in the report title. The methodology is documented, not assumed.",
   },
   {
     Icon:  Leaf,
     title: "The hard parts should be automatic",
-    body:  "Emission factor updates, FX conversion, species taxonomy lookup, SBTi registry sync — these happen automatically. The sustainability manager's job is decisions and strategy, not data wrangling.",
+    body:  "Emission factor updates, FX conversion, species taxonomy lookup, Verra/Gold Standard validation — these happen automatically. The project manager's job is decisions and strategy, not data wrangling.",
   },
 ];
 
@@ -73,8 +73,8 @@ function Mission() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="prose-custom space-y-6 text-[17px] leading-8 text-surface-600">
           <p>
-            When a company publishes its Scope 1, 2 and 3 emissions — in an annual report, a CDP
-            submission, or an ESG disclosure — those numbers carry legal and reputational weight.
+            When a company publishes its Scope 1, 2 and 3 emissions — in an annual report, an ESG disclosure,
+            or a TNFD nature report — those numbers carry legal and reputational weight.
             Investors, regulators, and verifiers increasingly scrutinise them. And yet most of
             those numbers are produced in Excel workbooks that nobody outside the sustainability
             team has ever audited.
@@ -93,9 +93,9 @@ function Mission() {
             The problem is the tooling to apply it.
           </p>
           <p>
-            We are building that tooling — for the sustainability manager who needs to get CDP
-            submitted by Friday, and for the ecologist mapping restoration carbon across 40 land
-            parcels in PostGIS.
+            We are building that tooling — for the project manager who needs to verify carbon credits
+            against Verra and disclose biodiversity impacts under TNFD, and for the ecologist mapping
+            restoration carbon across 40 land parcels in PostGIS.
           </p>
         </div>
       </div>
@@ -140,7 +140,7 @@ function Built() {
           {[
             { label: "Backend",   stack: "Django 5.1 · PostgreSQL / PostGIS · Celery / Redis · S3" },
             { label: "Frontend",  stack: "Next.js 14 · TypeScript · Tailwind · TanStack Query" },
-            { label: "Standards", stack: "GHG Protocol · IPCC AR6 · SBTi · CDP · TNFD · ISO 14064" },
+            { label: "Standards", stack: "GHG Protocol · IPCC AR6 · Verra/GS · TNFD · ISO 14064" },
           ].map(({ label, stack }) => (
             <div key={label} className="rounded-xl border border-surface-200 p-5">
               <p className="mb-1 text-xs font-bold uppercase tracking-wider text-surface-400">{label}</p>

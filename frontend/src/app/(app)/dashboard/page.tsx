@@ -28,7 +28,7 @@ interface Project {
 }
 
 const VERIFICATION_LABELS: Record<number, string> = {
-  1: "Unverified", 2: "Pending", 3: "Verified", 4: "Verified (3rd Party)", 5: "CDP Submitted",
+  1: "Unverified", 2: "Pending", 3: "Verified", 4: "Verified (3rd Party)",
 };
 
 function ScopeCard({ label, value, colour }: { label: string; value: number; colour: string }) {
@@ -45,7 +45,7 @@ function ScopeCard({ label, value, colour }: { label: string; value: number; col
 
 function VerificationBadge({ status }: { status: number }) {
   const colours: Record<number, string> = {
-    1: "badge-slate", 2: "badge-yellow", 3: "badge-green", 4: "badge-green", 5: "badge-blue",
+    1: "badge-slate", 2: "badge-yellow", 3: "badge-green", 4: "badge-green",
   };
   return (
     <span className={`badge ${colours[status] ?? "badge-slate"}`}>

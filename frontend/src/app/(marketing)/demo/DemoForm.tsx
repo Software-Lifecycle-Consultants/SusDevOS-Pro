@@ -24,9 +24,8 @@ const TEAM_SIZES = [
 
 const USE_CASES = [
   "GHG inventory (Scope 1, 2, 3)",
-  "SBTi target setting and tracking",
-  "CDP questionnaire submission",
-  "TNFD / biodiversity reporting",
+  "Carbon credit validation (Verra/Gold Standard)",
+  "TNFD biodiversity / nature reporting",
   "Land and ecosystem carbon accounting",
   "Managing multiple client entities",
   "Replacing spreadsheets",

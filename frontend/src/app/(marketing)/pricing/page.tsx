@@ -97,8 +97,7 @@ const FEATURE_GROUPS: {
   {
     group: "Targets & offsets",
     rows: [
-      { label: "SBTi target setting & milestones",     plans: { free: false, starter: true, professional: true, agency: true, enterprise: true } },
-      { label: "SBTi registry sync (monthly)",         plans: { free: false, starter: false, professional: true, agency: true, enterprise: true } },
+      { label: "Carbon goals & target milestones",     plans: { free: false, starter: true, professional: true, agency: true, enterprise: true } },
       { label: "Carbon offset management",             plans: { free: false, starter: true, professional: true, agency: true, enterprise: true } },
       { label: "Verra / Gold Standard validation",     plans: { free: false, starter: false, professional: true, agency: true, enterprise: true } },
     ],
@@ -123,7 +122,6 @@ const FEATURE_GROUPS: {
       { label: "PDF report (unbranded)",               plans: { free: false, starter: true, professional: true, agency: false, enterprise: false } },
       { label: "PDF report (white-label)",             plans: { free: false, starter: false, professional: false, agency: true, enterprise: true } },
       { label: "CSV / JSON export",                    plans: { free: false, starter: true, professional: true, agency: true, enterprise: true } },
-      { label: "CDP export format",                    plans: { free: false, starter: false, professional: true, agency: true, enterprise: true } },
       { label: "Client read-only portal",              plans: { free: false, starter: false, professional: false, agency: true, enterprise: true } },
     ],
   },

@@ -5,7 +5,7 @@ import { DemoForm } from "./DemoForm";
 export const metadata: Metadata = {
   title: "Book a Demo — SusDevOS",
   description:
-    "See SusDevOS in action. A 30-minute demo tailored to your use case — GHG inventory, SBTi targets, CDP export, or TNFD biodiversity reporting.",
+    "See SusDevOS in action. A 30-minute demo tailored to your use case — GHG inventory, TNFD biodiversity reporting, Verra/Gold Standard credit validation, or land carbon.",
   alternates: { canonical: "https://susdevos.com/demo" },
 };
 
@@ -18,7 +18,7 @@ const WHAT_TO_EXPECT = [
   {
     Icon:  BarChart3,
     title: "Tailored to your use case",
-    body:  "Tell us what you're trying to solve — GHG inventory, Scope 3, SBTi, CDP, or land and biodiversity — and we'll focus the demo there.",
+    body:  "Tell us what you're trying to solve — GHG inventory, Scope 3, Verra credit validation, TNFD LEAP, or land and biodiversity — and we'll focus the demo there.",
   },
   {
     Icon:  Users,
@@ -36,7 +36,7 @@ const DEMO_COVERS = [
   "Live GHG inventory walkthrough with real emission factor calculations",
   "Scope 3 category setup and relevance assessment",
   "Verification workflow from draft to third-party sign-off",
-  "CDP questionnaire export and SBTi target tracking",
+  "Verra/Gold Standard credit validation and TNFD LEAP biodiversity reporting",
   "Land parcel mapping, IPCC biomass, and TNFD reporting (if relevant)",
   "Multi-entity setup for ESG consultancy workflows",
   "API access and integration overview",

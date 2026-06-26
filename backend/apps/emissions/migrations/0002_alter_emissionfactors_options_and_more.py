@@ -45,6 +45,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ghginventories',
             name='VerificationStatus',
-            field=models.PositiveSmallIntegerField(choices=[(1, 'Unverified'), (2, 'Pending'), (3, 'Verified - First Party'), (4, 'Verified - Third Party'), (5, 'Submitted to CDP')], default=1),
+            field=models.PositiveSmallIntegerField(choices=[(1, 'Unverified'), (2, 'Pending'), (3, 'Verified - First Party'), (4, 'Verified - Third Party')], default=1),
         ),
     ]

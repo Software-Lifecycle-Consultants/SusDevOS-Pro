@@ -28,7 +28,6 @@ const VERIF_STATUS: Record<number, { label: string; badge: string; next?: string
   2: { label: "Internally approved", badge: "badge-blue",   next: "Mark third-party verified" },
   3: { label: "Verified",            badge: "badge-green"                               },
   4: { label: "Rejected",            badge: "badge-red",    next: "Reset to draft"      },
-  5: { label: "CDP Submitted",       badge: "badge-blue"                                },
 };
 
 const CONSOLIDATION_LABELS: Record<number, string> = {
@@ -96,7 +95,7 @@ function CreateInventoryModal({ onClose, entityId }: { onClose: () => void; enti
                 value={form.ReportingYear} onChange={(e) => set("ReportingYear", e.target.value)} />
             </div>
             <div>
-              <label className="label mb-1">Base year <span className="font-normal text-surface-400">(SBTi)</span></label>
+              <label className="label mb-1">Base year <span className="font-normal text-surface-400">(optional)</span></label>
               <input className="input" type="number" min={2000} max={2100}
                 value={form.BaseYear} onChange={(e) => set("BaseYear", e.target.value)}
                 placeholder="e.g. 2019" />

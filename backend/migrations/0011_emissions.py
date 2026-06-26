@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
                 ('BaselineYear', models.PositiveSmallIntegerField(
                     null=True,
                     blank=True,
-                    help_text="Baseline year for NDC/SBTi reporting (4-digit year)"
+                    help_text="Baseline year for GHG reporting (4-digit year)"
                 )),
                 ('ReportingPeriodFrom', models.DateField(
                     null=True,
@@ -164,14 +164,9 @@ class Migration(migrations.Migration):
                 )),
                 ('VerifiedAt', models.DateTimeField(null=True, blank=True)),
                 ('VerificationNotes', models.TextField(null=True, blank=True)),
-                # NDC/SBTi flags (aggregated in reports)
                 ('CountsTowardNDC', models.BooleanField(
                     default=False,
-                    help_text="Include this record in NDC reporting aggregations"
-                )),
-                ('CountsTowardSBTi', models.BooleanField(
-                    default=False,
-                    help_text="Include this record in SBTi progress tracking"
+                    help_text="Include this record in national/governmental reporting aggregations"
                 )),
                 # BaseAuditMixin
                 ('Status', models.PositiveSmallIntegerField(

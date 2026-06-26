@@ -116,7 +116,7 @@ FEATURE_GATES = [
      None),
 
     ("scope_2_market_based",
-     "Market-based Scope 2 is required for SBTi reporting. Upgrade to Starter.",
+     "Market-based Scope 2 requires Starter.",
      ["starter", "professional", "agency", "enterprise"],
      None),
 
@@ -148,7 +148,7 @@ FEATURE_GATES = [
 
     # ── GHG inventory ─────────────────────────────────────────────────────────
     ("ghg_inventory_formal",
-     "Formal versioned GHG inventories (required for CDP and verification) are available on Starter.",
+     "Formal versioned GHG inventories (required for verification) are available on Starter.",
      ["starter", "professional", "agency", "enterprise"],
      None),
 
@@ -160,17 +160,6 @@ FEATURE_GATES = [
     ("multiple_reporting_years",
      "Access historical reporting years and year-on-year comparisons on Starter.",
      ["starter", "professional", "agency", "enterprise"],
-     None),
-
-    # ── Targets ───────────────────────────────────────────────────────────────
-    ("sbti_targets",
-     "SBTi target setting and milestone tracking are available on Starter.",
-     ["starter", "professional", "agency", "enterprise"],
-     None),
-
-    ("sbti_registry_sync",
-     "Automatic SBTi registry validation sync is available on Professional.",
-     ["professional", "agency", "enterprise"],
      None),
 
     # ── Ecosystem & nature ────────────────────────────────────────────────────
@@ -251,11 +240,6 @@ FEATURE_GATES = [
     ("report_csv_json_export",
      "CSV and JSON data export is available on Starter.",
      ["starter", "professional", "agency", "enterprise"],
-     None),
-
-    ("report_cdp_export",
-     "CDP-formatted export requires Professional.",
-     ["professional", "agency", "enterprise"],
      None),
 
     # ── Audit log retention ───────────────────────────────────────────────────

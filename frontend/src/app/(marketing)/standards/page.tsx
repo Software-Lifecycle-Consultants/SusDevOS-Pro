@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2, ExternalLink } from "lucide-react";
 export const metadata: Metadata = {
   title: "Standards — SusDevOS",
   description:
-    "SusDevOS is built on GHG Protocol, SBTi, CDP, TNFD, IPCC AR6 and UN SDGs. Read how each standard is implemented — not just referenced.",
+    "SusDevOS is built on GHG Protocol, TNFD, IPCC AR6 and UN SDGs. Read how each standard is implemented — not just referenced.",
   alternates: { canonical: "https://susdevos.com/standards" },
 };
 
@@ -31,47 +31,6 @@ const STANDARDS = [
       "PDF reports include all GHG Protocol-required disclosures: reporting year, boundary, base year, methodology, emission factors, and GWP source",
     ],
     supplementary: ["GHG Protocol Corporate Value Chain (Scope 3) Standard — all 15 categories", "GHG Protocol Scope 2 Guidance"],
-  },
-  {
-    id:        "sbti",
-    abbr:      "SBTi",
-    full:      "Science Based Targets initiative",
-    publisher: "CDP, UN Global Compact, WRI, WWF",
-    url:       "https://sciencebasedtargets.org",
-    dot:       "bg-brand-600",
-    summary:   "The SBTi provides companies with a clearly-defined pathway to reduce emissions in line with the Paris Agreement. SusDevOS tracks progress against SBTi-validated targets and auto-syncs validation status from the public registry.",
-    how: [
-      "Absolute and intensity reduction targets are set against a defined base year inventory",
-      "Year-by-year progress is tracked against linear annual reduction milestones (1.5°C pathway requires ~4.2% reduction per year for absolute targets)",
-      "SBTi validation status auto-syncs monthly from the Companies Taking Action CSV registry — no manual checking",
-      "SBTi company ID can be stored on each entity for exact-match registry lookup, with fuzzy-name matching as a fallback",
-      "Near-term and long-term (net-zero) targets can be tracked separately, with SBTi status mapped to Committed, Targets Set, or Achieved",
-      "SBTi sector-specific pathways (e.g. SDA for electricity, SBT for buildings) can be configured per entity based on SIC code",
-    ],
-    supplementary: ["SBTi Corporate Net-Zero Standard", "SBTi Target Setting Manual"],
-  },
-  {
-    id:        "cdp",
-    abbr:      "CDP",
-    full:      "CDP Climate Change Questionnaire",
-    publisher: "CDP (formerly Carbon Disclosure Project)",
-    url:       "https://www.cdp.net",
-    dot:       "bg-sky-600",
-    summary:   "CDP runs the world's largest environmental disclosure system. SusDevOS generates CDP-ready exports that map directly to the Climate Change questionnaire sections, eliminating hours of manual reformatting. The export is updated annually to reflect each year's questionnaire changes.",
-    how: [
-      "C4 (Targets and performance) auto-populated from the Targets module — SBTi status, net-zero pathway, target year, and annual milestone progress",
-      "C6 (Scope 1 and 2 emissions) auto-populated from the verified GHG inventory, including both location-based and market-based Scope 2 as required by C6.3",
-      "C7 (Emissions breakdown) populated from EmissionsData records, grouped by facility, activity category, and Scope 3 sub-category",
-      "C10 (Verification) populated from the verification workflow status, verifier name, verification body, and third-party sign-off timestamps",
-      "CDP 2025 ISSB S2 alignment flag — inventory disclosure is tagged as IFRS S2-aligned where GHG Protocol methodology is used (which it always is in SusDevOS)",
-      "Biogenic CO2 reported separately in the export per CDP 2025 guidance — sourced from BiogenicCO₂AmountTonnes, never included in the GWP total",
-      "Export format matches the CDP online response system column structure — paste directly without reformatting",
-    ],
-    supplementary: [
-      "CDP Climate Change 2025 Questionnaire Guidance",
-      "CDP Technical Note: Accounting of Scope 2 Emissions (location-based and market-based)",
-      "IFRS S2 Climate-related Disclosures (CDP 2025 alignment)",
-    ],
   },
   {
     id:        "tnfd",
@@ -121,7 +80,7 @@ const STANDARDS = [
     dot:       "bg-indigo-600",
     summary:   "SusDevOS maps platform capabilities to relevant SDGs, helping sustainability teams demonstrate contribution to the global agenda in board reports and ESG disclosures.",
     how: [
-      "SDG 13 (Climate Action) — GHG inventory, SBTi targets, and CDP export directly support national and corporate climate commitments",
+      "SDG 13 (Climate Action) — GHG inventory and verified emissions reporting directly support corporate climate commitments",
       "SDG 15 (Life on Land) — TNFD LEAP assessments, species tracking, IUCN status, and restoration sequestration address biodiversity and ecosystem health",
       "SDG 7 (Affordable and Clean Energy) — Scope 2 market-based reporting supports renewable energy procurement transparency",
       "SDG 11 (Sustainable Cities) — Land parcel and development project tracking supports sustainable urban development disclosures",
@@ -168,7 +127,7 @@ function Hero() {
           </span>
         </h1>
         <p className="mx-auto mb-8 max-w-2xl text-lg text-surface-300 leading-relaxed">
-          SusDevOS implements the GHG Protocol, SBTi, CDP, TNFD and IPCC at the calculation
+          SusDevOS implements the GHG Protocol, TNFD and IPCC at the calculation
           and methodology level — not just in the reporting layer. Here&apos;s exactly how.
         </p>
         {/* Standard pills */}
@@ -255,7 +214,7 @@ function Disclaimer() {
     <section className="bg-surface-50 py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <p className="text-center text-xs text-surface-400 max-w-3xl mx-auto">
-          GHG Protocol, SBTi, CDP, TNFD, IPCC and UN SDGs are trademarks or registered marks of their
+          GHG Protocol, TNFD, IPCC and UN SDGs are trademarks or registered marks of their
           respective owners. SusDevOS is not affiliated with, endorsed by, or officially certified
           by any of these organisations. &quot;Aligned to&quot; and &quot;implements&quot; describe SusDevOS&apos;s
           use of these publicly available methodologies and frameworks in its calculation and reporting engine.
@@ -282,7 +241,7 @@ function CTA() {
           Standards-aligned from day one.
         </h2>
         <p className="mx-auto mb-8 max-w-lg text-brand-100">
-          Your first GHG inventory, verified and ready for CDP, your auditor, and your board.
+          Your first GHG inventory, verified and ready for your auditor, Verra/Gold Standard, and your board.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link

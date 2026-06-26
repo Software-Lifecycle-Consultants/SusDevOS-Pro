@@ -31,11 +31,6 @@ app.conf.beat_schedule = {
         "schedule": crontab(hour=2, minute=0, day_of_week="sunday"),
         "options": {"expires": 86400},
     },
-    "sync-sbti-registry-monthly": {
-        "task": "tasks.integrations.sync_sbti_registry",
-        "schedule": crontab(hour=2, minute=0, day_of_month=1),
-        "options": {"expires": 86400},
-    },
     "sync-verra-registry-daily": {
         "task": "tasks.integrations.sync_verra_registry",
         "schedule": crontab(hour=3, minute=0),

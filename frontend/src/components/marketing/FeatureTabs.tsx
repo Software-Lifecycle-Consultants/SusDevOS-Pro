@@ -16,10 +16,10 @@ const TABS = [
     features: [
       { Icon: BarChart3,    title: "Auto emission factors",    body: "DEFRA 2024, EPA eGRID and Climatiq — 10,000+ factors updated annually, applied automatically." },
       { Icon: CheckCircle2, title: "Scope 3 assessment",       body: "Guided relevance checklist for all 15 categories. Documented decisions, no guesswork." },
-      { Icon: Target,       title: "SBTi target tracking",     body: "Year-by-year milestone progress against your 1.5°C pathway target." },
       { Icon: Activity,     title: "Verification workflow",     body: "Internal approval → third-party sign-off → immutable verified record." },
-      { Icon: Download,     title: "CDP-ready export",          body: "Auto-maps to C6, C7 and C10 questionnaire sections in one click." },
       { Icon: FileText,     title: "Audit-ready PDF",           body: "Every factor, every GWP value, every boundary decision fully documented." },
+      { Icon: Target,       title: "TNFD LEAP nature reporting", body: "Locate, Evaluate, Assess, Prepare framework for biodiversity impacts — TNFD v1.0 aligned." },
+      { Icon: Download,     title: "Verra/Gold Standard validation", body: "Real-time registry check on offset serial numbers — unvalidated credits never deducted from net totals." },
     ],
   },
   {

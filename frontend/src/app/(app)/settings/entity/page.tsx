@@ -43,7 +43,6 @@ interface Entity {
   FiscalYearEndMonth:   number;
   ConsolidationApproach: number | null;
   CompaniesHouseNumber: string | null;
-  SBTiCompanyId:        string | null;
 }
 
 export default function EntitySettingsPage() {
@@ -207,13 +206,6 @@ export default function EntitySettingsPage() {
               value={form.VATNumber ?? ""}
               onChange={(e) => set("VATNumber", e.target.value)} />
           </div>
-        </div>
-
-        <div>
-          <label className="label mb-1">SBTi Company ID <span className="font-normal text-surface-400">(optional)</span></label>
-          <input className={inputCls} placeholder="From the SBTi Companies Taking Action page"
-            value={form.SBTiCompanyId ?? ""}
-            onChange={(e) => set("SBTiCompanyId", e.target.value)} />
         </div>
       </div>
 
