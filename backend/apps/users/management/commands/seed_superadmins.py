@@ -11,9 +11,8 @@ Environment variables required:
     SUPERADMIN_1_EMAIL, SUPERADMIN_1_USERNAME, SUPERADMIN_1_PASSWORD
     SUPERADMIN_2_EMAIL, SUPERADMIN_2_USERNAME, SUPERADMIN_2_PASSWORD
 """
-from django.core.management.base import BaseCommand
-from django.conf import settings
-from decouple import config
+from django.core.management.base import BaseCommand, CommandError
+from decouple import config, UndefinedValueError
 
 
 class Command(BaseCommand):
@@ -22,18 +21,25 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from apps.users.models import Users
 
-        superadmins = [
-            {
-                "email":    config("SUPERADMIN_1_EMAIL",    default="superadmin1@susdevos.com"),
-                "username": config("SUPERADMIN_1_USERNAME", default="superadmin1"),
-                "password": config("SUPERADMIN_1_PASSWORD", default="ChangeMe!12345"),
-            },
-            {
-                "email":    config("SUPERADMIN_2_EMAIL",    default="superadmin2@susdevos.com"),
-                "username": config("SUPERADMIN_2_USERNAME", default="superadmin2"),
-                "password": config("SUPERADMIN_2_PASSWORD", default="ChangeMe!67890"),
-            },
-        ]
+        # All six variables are required — no fallback to known strings.
+        try:
+            superadmins = [
+                {
+                    "email":    config("SUPERADMIN_1_EMAIL"),
+                    "username": config("SUPERADMIN_1_USERNAME"),
+                    "password": config("SUPERADMIN_1_PASSWORD"),
+                },
+                {
+                    "email":    config("SUPERADMIN_2_EMAIL"),
+                    "username": config("SUPERADMIN_2_USERNAME"),
+                    "password": config("SUPERADMIN_2_PASSWORD"),
+                },
+            ]
+        except UndefinedValueError as e:
+            raise CommandError(
+                f"Missing required environment variable: {e}. "
+                "Set all SUPERADMIN_* variables in .env.prod before running this command."
+            ) from e
 
         for sa in superadmins:
             user, created = Users.objects.get_or_create(

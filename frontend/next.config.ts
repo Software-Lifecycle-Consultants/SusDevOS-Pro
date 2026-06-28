@@ -1,11 +1,26 @@
 import type { NextConfig } from "next";
 
+// CSP: strict defaults, allow same-origin scripts + Next.js inline scripts.
+// Adjust connect-src if you add third-party analytics or Sentry.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",   // 'unsafe-inline' required by Next.js RSC inline scripts
+  "style-src 'self' 'unsafe-inline'",    // Tailwind inlines styles
+  "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
 const SECURITY_HEADERS = [
   { key: "X-DNS-Prefetch-Control",   value: "on" },
   { key: "X-Content-Type-Options",   value: "nosniff" },
   { key: "X-Frame-Options",          value: "DENY" },
   { key: "Referrer-Policy",          value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy",       value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Content-Security-Policy",  value: CSP },
 ];
 
 const nextConfig: NextConfig = {

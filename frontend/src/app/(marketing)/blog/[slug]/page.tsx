@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Post {
   BlogId:         number;
@@ -127,7 +129,7 @@ function ArticleJsonLd({ post }: { post: Post }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
     />
   );
 }
@@ -203,39 +205,36 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       {/* Body */}
       <section className="bg-white py-14 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          {/*
-            PostBody is rendered as HTML. If your team writes in Markdown,
-            install react-markdown + remark-gfm and replace this div.
-            For HTML content from a rich-text editor, sanitize with DOMPurify before saving.
-          */}
-          <div
-            className="
-              text-surface-700 leading-relaxed
-              [&>h2]:mt-10 [&>h2]:mb-4 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-surface-900
-              [&>h3]:mt-8 [&>h3]:mb-3 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-surface-900
-              [&>p]:mb-5 [&>p]:text-[17px] [&>p]:leading-8
-              [&>ul]:mb-5 [&>ul]:ml-6 [&>ul]:list-disc [&>ul]:space-y-2
-              [&>ol]:mb-5 [&>ol]:ml-6 [&>ol]:list-decimal [&>ol]:space-y-2
-              [&>li]:text-[17px] [&>li]:leading-7
-              [&>blockquote]:my-6 [&>blockquote]:border-l-4 [&>blockquote]:border-brand-300
-              [&>blockquote]:pl-5 [&>blockquote]:italic [&>blockquote]:text-surface-500
-              [&>pre]:my-6 [&>pre]:overflow-x-auto [&>pre]:rounded-xl [&>pre]:bg-surface-900
-              [&>pre]:p-5 [&>pre]:text-sm [&>pre]:text-surface-100
-              [&>code]:rounded [&>code]:bg-surface-100 [&>code]:px-1.5 [&>code]:py-0.5
-              [&>code]:text-sm [&>code]:font-mono [&>code]:text-surface-800
-              [&>hr]:my-10 [&>hr]:border-surface-200
-              [&>a]:text-brand-600 [&>a]:underline [&>a:hover]:text-brand-800
-              [&>img]:my-8 [&>img]:rounded-xl [&>img]:shadow-md
-              [&>table]:my-6 [&>table]:w-full [&>table]:border-collapse
-              [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-surface-200
-              [&>table>thead>tr>th]:bg-surface-50 [&>table>thead>tr>th]:px-4
-              [&>table>thead>tr>th]:py-2 [&>table>thead>tr>th]:text-left
-              [&>table>thead>tr>th]:text-sm [&>table>thead>tr>th]:font-semibold
-              [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-surface-200
-              [&>table>tbody>tr>td]:px-4 [&>table>tbody>tr>td]:py-2 [&>table>tbody>tr>td]:text-sm
-            "
-            dangerouslySetInnerHTML={{ __html: post.PostBody }}
-          />
+          {/* PostBody is Markdown — react-markdown renders it safely (no dangerouslySetInnerHTML). */}
+          <div className="
+            text-surface-700 leading-relaxed
+            [&>h2]:mt-10 [&>h2]:mb-4 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-surface-900
+            [&>h3]:mt-8 [&>h3]:mb-3 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-surface-900
+            [&>p]:mb-5 [&>p]:text-[17px] [&>p]:leading-8
+            [&>ul]:mb-5 [&>ul]:ml-6 [&>ul]:list-disc [&>ul]:space-y-2
+            [&>ol]:mb-5 [&>ol]:ml-6 [&>ol]:list-decimal [&>ol]:space-y-2
+            [&>li]:text-[17px] [&>li]:leading-7
+            [&>blockquote]:my-6 [&>blockquote]:border-l-4 [&>blockquote]:border-brand-300
+            [&>blockquote]:pl-5 [&>blockquote]:italic [&>blockquote]:text-surface-500
+            [&>pre]:my-6 [&>pre]:overflow-x-auto [&>pre]:rounded-xl [&>pre]:bg-surface-900
+            [&>pre]:p-5 [&>pre]:text-sm [&>pre]:text-surface-100
+            [&>code]:rounded [&>code]:bg-surface-100 [&>code]:px-1.5 [&>code]:py-0.5
+            [&>code]:text-sm [&>code]:font-mono [&>code]:text-surface-800
+            [&>hr]:my-10 [&>hr]:border-surface-200
+            [&>a]:text-brand-600 [&>a]:underline [&>a:hover]:text-brand-800
+            [&>img]:my-8 [&>img]:rounded-xl [&>img]:shadow-md
+            [&>table]:my-6 [&>table]:w-full [&>table]:border-collapse
+            [&>table>thead>tr>th]:border [&>table>thead>tr>th]:border-surface-200
+            [&>table>thead>tr>th]:bg-surface-50 [&>table>thead>tr>th]:px-4
+            [&>table>thead>tr>th]:py-2 [&>table>thead>tr>th]:text-left
+            [&>table>thead>tr>th]:text-sm [&>table>thead>tr>th]:font-semibold
+            [&>table>tbody>tr>td]:border [&>table>tbody>tr>td]:border-surface-200
+            [&>table>tbody>tr>td]:px-4 [&>table>tbody>tr>td]:py-2 [&>table>tbody>tr>td]:text-sm
+          ">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.PostBody}
+            </ReactMarkdown>
+          </div>
 
           {/* Share + back */}
           <div className="mt-14 flex items-center justify-between border-t border-surface-200 pt-8">

@@ -47,3 +47,26 @@ def purge_expired_audit_logs():
 
     logger.info("purge_expired_audit_logs: deleted %d rows total", total)
     return {"deleted": total}
+
+
+@shared_task(name="tasks.auth.prune_old_notifications")
+def prune_old_notifications():
+    """Keep max 100 notifications per user — delete oldest beyond that limit."""
+    from apps.notifications.models import Notifications
+    from django.db.models import OuterRef, Subquery
+
+    # ORM approach: find the 101st notification (by CreatedAt desc) per user and
+    # delete everything older than it.
+    keep_threshold = (
+        Notifications.objects
+        .filter(UserId_id=OuterRef("UserId_id"))
+        .order_by("-CreatedAt")
+        .values("CreatedAt")[100:101]
+    )
+    deleted, _ = (
+        Notifications.objects
+        .filter(CreatedAt__lt=Subquery(keep_threshold))
+        .delete()
+    )
+    logger.info("prune_old_notifications: removed %d rows", deleted)
+    return {"deleted": deleted}

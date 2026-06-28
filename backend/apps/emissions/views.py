@@ -211,13 +211,24 @@ class GHGInventoriesViewSet(TenantViewSetMixin, ModelViewSet):
     serializer_class = GHGInventoriesSerializer
     permission_classes = [IsAuthenticated]
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def _check_not_verified(self, instance):
         if instance.VerificationStatus >= VERIFIED:
             return Response({"code": "verified_immutable",
-                             "detail": "Verified inventories cannot be edited."},
+                             "detail": "Verified inventories cannot be edited or deleted."},
                             status=status.HTTP_403_FORBIDDEN)
+        return None
+
+    def update(self, request, *args, **kwargs):
+        err = self._check_not_verified(self.get_object())
+        if err:
+            return err
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        err = self._check_not_verified(self.get_object())
+        if err:
+            return err
+        return super().destroy(request, *args, **kwargs)
 
 
 class TargetsViewSet(TenantViewSetMixin, ModelViewSet):

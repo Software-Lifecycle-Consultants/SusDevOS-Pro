@@ -15,29 +15,4 @@ def reset_daily_api_counters():
     return {"reset": updated}
 
 
-@shared_task(name="tasks.billing.prune_old_notifications")
-def prune_old_notifications():
-    """Keep max 100 notifications per user — prune oldest beyond that."""
-    from django.db import connection
-
-    with connection.cursor() as cur:
-        # Delete notifications beyond rank 100 per user (ordered by CreatedAt desc)
-        cur.execute("""
-            DELETE FROM notifications
-            WHERE "NotificationId" IN (
-                SELECT "NotificationId"
-                FROM (
-                    SELECT "NotificationId",
-                           ROW_NUMBER() OVER (
-                               PARTITION BY "UserId_id"
-                               ORDER BY "CreatedAt" DESC
-                           ) AS rn
-                    FROM notifications
-                ) ranked
-                WHERE rn > 100
-            )
-        """)
-        deleted = cur.rowcount
-
-    logger.info("prune_old_notifications: removed %d rows", deleted)
-    return {"deleted": deleted}
+# Note: prune_old_notifications task was moved to tasks/auth.py (correct module)

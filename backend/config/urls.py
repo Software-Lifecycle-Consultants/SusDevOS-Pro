@@ -8,13 +8,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
 
+
+def health_check(request):
+    """Lightweight health check — no auth, no DB query. Used by Docker + Nginx."""
+    return JsonResponse({"status": "ok"})
+
 urlpatterns = [
+    # Health check — no auth, used by Docker HEALTHCHECK and Nginx
+    path("health/", health_check),
+
     # Django admin
     path("admin/", admin.site.urls),
 

@@ -40,7 +40,7 @@ axiosInstance.interceptors.response.use(
         useAuthStore.getState().setAccessToken(data.access_token);
         original.headers = {
           ...original.headers,
-          Authorization: `Bearer ${data.access}`,
+          Authorization: `Bearer ${data.access_token}`,
         };
         return axiosInstance(original);
       } catch {
