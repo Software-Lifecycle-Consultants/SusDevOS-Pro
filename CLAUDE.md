@@ -9,6 +9,26 @@ SusDevOS is a multi-tenant SaaS platform for sustainable development tracking:
 
 Target users: sustainability managers, ESG consultants, development project managers.
 
+## Product scope — IN and OUT (authoritative)
+
+The product was refocused on **nature / MRV + TNFD** (commit "remove SBTi, CDP, NDC, RE100").
+This list is the source of truth — if a spec/marketing doc still describes an OUT-of-scope
+feature, the doc is stale, not a backlog item.
+
+**In scope:** GHG accounting (Scope 1/2/3, GHG Protocol; market- & location-based Scope 2),
+IPCC LULUCF biomass carbon (tree removals + restoration sequestration), TNFD-aligned
+biodiversity (Species + GBIF/IUCN), carbon-credit MRV (Verra / Gold Standard validation),
+emission factors via Climatiq (aggregator), generic Targets/milestones, reporting (CSV/PDF).
+
+**Out of scope — do NOT (re)build:**
+- **SBTi** — no target-validation/registry sync, no SBTi-specific tiers or marketing.
+- **CDP** — no CDP export format / questionnaire mapping / Partner Program integration.
+- **NDC** — no "counts toward NDC" tagging (field removed).
+- **RE100** — no renewable-electricity commitment tracking.
+
+Generic GHG capabilities that happen to *support* external frameworks (e.g. market-based
+Scope 2) stay in scope — just don't frame or build them as SBTi/CDP/NDC/RE100 features.
+
 ## Spec documents — read before building anything
 
 All design decisions are documented in `spec/`. Read the relevant spec before implementing:
