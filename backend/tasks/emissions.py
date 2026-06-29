@@ -24,9 +24,9 @@ def recompute_stale_inventory_totals():
     from apps.emissions.models import EmissionsData, GHGInventories
 
     stale_cutoff = now() - timedelta(hours=24)
-    # Inventories with no TotalsLastComputedAt field — recompute via NetEmissionsTonnes being null
+    # Spec (celery_tasks.md): recompute inventories never computed OR last computed >24h ago.
     stale = GHGInventories.objects.filter(
-        models.Q(NetEmissionsTonnes__isnull=True),
+        models.Q(TotalsLastComputedAt__isnull=True) | models.Q(TotalsLastComputedAt__lt=stale_cutoff),
         DeletedAt__isnull=True,
         VerificationStatus__lt=3,  # don't touch verified inventories
     )
@@ -73,7 +73,9 @@ def _compute_inventory_totals(inventory):
     ).aggregate(t=models.Sum("OffsetAmountTonnes"))["t"]
     total_offsets = Decimal(str(offsets or 0))
 
-    net = scope1 + scope2l + scope3 - total_offsets
+    # Net uses market-based Scope 2 as the primary method (GHG Protocol Scope 2 Guidance,
+    # SBTi requirement). Location-based remains stored for dual reporting.
+    net = scope1 + scope2m + scope3 - total_offsets
 
     inventory.TotalScope1Tonnes          = scope1
     inventory.TotalScope2LocationTonnes  = scope2l
@@ -81,9 +83,11 @@ def _compute_inventory_totals(inventory):
     inventory.TotalScope3Tonnes          = scope3
     inventory.TotalOffsetsTonnes         = total_offsets
     inventory.NetEmissionsTonnes         = net
+    inventory.TotalsLastComputedAt       = now()
     inventory.save(update_fields=[
         "TotalScope1Tonnes", "TotalScope2LocationTonnes", "TotalScope2MarketTonnes",
         "TotalScope3Tonnes", "TotalOffsetsTonnes", "NetEmissionsTonnes",
+        "TotalsLastComputedAt",
     ])
 
 

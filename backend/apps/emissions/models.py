@@ -151,6 +151,10 @@ class GHGInventories(BaseAuditMixin):
     TotalScope3Tonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     TotalOffsetsTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     NetEmissionsTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
+    TotalsLastComputedAt = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Timestamp of last scope-total recompute. NULL or >24h old => stale (see tasks.emissions).",
+    )
 
     class Meta:
         db_table = "ghg_inventories"
@@ -220,8 +224,20 @@ class EmissionsData(BaseAuditMixin):
     EmissionsReduced = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     EmissionsReducedTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     # Biogenic CO2 -- NOT in GWP total (critical rule #4)
+    BiogenicCO2FactorKg = models.DecimalField(
+        max_digits=18, decimal_places=8, null=True, blank=True,
+        help_text="kg biogenic CO2 per canonical unit of fuel (combustion of biomass/biofuels).",
+    )
     BiogenicCO2AmountTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
-    # Scope 2 dual method (critical rule #5)
+    # Scope 2 dual method (critical rule #5) — separate location/market EF inputs
+    EFLocationBased = models.DecimalField(
+        max_digits=18, decimal_places=8, null=True, blank=True,
+        help_text="Grid-average emission factor (kg CO2e per canonical unit).",
+    )
+    EFMarketBased = models.DecimalField(
+        max_digits=18, decimal_places=8, null=True, blank=True,
+        help_text="Contractual/supplier emission factor (kg CO2e per canonical unit); 0 if 100% renewable EACs.",
+    )
     EmissionsAmountLocationBased = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     EmissionsAmountMarketBased = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     # Spend-based FX (from 0027)

@@ -18,6 +18,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from rest_framework.filters import OrderingFilter, SearchFilter
 
+from apps.billing.mixins import FeatureGateMixin
 from apps.shared.views import TenantViewSetMixin
 from .models import (
     EmissionFactorSets, EmissionFactors,
@@ -174,13 +175,14 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class EmissionsOffsetsViewSet(TenantViewSetMixin, ModelViewSet):
+class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
     """
     Standalone offset management — GET /api/emissions-offsets/
     Lists all offsets for the entity regardless of which emissions record they
     belong to, so the sustainability manager has a single place to review them.
     The nested actions on EmissionsDataViewSet remain for record-level access.
     """
+    required_feature = "carbon_offsets"
     queryset         = EmissionsOffsets.objects.all()
     serializer_class = EmissionsOffsetsSerializer
     permission_classes = [IsAuthenticated]
@@ -206,7 +208,8 @@ class GwpDatasetsViewSet(ReadOnlyModelViewSet):
     lookup_field = "GwpDatasetId"
 
 
-class GHGInventoriesViewSet(TenantViewSetMixin, ModelViewSet):
+class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
+    required_feature = "ghg_inventory_formal"
     queryset = GHGInventories.objects.all()
     serializer_class = GHGInventoriesSerializer
     permission_classes = [IsAuthenticated]

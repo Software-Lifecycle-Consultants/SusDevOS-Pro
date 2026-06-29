@@ -14,6 +14,12 @@ IUCN_STATUS_CHOICES = [
     ("DD", "Data Deficient"), ("NE", "Not Evaluated"),
 ]
 
+IPCC_FOREST_TYPE_CHOICES = [
+    ("tropical", "Tropical"), ("temperate", "Temperate"), ("boreal", "Boreal"),
+    ("mangrove", "Mangrove"), ("savanna", "Savanna / Woodland"),
+    ("shrubland", "Shrubland"), ("grassland", "Grassland"),
+]
+
 
 class Ecosystem(BaseAuditMixin):
     EcosystemId = models.AutoField(primary_key=True)
@@ -51,6 +57,35 @@ class Species(BaseAuditMixin):
     IUCNStatus = models.CharField(max_length=2, choices=IUCN_STATUS_CHOICES, null=True, blank=True)
     IUCNSyncedAt = models.DateTimeField(null=True, blank=True)
     GBIFKey = models.PositiveIntegerField(null=True, blank=True)
+    # ── IPCC LULUCF biomass parameters (ghg_calculation_spec §6) ────────────────
+    IPCCForestType = models.CharField(
+        max_length=20, choices=IPCC_FOREST_TYPE_CHOICES, null=True, blank=True,
+        help_text="IPCC forest type for Tier 1 BEF/R lookup",
+    )
+    BasicWoodDensity = models.DecimalField(
+        max_digits=8, decimal_places=4, null=True, blank=True,
+        help_text="D — tonnes dry matter per m³ fresh volume (IPCC Table 4.13)",
+    )
+    BiomassExpansionFactor = models.DecimalField(
+        max_digits=8, decimal_places=4, null=True, blank=True,
+        help_text="BEF — merchantable volume → total AGB (IPCC Table 4.5)",
+    )
+    RootToShootRatio = models.DecimalField(
+        max_digits=8, decimal_places=4, null=True, blank=True,
+        help_text="R — below-ground/above-ground biomass ratio (IPCC Table 4.4)",
+    )
+    CarbonFraction = models.DecimalField(
+        max_digits=6, decimal_places=4, null=True, blank=True, default=0.47,
+        help_text="CF — carbon content of dry biomass (IPCC default 0.47)",
+    )
+    AnnualSequestrationRateTonnesCO2ePerHa = models.DecimalField(
+        max_digits=10, decimal_places=4, null=True, blank=True,
+        help_text="Mean annual CO2e sequestered per ha at maturity (IPCC Annex 3A.1)",
+    )
+    BiomassDataSource = models.CharField(
+        max_length=200, null=True, blank=True,
+        help_text="Citation for biomass parameter values (IPCC table ref, study DOI)",
+    )
 
     class Meta:
         db_table = "species"

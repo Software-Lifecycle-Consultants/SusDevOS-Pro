@@ -96,7 +96,17 @@ class EntitiesViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_create(self, serializer):
-        serializer.save()
+        entity = serializer.save()
+        from apps.notifications.services import notify
+        notify(
+            user_id=self.request.user.UserId,
+            entity_id=entity.EntityId,
+            type="entity_created",
+            title="New entity created",
+            body=f"Entity '{getattr(entity, 'EntityName', entity.EntityId)}' was created.",
+            related_module="entities",
+            related_record_id=entity.EntityId,
+        )
 
     # ── Nested: Locations ─────────────────────────────────────────────────────
 

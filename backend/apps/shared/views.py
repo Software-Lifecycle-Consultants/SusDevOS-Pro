@@ -53,11 +53,29 @@ class TenantViewSetMixin:
         return qs.filter(EntityId=entity_id)
 
     def perform_create(self, serializer):
-        serializer.save(
+        instance = serializer.save(
             EntityId_id=self.request.entity_id,
             CreatedBy=self.request.user.UserId,
         )
+        self._audit("Create", instance)
+        return instance
+
+    def perform_update(self, serializer):
+        instance = serializer.save(UpdatedBy=self.request.user.UserId)
+        self._audit("Update", instance)
+        return instance
 
     def perform_destroy(self, instance):
         instance.Status = 4
         instance.save()
+        self._audit("Delete", instance)
+
+    def _audit(self, action, instance):
+        from apps.shared.audit import audit_log
+        audit_log(
+            action=action,
+            table_name=getattr(instance._meta, "db_table", None),
+            record_id=getattr(instance, "pk", None),
+            description=f"{action} {instance.__class__.__name__} #{getattr(instance, 'pk', '?')}",
+            request=self.request,
+        )

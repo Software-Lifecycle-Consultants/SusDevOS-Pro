@@ -46,12 +46,44 @@ def _compute_amounts(instance) -> None:
     instance.EmissionsAmount       = kg.quantize(Decimal("0.0001"))
     instance.EmissionsAmountTonnes = (kg / Decimal("1000")).quantize(Decimal("0.000001"))
 
+    # Biogenic CO2 (combustion of biomass/biofuels) — computed separately and
+    # EXCLUDED from EmissionsAmount/GWP total (GHG Protocol §9, critical rule #4).
+    if instance.BiogenicCO2FactorKg is not None:
+        bio_kg = qty * instance.BiogenicCO2FactorKg
+        instance.BiogenicCO2AmountTonnes = (bio_kg / Decimal("1000")).quantize(Decimal("0.000001"))
+
     if instance.Scope == 2:
-        instance.EmissionsAmountLocationBased = instance.EmissionsAmount
-        # Market-based: preserve any existing value (supplier EAC EF may differ);
-        # only default to location-based if not yet set.
-        if instance.EmissionsAmountMarketBased is None:
-            instance.EmissionsAmountMarketBased = instance.EmissionsAmount
+        _compute_scope2(instance, qty)
+
+
+def _compute_scope2(instance, qty) -> None:
+    """
+    Dual-method Scope 2 (GHG Protocol Scope 2 Guidance, critical rule #5).
+    Uses separate EFLocationBased / EFMarketBased inputs when provided; falls back
+    to the generic EmissionFactor result so legacy records still populate both.
+    The primary EmissionsAmount uses market-based when available (SBTi requirement).
+    """
+    fallback = instance.EmissionsAmount  # qty × EmissionFactor × gwp, already computed
+
+    if instance.EFLocationBased is not None:
+        lb_kg = qty * instance.EFLocationBased
+        instance.EmissionsAmountLocationBased = lb_kg.quantize(Decimal("0.0001"))
+    elif instance.EmissionsAmountLocationBased is None:
+        instance.EmissionsAmountLocationBased = fallback
+
+    if instance.EFMarketBased is not None:
+        mb_kg = qty * instance.EFMarketBased
+        instance.EmissionsAmountMarketBased = mb_kg.quantize(Decimal("0.0001"))
+    elif instance.EmissionsAmountMarketBased is None:
+        instance.EmissionsAmountMarketBased = instance.EmissionsAmountLocationBased
+
+    # Primary figure: market-based when available, else location-based.
+    primary = instance.EmissionsAmountMarketBased
+    if primary is None:
+        primary = instance.EmissionsAmountLocationBased
+    if primary is not None:
+        instance.EmissionsAmount       = primary
+        instance.EmissionsAmountTonnes = (primary / Decimal("1000")).quantize(Decimal("0.000001"))
 
 
 def _get_gwp_factor(instance) -> Decimal:
@@ -79,6 +111,17 @@ def verify_record(instance, verified_by, notes: str = "") -> None:
     instance.VerificationNotes  = notes
     instance.save()
 
+    from apps.notifications.services import notify
+    notify(
+        user_id=instance.CreatedBy,
+        entity_id=instance.EntityId_id,
+        type="emissions_verified",
+        title="Emissions record verified",
+        body=f"'{instance.Title}' has been verified and is now locked.",
+        related_module="emissions",
+        related_record_id=instance.EmissionsId,
+    )
+
 
 def unlock_record(instance, reason: str, unlocked_by, entity_id: int) -> None:
     """
@@ -100,4 +143,15 @@ def unlock_record(instance, reason: str, unlocked_by, entity_id: int) -> None:
         RecordId          = instance.EmissionsId,
         Description       = f"Unlocked verified record. Reason: {reason}",
         RetentionTier     = 3,  # 7-year regulatory retention (CLAUDE.md §compliance)
+    )
+
+    from apps.notifications.services import notify
+    notify(
+        user_id=instance.CreatedBy,
+        entity_id=entity_id,
+        type="emissions_unlocked",
+        title="Verified record unlocked",
+        body=f"'{instance.Title}' was unlocked for editing. Reason: {reason}",
+        related_module="emissions",
+        related_record_id=instance.EmissionsId,
     )

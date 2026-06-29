@@ -374,53 +374,46 @@ def recompute_stale_inventory_totals():
 
 ### `link_milestone_actuals` — Nightly, 01:30 UTC
 
+> **Implemented model fields** (`apps/emissions/models.TargetMilestones`): `MilestoneYear`,
+> `TargetEmissionsTonnes`, `ActualEmissionsTonnes`, `IsAchieved` (bool). There is no
+> `ActualInventoryId` FK or multi-tier `AchievementStatus` — the milestone is matched to its
+> inventory by `(EntityId, MilestoneYear)` and achievement is a simple
+> `actual <= target` boolean. The task below reflects the actual implementation.
+
 ```python
 @shared_task(name="tasks.emissions.link_milestone_actuals")
 def link_milestone_actuals():
     """
-    For each TargetMilestone where MilestoneYear has passed:
-      1. Find the GHGInventory for that entity + year.
-      2. If found and totals computed, populate ActualEmissionsTonnesCO2e + ActualInventoryId.
-      3. Set AchievementStatus based on comparison to ExpectedEmissionsTonnesCO2e.
+    For each TargetMilestone where MilestoneYear has passed and actuals not yet
+    linked, find the matching computed GHGInventory and populate
+    ActualEmissionsTonnes + IsAchieved.
     """
     current_year = date.today().year
 
     milestones = TargetMilestones.objects.filter(
         MilestoneYear__lt=current_year,
-        ActualInventoryId__isnull=True,
-        DeletedAt__isnull=True,
+        ActualEmissionsTonnes__isnull=True,
+        Status__lt=4,
     ).select_related("TargetId__EntityId")
 
     for milestone in milestones:
         entity = milestone.TargetId.EntityId
-        scopes = milestone.TargetId.ScopesCovered
 
         inventory = GHGInventories.objects.filter(
             EntityId=entity,
             ReportingYear=milestone.MilestoneYear,
-            TotalsLastComputedAt__isnull=False,
+            NetEmissionsTonnes__isnull=False,   # totals computed
         ).first()
 
         if not inventory:
             continue
 
-        actual = _sum_scopes(inventory, scopes)
-        expected = milestone.ExpectedEmissionsTonnesCO2e
+        actual = inventory.NetEmissionsTonnes or Decimal("0")
+        target = milestone.TargetEmissionsTonnes
 
-        status = None
-        if expected:
-            ratio = actual / expected if expected else None
-            if ratio and ratio <= Decimal("1.05"):
-                status = 3   # Achieved
-            elif ratio and ratio <= Decimal("1.15"):
-                status = 2   # AtRisk
-            else:
-                status = 4   # Missed
-
-        milestone.ActualEmissionsTonnesCO2e = actual
-        milestone.ActualInventoryId = inventory
-        milestone.AchievementStatus = status
-        milestone.save(update_fields=["ActualEmissionsTonnesCO2e", "ActualInventoryId", "AchievementStatus"])
+        milestone.ActualEmissionsTonnes = actual
+        milestone.IsAchieved = bool(target and actual <= target)
+        milestone.save(update_fields=["ActualEmissionsTonnes", "IsAchieved"])
 ```
 
 ---

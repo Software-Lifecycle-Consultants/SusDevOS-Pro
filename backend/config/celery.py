@@ -14,6 +14,19 @@ app = Celery("susdevos")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
+# The task modules live in a top-level ``tasks/`` package (not inside Django apps),
+# so autodiscover_tasks() does not find them. Import them explicitly so every task
+# referenced in beat_schedule is registered with the worker.
+app.conf.imports = (
+    "tasks.emissions",
+    "tasks.reports",
+    "tasks.auth",
+    "tasks.billing",
+    "tasks.integrations.fx",
+    "tasks.integrations.verra",
+    "tasks.integrations.climatiq",
+)
+
 # ── Beat schedule ─────────────────────────────────────────────────────────────
 # Primary schedule is stored in the DB (django_celery_beat), which allows
 # editing via admin without redeploy. This dict is the initial seed.

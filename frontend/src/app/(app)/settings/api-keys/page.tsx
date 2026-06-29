@@ -46,7 +46,7 @@ export default function ApiKeysPage() {
     mutationFn: () =>
       axiosInstance.post(`/api/entities/${activeEntityId}/api-keys/`, { KeyName: newKeyName }, { headers }),
     onSuccess: (res) => {
-      setGeneratedKey(res.data.raw_key);
+      setGeneratedKey(res.data.RawKey);
       setNewKeyName("");
       setShowForm(false);
       queryClient.invalidateQueries({ queryKey: ["api-keys", activeEntityId] });
