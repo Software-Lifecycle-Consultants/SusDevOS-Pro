@@ -84,10 +84,28 @@ export interface EmissionsData {
    */
   readonly EmissionsReducedTonnes: string | null;
   /**
+   * kg biogenic CO2 per canonical unit of fuel (combustion of biomass/biofuels).
+   * @nullable
+   * @pattern ^-?\d{0,10}(?:\.\d{0,8})?$
+   */
+  BiogenicCO2FactorKg?: string | null;
+  /**
    * @nullable
    * @pattern ^-?\d{0,12}(?:\.\d{0,6})?$
    */
   readonly BiogenicCO2AmountTonnes: string | null;
+  /**
+   * Grid-average emission factor (kg CO2e per canonical unit).
+   * @nullable
+   * @pattern ^-?\d{0,10}(?:\.\d{0,8})?$
+   */
+  EFLocationBased?: string | null;
+  /**
+   * Contractual/supplier emission factor (kg CO2e per canonical unit); 0 if 100% renewable EACs.
+   * @nullable
+   * @pattern ^-?\d{0,10}(?:\.\d{0,8})?$
+   */
+  EFMarketBased?: string | null;
   /**
    * @nullable
    * @pattern ^-?\d{0,14}(?:\.\d{0,4})?$
@@ -150,7 +168,6 @@ export interface EmissionsData {
   readonly VerifiedAt: string | null;
   /** @nullable */
   VerificationNotes?: string | null;
-  CountsTowardNDC?: boolean;
   readonly EntityId: number;
   /** @nullable */
   ProjectId?: number | null;

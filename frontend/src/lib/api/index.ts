@@ -33,9 +33,16 @@ import type {
   EcosystemDetail,
   EcosystemDetailRequest,
   EcosystemsListParams,
+  EmissionFactorSets,
+  EmissionFactorSetsListParams,
+  EmissionFactors,
+  EmissionFactorsListParams,
   EmissionsData,
   EmissionsDataRequest,
   EmissionsListParams,
+  EmissionsOffsets,
+  EmissionsOffsetsListParams,
+  EmissionsOffsetsRequest,
   EntitiesDetail,
   EntitiesDetailRequest,
   EntitiesListParams,
@@ -57,7 +64,10 @@ import type {
   PaginatedBlogsListList,
   PaginatedDevelopmentProjectsListList,
   PaginatedEcosystemListList,
+  PaginatedEmissionFactorSetsList,
+  PaginatedEmissionFactorsList,
   PaginatedEmissionsDataListList,
+  PaginatedEmissionsOffsetsList,
   PaginatedEntitiesListList,
   PaginatedGHGInventoriesList,
   PaginatedGwpDatasetsList,
@@ -98,6 +108,68 @@ import type {
 } from '../../types/api';
 
 import { axiosInstance } from '../orval-mutator';
+/**
+ * POST /api/auth/signup
+Self-service registration: creates Entity + User + Free plan subscription.
+Returns an access token and sets the refresh cookie ΓÇö user is logged in immediately.
+ */
+export const authSignupCreate = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/auth/signup`, method: 'POST', signal
+    },
+      );
+    }
+  
+
+
+export const getAuthSignupCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authSignupCreate>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof authSignupCreate>>, TError,void, TContext> => {
+
+const mutationKey = ['authSignupCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authSignupCreate>>, void> = () => {
+          
+
+          return  authSignupCreate()
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthSignupCreateMutationResult = NonNullable<Awaited<ReturnType<typeof authSignupCreate>>>
+    
+    export type AuthSignupCreateMutationError = unknown
+
+    export const useAuthSignupCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authSignupCreate>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authSignupCreate>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getAuthSignupCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 export const authLoginCreate = (
     
  signal?: AbortSignal
@@ -388,7 +460,7 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * First-login flow for newly invited users — same mechanism as reset password.
+ * First-login flow for newly invited users ΓÇö same mechanism as reset password.
  */
 export const authOnboardCreate = (
     
@@ -752,6 +824,70 @@ const {mutation: mutationOptions} = options ?
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
+export const entitiesUpdate = (
+    entityId: number | undefined | null,
+    entitiesDetailRequest: EntitiesDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<EntitiesDetail>(
+      {url: `/api/entities/${entityId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: entitiesDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getEntitiesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+
+const mutationKey = ['entitiesUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+          const {entityId,data} = props ?? {};
+
+          return  entitiesUpdate(entityId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EntitiesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesUpdate>>>
+    export type EntitiesUpdateMutationBody = EntitiesDetailRequest
+    export type EntitiesUpdateMutationError = unknown
+
+    export const useEntitiesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof entitiesUpdate>>,
+        TError,
+        {entityId: number | undefined | null;data: EntitiesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEntitiesUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * CRUD for Entities.
+SA sees all; Admin sees own + related branches.
+Creation is SA-only and also creates the initial admin user.
+ */
 export const entitiesRetrieve = (
     entityId: number | undefined | null,
  signal?: AbortSignal
@@ -839,70 +975,6 @@ export function useEntitiesRetrieve<TData = Awaited<ReturnType<typeof entitiesRe
 
 
 
-/**
- * CRUD for Entities.
-SA sees all; Admin sees own + related branches.
-Creation is SA-only and also creates the initial admin user.
- */
-export const entitiesUpdate = (
-    entityId: number | undefined | null,
-    entitiesDetailRequest: EntitiesDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: entitiesDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getEntitiesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
-
-const mutationKey = ['entitiesUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
-          const {entityId,data} = props ?? {};
-
-          return  entitiesUpdate(entityId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EntitiesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesUpdate>>>
-    export type EntitiesUpdateMutationBody = EntitiesDetailRequest
-    export type EntitiesUpdateMutationError = unknown
-
-    export const useEntitiesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesUpdate>>,
-        TError,
-        {entityId: number | undefined | null;data: EntitiesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEntitiesUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * CRUD for Entities.
 SA sees all; Admin sees own + related branches.
@@ -2282,6 +2354,62 @@ const {mutation: mutationOptions} = options ?
       return useMutation(mutationOptions, queryClient);
     }
     
+export const usersDestroy = (
+    userId: number | undefined | null,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/users/${userId}/`, method: 'DELETE'
+    },
+      );
+    }
+  
+
+
+export const getUsersDestroyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext> => {
+
+const mutationKey = ['usersDestroy'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersDestroy>>, {userId: number | undefined | null}> = (props) => {
+          const {userId} = props ?? {};
+
+          return  usersDestroy(userId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof usersDestroy>>>
+    
+    export type UsersDestroyMutationError = unknown
+
+    export const useUsersDestroy = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof usersDestroy>>,
+        TError,
+        {userId: number | undefined | null},
+        TContext
+      > => {
+
+      const mutationOptions = getUsersDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 export const usersRetrieve = (
     userId: number | undefined | null,
  signal?: AbortSignal
@@ -2424,62 +2552,6 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getUsersPartialUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-export const usersDestroy = (
-    userId: number | undefined | null,
- ) => {
-      
-      
-      return axiosInstance<void>(
-      {url: `/api/users/${userId}/`, method: 'DELETE'
-    },
-      );
-    }
-  
-
-
-export const getUsersDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext> => {
-
-const mutationKey = ['usersDestroy'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersDestroy>>, {userId: number | undefined | null}> = (props) => {
-          const {userId} = props ?? {};
-
-          return  usersDestroy(userId,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof usersDestroy>>>
-    
-    export type UsersDestroyMutationError = unknown
-
-    export const useUsersDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof usersDestroy>>,
-        TError,
-        {userId: number | undefined | null},
-        TContext
-      > => {
-
-      const mutationOptions = getUsersDestroyMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -3442,6 +3514,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const projectsUpdate = (
+    projectId: number | undefined | null,
+    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<DevelopmentProjectsDetail>(
+      {url: `/api/projects/${projectId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: developmentProjectsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getProjectsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+
+const mutationKey = ['projectsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
+          const {projectId,data} = props ?? {};
+
+          return  projectsUpdate(projectId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProjectsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsUpdate>>>
+    export type ProjectsUpdateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsUpdateMutationError = unknown
+
+    export const useProjectsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof projectsUpdate>>,
+        TError,
+        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getProjectsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const projectsRetrieve = (
     projectId: number | undefined | null,
  signal?: AbortSignal
@@ -3529,72 +3667,6 @@ export function useProjectsRetrieve<TData = Awaited<ReturnType<typeof projectsRe
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const projectsUpdate = (
-    projectId: number | undefined | null,
-    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/${projectId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: developmentProjectsDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getProjectsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
-
-const mutationKey = ['projectsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
-          const {projectId,data} = props ?? {};
-
-          return  projectsUpdate(projectId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProjectsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsUpdate>>>
-    export type ProjectsUpdateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsUpdateMutationError = unknown
-
-    export const useProjectsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsUpdate>>,
-        TError,
-        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getProjectsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -3986,6 +4058,70 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const projectsPhasesDestroy = (
+    projectId: number | undefined | null,
+    phaseId: string | undefined | null,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/projects/${projectId}/phases/${phaseId}/`, method: 'DELETE'
+    },
+      );
+    }
+  
+
+
+export const getProjectsPhasesDestroyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext> => {
+
+const mutationKey = ['projectsPhasesDestroy'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPhasesDestroy>>, {projectId: number | undefined | null;phaseId: string | undefined | null}> = (props) => {
+          const {projectId,phaseId} = props ?? {};
+
+          return  projectsPhasesDestroy(projectId,phaseId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProjectsPhasesDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPhasesDestroy>>>
+    
+    export type ProjectsPhasesDestroyMutationError = unknown
+
+    export const useProjectsPhasesDestroy = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof projectsPhasesDestroy>>,
+        TError,
+        {projectId: number | undefined | null;phaseId: string | undefined | null},
+        TContext
+      > => {
+
+      const mutationOptions = getProjectsPhasesDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const projectsPhasesRetrieve2 = (
     projectId: number | undefined | null,
     phaseId: string | undefined | null,
@@ -4143,70 +4279,6 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getProjectsPhasesPartialUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const projectsPhasesDestroy = (
-    projectId: number | undefined | null,
-    phaseId: string | undefined | null,
- ) => {
-      
-      
-      return axiosInstance<void>(
-      {url: `/api/projects/${projectId}/phases/${phaseId}/`, method: 'DELETE'
-    },
-      );
-    }
-  
-
-
-export const getProjectsPhasesDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext> => {
-
-const mutationKey = ['projectsPhasesDestroy'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPhasesDestroy>>, {projectId: number | undefined | null;phaseId: string | undefined | null}> = (props) => {
-          const {projectId,phaseId} = props ?? {};
-
-          return  projectsPhasesDestroy(projectId,phaseId,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProjectsPhasesDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPhasesDestroy>>>
-    
-    export type ProjectsPhasesDestroyMutationError = unknown
-
-    export const useProjectsPhasesDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesDestroy>>, TError,{projectId: number | undefined | null;phaseId: string | undefined | null}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsPhasesDestroy>>,
-        TError,
-        {projectId: number | undefined | null;phaseId: string | undefined | null},
-        TContext
-      > => {
-
-      const mutationOptions = getProjectsPhasesDestroyMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -4604,6 +4676,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const landParcelsUpdate = (
+    landParcelId: number | undefined | null,
+    landParcelsDetailRequest: LandParcelsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<LandParcelsDetail>(
+      {url: `/api/land-parcels/${landParcelId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: landParcelsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getLandParcelsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
+
+const mutationKey = ['landParcelsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
+          const {landParcelId,data} = props ?? {};
+
+          return  landParcelsUpdate(landParcelId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LandParcelsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsUpdate>>>
+    export type LandParcelsUpdateMutationBody = LandParcelsDetailRequest
+    export type LandParcelsUpdateMutationError = unknown
+
+    export const useLandParcelsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof landParcelsUpdate>>,
+        TError,
+        {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getLandParcelsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const landParcelsRetrieve = (
     landParcelId: number | undefined | null,
  signal?: AbortSignal
@@ -4691,72 +4829,6 @@ export function useLandParcelsRetrieve<TData = Awaited<ReturnType<typeof landPar
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const landParcelsUpdate = (
-    landParcelId: number | undefined | null,
-    landParcelsDetailRequest: LandParcelsDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<LandParcelsDetail>(
-      {url: `/api/land-parcels/${landParcelId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: landParcelsDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getLandParcelsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
-
-const mutationKey = ['landParcelsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
-          const {landParcelId,data} = props ?? {};
-
-          return  landParcelsUpdate(landParcelId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type LandParcelsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsUpdate>>>
-    export type LandParcelsUpdateMutationBody = LandParcelsDetailRequest
-    export type LandParcelsUpdateMutationError = unknown
-
-    export const useLandParcelsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof landParcelsUpdate>>,
-        TError,
-        {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getLandParcelsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -5112,7 +5184,7 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
  */
 export const ecosystemsList = (
     params?: EcosystemsListParams,
@@ -5203,7 +5275,7 @@ export function useEcosystemsList<TData = Awaited<ReturnType<typeof ecosystemsLi
 
 
 /**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
  */
 export const ecosystemsCreate = (
     ecosystemDetailRequest: EcosystemDetailRequest,
@@ -5265,7 +5337,69 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
+ */
+export const ecosystemsUpdate = (
+    ecosystemId: number | undefined | null,
+    ecosystemDetailRequest: EcosystemDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<EcosystemDetail>(
+      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: ecosystemDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getEcosystemsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
+
+const mutationKey = ['ecosystemsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
+          const {ecosystemId,data} = props ?? {};
+
+          return  ecosystemsUpdate(ecosystemId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EcosystemsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsUpdate>>>
+    export type EcosystemsUpdateMutationBody = EcosystemDetailRequest
+    export type EcosystemsUpdateMutationError = unknown
+
+    export const useEcosystemsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ecosystemsUpdate>>,
+        TError,
+        {ecosystemId: number | undefined | null;data: EcosystemDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEcosystemsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
  */
 export const ecosystemsRetrieve = (
     ecosystemId: number | undefined | null,
@@ -5355,69 +5489,7 @@ export function useEcosystemsRetrieve<TData = Awaited<ReturnType<typeof ecosyste
 
 
 /**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
- */
-export const ecosystemsUpdate = (
-    ecosystemId: number | undefined | null,
-    ecosystemDetailRequest: EcosystemDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<EcosystemDetail>(
-      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: ecosystemDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getEcosystemsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
-
-const mutationKey = ['ecosystemsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
-          const {ecosystemId,data} = props ?? {};
-
-          return  ecosystemsUpdate(ecosystemId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EcosystemsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsUpdate>>>
-    export type EcosystemsUpdateMutationBody = EcosystemDetailRequest
-    export type EcosystemsUpdateMutationError = unknown
-
-    export const useEcosystemsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ecosystemsUpdate>>,
-        TError,
-        {ecosystemId: number | undefined | null;data: EcosystemDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEcosystemsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
  */
 export const ecosystemsPartialUpdate = (
     ecosystemId: number | undefined | null,
@@ -5479,7 +5551,7 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
+ * Ecosystem uses IntegerField for EntityId ΓÇö uses a custom queryset filter.
  */
 export const ecosystemsDestroy = (
     ecosystemId: number | undefined | null,
@@ -5684,6 +5756,155 @@ const {mutation: mutationOptions} = options ?
       return useMutation(mutationOptions, queryClient);
     }
     
+/**
+ * GBIF taxonomy lookup. GET ?q=<common or scientific name> ΓåÆ top matches.
+ */
+export const speciesSearchRetrieve = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<SpeciesDetail>(
+      {url: `/api/species/search/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getSpeciesSearchRetrieveQueryKey = () => {
+    return [
+    `/api/species/search/`
+    ] as const;
+    }
+
+    
+export const getSpeciesSearchRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSpeciesSearchRetrieveQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof speciesSearchRetrieve>>> = ({ signal }) => speciesSearchRetrieve(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type SpeciesSearchRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof speciesSearchRetrieve>>>
+export type SpeciesSearchRetrieveQueryError = unknown
+
+
+export function useSpeciesSearchRetrieve<TData = Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof speciesSearchRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof speciesSearchRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useSpeciesSearchRetrieve<TData = Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof speciesSearchRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof speciesSearchRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useSpeciesSearchRetrieve<TData = Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useSpeciesSearchRetrieve<TData = Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof speciesSearchRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getSpeciesSearchRetrieveQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+export const speciesUpdate = (
+    speciesId: number | undefined | null,
+    speciesDetailRequest: SpeciesDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<SpeciesDetail>(
+      {url: `/api/species/${speciesId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: speciesDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getSpeciesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
+
+const mutationKey = ['speciesUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
+          const {speciesId,data} = props ?? {};
+
+          return  speciesUpdate(speciesId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SpeciesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesUpdate>>>
+    export type SpeciesUpdateMutationBody = SpeciesDetailRequest
+    export type SpeciesUpdateMutationError = unknown
+
+    export const useSpeciesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof speciesUpdate>>,
+        TError,
+        {speciesId: number | undefined | null;data: SpeciesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getSpeciesUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 export const speciesRetrieve = (
     speciesId: number | undefined | null,
  signal?: AbortSignal
@@ -5771,65 +5992,6 @@ export function useSpeciesRetrieve<TData = Awaited<ReturnType<typeof speciesRetr
 
 
 
-export const speciesUpdate = (
-    speciesId: number | undefined | null,
-    speciesDetailRequest: SpeciesDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<SpeciesDetail>(
-      {url: `/api/species/${speciesId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: speciesDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getSpeciesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
-
-const mutationKey = ['speciesUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
-          const {speciesId,data} = props ?? {};
-
-          return  speciesUpdate(speciesId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SpeciesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesUpdate>>>
-    export type SpeciesUpdateMutationBody = SpeciesDetailRequest
-    export type SpeciesUpdateMutationError = unknown
-
-    export const useSpeciesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof speciesUpdate>>,
-        TError,
-        {speciesId: number | undefined | null;data: SpeciesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getSpeciesUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 export const speciesPartialUpdate = (
     speciesId: number | undefined | null,
     speciesDetailRequest: SpeciesDetailRequest,
@@ -6113,6 +6275,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const emissionsUpdate = (
+    emissionsId: number | undefined | null,
+    emissionsDataRequest: EmissionsDataRequest,
+ ) => {
+      
+      
+      return axiosInstance<EmissionsData>(
+      {url: `/api/emissions/${emissionsId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsDataRequest
+    },
+      );
+    }
+  
+
+
+export const getEmissionsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+
+const mutationKey = ['emissionsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+          const {emissionsId,data} = props ?? {};
+
+          return  emissionsUpdate(emissionsId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsUpdate>>>
+    export type EmissionsUpdateMutationBody = EmissionsDataRequest
+    export type EmissionsUpdateMutationError = unknown
+
+    export const useEmissionsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsUpdate>>,
+        TError,
+        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const emissionsRetrieve = (
     emissionsId: number | undefined | null,
  signal?: AbortSignal
@@ -6200,72 +6428,6 @@ export function useEmissionsRetrieve<TData = Awaited<ReturnType<typeof emissions
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const emissionsUpdate = (
-    emissionsId: number | undefined | null,
-    emissionsDataRequest: EmissionsDataRequest,
- ) => {
-      
-      
-      return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/${emissionsId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: emissionsDataRequest
-    },
-      );
-    }
-  
-
-
-export const getEmissionsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
-
-const mutationKey = ['emissionsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
-          const {emissionsId,data} = props ?? {};
-
-          return  emissionsUpdate(emissionsId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmissionsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsUpdate>>>
-    export type EmissionsUpdateMutationBody = EmissionsDataRequest
-    export type EmissionsUpdateMutationError = unknown
-
-    export const useEmissionsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsUpdate>>,
-        TError,
-        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEmissionsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -6694,7 +6856,7 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
-export const emissionsOffsetsDestroy = (
+export const emissionsOffsetsDestroy2 = (
     emissionsId: number | undefined | null,
     offsetId: string | undefined | null,
  ) => {
@@ -6708,11 +6870,11 @@ export const emissionsOffsetsDestroy = (
   
 
 
-export const getEmissionsOffsetsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext> => {
+export const getEmissionsOffsetsDestroy2MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext> => {
 
-const mutationKey = ['emissionsOffsetsDestroy'];
+const mutationKey = ['emissionsOffsetsDestroy2'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6722,10 +6884,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, {emissionsId: number | undefined | null;offsetId: string | undefined | null}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>, {emissionsId: number | undefined | null;offsetId: string | undefined | null}> = (props) => {
           const {emissionsId,offsetId} = props ?? {};
 
-          return  emissionsOffsetsDestroy(emissionsId,offsetId,)
+          return  emissionsOffsetsDestroy2(emissionsId,offsetId,)
         }
 
         
@@ -6733,20 +6895,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsOffsetsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>>
+    export type EmissionsOffsetsDestroy2MutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>>
     
-    export type EmissionsOffsetsDestroyMutationError = unknown
+    export type EmissionsOffsetsDestroy2MutationError = unknown
 
-    export const useEmissionsOffsetsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext>, }
+    export const useEmissionsOffsetsDestroy2 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsDestroy>>,
+        Awaited<ReturnType<typeof emissionsOffsetsDestroy2>>,
         TError,
         {emissionsId: number | undefined | null;offsetId: string | undefined | null},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsOffsetsDestroyMutationOptions(options);
+      const mutationOptions = getEmissionsOffsetsDestroy2MutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6758,7 +6920,7 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
-export const emissionsOffsetsPartialUpdate = (
+export const emissionsOffsetsPartialUpdate2 = (
     emissionsId: number | undefined | null,
     offsetId: string | undefined | null,
     emissionsDataRequest: EmissionsDataRequest,
@@ -6775,11 +6937,11 @@ export const emissionsOffsetsPartialUpdate = (
   
 
 
-export const getEmissionsOffsetsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext> => {
+export const getEmissionsOffsetsPartialUpdate2MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext> => {
 
-const mutationKey = ['emissionsOffsetsPartialUpdate'];
+const mutationKey = ['emissionsOffsetsPartialUpdate2'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6789,10 +6951,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, {emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>, {emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}> = (props) => {
           const {emissionsId,offsetId,data} = props ?? {};
 
-          return  emissionsOffsetsPartialUpdate(emissionsId,offsetId,data,)
+          return  emissionsOffsetsPartialUpdate2(emissionsId,offsetId,data,)
         }
 
         
@@ -6800,20 +6962,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsOffsetsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>>
-    export type EmissionsOffsetsPartialUpdateMutationBody = EmissionsDataRequest
-    export type EmissionsOffsetsPartialUpdateMutationError = unknown
+    export type EmissionsOffsetsPartialUpdate2MutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>>
+    export type EmissionsOffsetsPartialUpdate2MutationBody = EmissionsDataRequest
+    export type EmissionsOffsetsPartialUpdate2MutationError = unknown
 
-    export const useEmissionsOffsetsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext>, }
+    export const useEmissionsOffsetsPartialUpdate2 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>, TError,{emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>,
+        Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate2>>,
         TError,
         {emissionsId: number | undefined | null;offsetId: string | undefined | null;data: EmissionsDataRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsOffsetsPartialUpdateMutationOptions(options);
+      const mutationOptions = getEmissionsOffsetsPartialUpdate2MutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6825,7 +6987,7 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
-export const emissionsOffsetsRetrieve = (
+export const emissionsOffsetsRetrieve2 = (
     emissionsId: number | undefined | null,
  signal?: AbortSignal
 ) => {
@@ -6840,66 +7002,66 @@ export const emissionsOffsetsRetrieve = (
 
 
 
-export const getEmissionsOffsetsRetrieveQueryKey = (emissionsId?: number | undefined | null,) => {
+export const getEmissionsOffsetsRetrieve2QueryKey = (emissionsId?: number | undefined | null,) => {
     return [
     `/api/emissions/${emissionsId}/offsets/`
     ] as const;
     }
 
     
-export const getEmissionsOffsetsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+export const getEmissionsOffsetsRetrieve2QueryOptions = <TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError = unknown>(emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEmissionsOffsetsRetrieveQueryKey(emissionsId);
+  const queryKey =  queryOptions?.queryKey ?? getEmissionsOffsetsRetrieve2QueryKey(emissionsId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>> = ({ signal }) => emissionsOffsetsRetrieve(emissionsId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>> = ({ signal }) => emissionsOffsetsRetrieve2(emissionsId, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(emissionsId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+   return  { queryKey, queryFn, enabled: !!(emissionsId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
 }
 
-export type EmissionsOffsetsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>>
-export type EmissionsOffsetsRetrieveQueryError = unknown
+export type EmissionsOffsetsRetrieve2QueryResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>>
+export type EmissionsOffsetsRetrieve2QueryError = unknown
 
 
-export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
- emissionsId: number | undefined | null, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>> & Pick<
+export function useEmissionsOffsetsRetrieve2<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError = unknown>(
+ emissionsId: number | undefined | null, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>,
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>,
           TError,
-          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
- emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>> & Pick<
+export function useEmissionsOffsetsRetrieve2<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError = unknown>(
+ emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>,
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>,
           TError,
-          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
- emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+export function useEmissionsOffsetsRetrieve2<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError = unknown>(
+ emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 
-export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
- emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+export function useEmissionsOffsetsRetrieve2<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError = unknown>(
+ emissionsId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve2>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const queryOptions = getEmissionsOffsetsRetrieveQueryOptions(emissionsId,options)
+  const queryOptions = getEmissionsOffsetsRetrieve2QueryOptions(emissionsId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -6919,7 +7081,7 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
-export const emissionsOffsetsCreate = (
+export const emissionsOffsetsCreate2 = (
     emissionsId: number | undefined | null,
     emissionsDataRequest: EmissionsDataRequest,
  signal?: AbortSignal
@@ -6936,11 +7098,11 @@ export const emissionsOffsetsCreate = (
   
 
 
-export const getEmissionsOffsetsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+export const getEmissionsOffsetsCreate2MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
 
-const mutationKey = ['emissionsOffsetsCreate'];
+const mutationKey = ['emissionsOffsetsCreate2'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6950,10 +7112,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
           const {emissionsId,data} = props ?? {};
 
-          return  emissionsOffsetsCreate(emissionsId,data,)
+          return  emissionsOffsetsCreate2(emissionsId,data,)
         }
 
         
@@ -6961,20 +7123,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsOffsetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate>>>
-    export type EmissionsOffsetsCreateMutationBody = EmissionsDataRequest
-    export type EmissionsOffsetsCreateMutationError = unknown
+    export type EmissionsOffsetsCreate2MutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>>
+    export type EmissionsOffsetsCreate2MutationBody = EmissionsDataRequest
+    export type EmissionsOffsetsCreate2MutationError = unknown
 
-    export const useEmissionsOffsetsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+    export const useEmissionsOffsetsCreate2 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsCreate>>,
+        Awaited<ReturnType<typeof emissionsOffsetsCreate2>>,
         TError,
         {emissionsId: number | undefined | null;data: EmissionsDataRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsOffsetsCreateMutationOptions(options);
+      const mutationOptions = getEmissionsOffsetsCreate2MutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -7114,7 +7276,386 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * GWP datasets are read-only — seeded, not user-created.
+ * Standalone offset management ΓÇö GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsList = (
+    params?: EmissionsOffsetsListParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<PaginatedEmissionsOffsetsList>(
+      {url: `/api/emissions-offsets/`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionsOffsetsListQueryKey = (params?: EmissionsOffsetsListParams,) => {
+    return [
+    `/api/emissions-offsets/`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getEmissionsOffsetsListQueryOptions = <TData = Awaited<ReturnType<typeof emissionsOffsetsList>>, TError = unknown>(params?: EmissionsOffsetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionsOffsetsListQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionsOffsetsList>>> = ({ signal }) => emissionsOffsetsList(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionsOffsetsListQueryResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsList>>>
+export type EmissionsOffsetsListQueryError = unknown
+
+
+export function useEmissionsOffsetsList<TData = Awaited<ReturnType<typeof emissionsOffsetsList>>, TError = unknown>(
+ params: undefined |  EmissionsOffsetsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionsOffsetsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionsOffsetsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionsOffsetsList<TData = Awaited<ReturnType<typeof emissionsOffsetsList>>, TError = unknown>(
+ params?: EmissionsOffsetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionsOffsetsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionsOffsetsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionsOffsetsList<TData = Awaited<ReturnType<typeof emissionsOffsetsList>>, TError = unknown>(
+ params?: EmissionsOffsetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionsOffsetsList<TData = Awaited<ReturnType<typeof emissionsOffsetsList>>, TError = unknown>(
+ params?: EmissionsOffsetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsList>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionsOffsetsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Standalone offset management ΓÇö GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsCreate = (
+    emissionsOffsetsRequest: EmissionsOffsetsRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionsOffsets>(
+      {url: `/api/emissions-offsets/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsOffsetsRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEmissionsOffsetsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: EmissionsOffsetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: EmissionsOffsetsRequest}, TContext> => {
+
+const mutationKey = ['emissionsOffsetsCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, {data: EmissionsOffsetsRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  emissionsOffsetsCreate(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsOffsetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate>>>
+    export type EmissionsOffsetsCreateMutationBody = EmissionsOffsetsRequest
+    export type EmissionsOffsetsCreateMutationError = unknown
+
+    export const useEmissionsOffsetsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: EmissionsOffsetsRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsOffsetsCreate>>,
+        TError,
+        {data: EmissionsOffsetsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsOffsetsCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Standalone offset management ΓÇö GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsDestroy = (
+    offsetId: number | undefined | null,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/emissions-offsets/${offsetId}/`, method: 'DELETE'
+    },
+      );
+    }
+  
+
+
+export const getEmissionsOffsetsDestroyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext> => {
+
+const mutationKey = ['emissionsOffsetsDestroy'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, {offsetId: number | undefined | null}> = (props) => {
+          const {offsetId} = props ?? {};
+
+          return  emissionsOffsetsDestroy(offsetId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsOffsetsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>>
+    
+    export type EmissionsOffsetsDestroyMutationError = unknown
+
+    export const useEmissionsOffsetsDestroy = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsOffsetsDestroy>>,
+        TError,
+        {offsetId: number | undefined | null},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsOffsetsDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Standalone offset management ΓÇö GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsRetrieve = (
+    offsetId: number | undefined | null,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionsOffsets>(
+      {url: `/api/emissions-offsets/${offsetId}/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionsOffsetsRetrieveQueryKey = (offsetId?: number | undefined | null,) => {
+    return [
+    `/api/emissions-offsets/${offsetId}/`
+    ] as const;
+    }
+
+    
+export const getEmissionsOffsetsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(offsetId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionsOffsetsRetrieveQueryKey(offsetId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>> = ({ signal }) => emissionsOffsetsRetrieve(offsetId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(offsetId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionsOffsetsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>>
+export type EmissionsOffsetsRetrieveQueryError = unknown
+
+
+export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
+ offsetId: number | undefined | null, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
+ offsetId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
+ offsetId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError = unknown>(
+ offsetId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionsOffsetsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionsOffsetsRetrieveQueryOptions(offsetId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Standalone offset management ΓÇö GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsPartialUpdate = (
+    offsetId: number | undefined | null,
+    emissionsOffsetsRequest: EmissionsOffsetsRequest,
+ ) => {
+      
+      
+      return axiosInstance<EmissionsOffsets>(
+      {url: `/api/emissions-offsets/${offsetId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsOffsetsRequest
+    },
+      );
+    }
+  
+
+
+export const getEmissionsOffsetsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{offsetId: number | undefined | null;data: EmissionsOffsetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{offsetId: number | undefined | null;data: EmissionsOffsetsRequest}, TContext> => {
+
+const mutationKey = ['emissionsOffsetsPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, {offsetId: number | undefined | null;data: EmissionsOffsetsRequest}> = (props) => {
+          const {offsetId,data} = props ?? {};
+
+          return  emissionsOffsetsPartialUpdate(offsetId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsOffsetsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>>
+    export type EmissionsOffsetsPartialUpdateMutationBody = EmissionsOffsetsRequest
+    export type EmissionsOffsetsPartialUpdateMutationError = unknown
+
+    export const useEmissionsOffsetsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>, TError,{offsetId: number | undefined | null;data: EmissionsOffsetsRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsOffsetsPartialUpdate>>,
+        TError,
+        {offsetId: number | undefined | null;data: EmissionsOffsetsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsOffsetsPartialUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * GWP datasets are read-only ΓÇö seeded, not user-created.
  */
 export const gwpDatasetsList = (
     params?: GwpDatasetsListParams,
@@ -7205,7 +7746,7 @@ export function useGwpDatasetsList<TData = Awaited<ReturnType<typeof gwpDatasets
 
 
 /**
- * GWP datasets are read-only — seeded, not user-created.
+ * GWP datasets are read-only ΓÇö seeded, not user-created.
  */
 export const gwpDatasetsRetrieve = (
     gwpDatasetId: number | undefined | null,
@@ -7295,11 +7836,8 @@ export function useGwpDatasetsRetrieve<TData = Awaited<ReturnType<typeof gwpData
 
 
 /**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
 export const ghgInventoriesList = (
     params?: GhgInventoriesListParams,
@@ -7390,11 +7928,8 @@ export function useGhgInventoriesList<TData = Awaited<ReturnType<typeof ghgInven
 
 
 /**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
 export const ghgInventoriesCreate = (
     gHGInventoriesRequest: GHGInventoriesRequest,
@@ -7456,11 +7991,71 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Mixin for tenant-scoped ModelViewSets.
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
+ */
+export const ghgInventoriesUpdate = (
+    inventoryId: number | undefined | null,
+    gHGInventoriesRequest: GHGInventoriesRequest,
+ ) => {
+      
+      
+      return axiosInstance<GHGInventories>(
+      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: gHGInventoriesRequest
+    },
+      );
+    }
+  
 
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
+
+export const getGhgInventoriesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
+
+const mutationKey = ['ghgInventoriesUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
+          const {inventoryId,data} = props ?? {};
+
+          return  ghgInventoriesUpdate(inventoryId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GhgInventoriesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesUpdate>>>
+    export type GhgInventoriesUpdateMutationBody = GHGInventoriesRequest
+    export type GhgInventoriesUpdateMutationError = unknown
+
+    export const useGhgInventoriesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ghgInventoriesUpdate>>,
+        TError,
+        {inventoryId: number | undefined | null;data: GHGInventoriesRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getGhgInventoriesUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
 export const ghgInventoriesRetrieve = (
     inventoryId: number | undefined | null,
@@ -7550,77 +8145,8 @@ export function useGhgInventoriesRetrieve<TData = Awaited<ReturnType<typeof ghgI
 
 
 /**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const ghgInventoriesUpdate = (
-    inventoryId: number | undefined | null,
-    gHGInventoriesRequest: GHGInventoriesRequest,
- ) => {
-      
-      
-      return axiosInstance<GHGInventories>(
-      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: gHGInventoriesRequest
-    },
-      );
-    }
-  
-
-
-export const getGhgInventoriesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
-
-const mutationKey = ['ghgInventoriesUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
-          const {inventoryId,data} = props ?? {};
-
-          return  ghgInventoriesUpdate(inventoryId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GhgInventoriesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesUpdate>>>
-    export type GhgInventoriesUpdateMutationBody = GHGInventoriesRequest
-    export type GhgInventoriesUpdateMutationError = unknown
-
-    export const useGhgInventoriesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ghgInventoriesUpdate>>,
-        TError,
-        {inventoryId: number | undefined | null;data: GHGInventoriesRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getGhgInventoriesUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
 export const ghgInventoriesPartialUpdate = (
     inventoryId: number | undefined | null,
@@ -7682,11 +8208,8 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
 export const ghgInventoriesDestroy = (
     inventoryId: number | undefined | null,
@@ -7912,6 +8435,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const targetsUpdate = (
+    targetId: number | undefined | null,
+    targetsRequest: TargetsRequest,
+ ) => {
+      
+      
+      return axiosInstance<Targets>(
+      {url: `/api/targets/${targetId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: targetsRequest
+    },
+      );
+    }
+  
+
+
+export const getTargetsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
+
+const mutationKey = ['targetsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
+          const {targetId,data} = props ?? {};
+
+          return  targetsUpdate(targetId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TargetsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsUpdate>>>
+    export type TargetsUpdateMutationBody = TargetsRequest
+    export type TargetsUpdateMutationError = unknown
+
+    export const useTargetsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof targetsUpdate>>,
+        TError,
+        {targetId: number | undefined | null;data: TargetsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getTargetsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const targetsRetrieve = (
     targetId: number | undefined | null,
  signal?: AbortSignal
@@ -7999,72 +8588,6 @@ export function useTargetsRetrieve<TData = Awaited<ReturnType<typeof targetsRetr
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const targetsUpdate = (
-    targetId: number | undefined | null,
-    targetsRequest: TargetsRequest,
- ) => {
-      
-      
-      return axiosInstance<Targets>(
-      {url: `/api/targets/${targetId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: targetsRequest
-    },
-      );
-    }
-  
-
-
-export const getTargetsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
-
-const mutationKey = ['targetsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
-          const {targetId,data} = props ?? {};
-
-          return  targetsUpdate(targetId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TargetsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsUpdate>>>
-    export type TargetsUpdateMutationBody = TargetsRequest
-    export type TargetsUpdateMutationError = unknown
-
-    export const useTargetsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof targetsUpdate>>,
-        TError,
-        {targetId: number | undefined | null;data: TargetsRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getTargetsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -8356,6 +8879,390 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
+ * Read-only list of emission factor sets (DEFRA, EPA eGRID, Climatiq, etc.).
+GET /api/emission-factor-sets/
+ */
+export const emissionFactorSetsList = (
+    params?: EmissionFactorSetsListParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<PaginatedEmissionFactorSetsList>(
+      {url: `/api/emission-factor-sets/`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionFactorSetsListQueryKey = (params?: EmissionFactorSetsListParams,) => {
+    return [
+    `/api/emission-factor-sets/`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getEmissionFactorSetsListQueryOptions = <TData = Awaited<ReturnType<typeof emissionFactorSetsList>>, TError = unknown>(params?: EmissionFactorSetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionFactorSetsListQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionFactorSetsList>>> = ({ signal }) => emissionFactorSetsList(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionFactorSetsListQueryResult = NonNullable<Awaited<ReturnType<typeof emissionFactorSetsList>>>
+export type EmissionFactorSetsListQueryError = unknown
+
+
+export function useEmissionFactorSetsList<TData = Awaited<ReturnType<typeof emissionFactorSetsList>>, TError = unknown>(
+ params: undefined |  EmissionFactorSetsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorSetsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorSetsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorSetsList<TData = Awaited<ReturnType<typeof emissionFactorSetsList>>, TError = unknown>(
+ params?: EmissionFactorSetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorSetsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorSetsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorSetsList<TData = Awaited<ReturnType<typeof emissionFactorSetsList>>, TError = unknown>(
+ params?: EmissionFactorSetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionFactorSetsList<TData = Awaited<ReturnType<typeof emissionFactorSetsList>>, TError = unknown>(
+ params?: EmissionFactorSetsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsList>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionFactorSetsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Read-only list of emission factor sets (DEFRA, EPA eGRID, Climatiq, etc.).
+GET /api/emission-factor-sets/
+ */
+export const emissionFactorSetsRetrieve = (
+    setId: number | undefined | null,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionFactorSets>(
+      {url: `/api/emission-factor-sets/${setId}/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionFactorSetsRetrieveQueryKey = (setId?: number | undefined | null,) => {
+    return [
+    `/api/emission-factor-sets/${setId}/`
+    ] as const;
+    }
+
+    
+export const getEmissionFactorSetsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError = unknown>(setId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionFactorSetsRetrieveQueryKey(setId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>> = ({ signal }) => emissionFactorSetsRetrieve(setId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(setId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionFactorSetsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>>
+export type EmissionFactorSetsRetrieveQueryError = unknown
+
+
+export function useEmissionFactorSetsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError = unknown>(
+ setId: number | undefined | null, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorSetsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError = unknown>(
+ setId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorSetsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError = unknown>(
+ setId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionFactorSetsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError = unknown>(
+ setId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorSetsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionFactorSetsRetrieveQueryOptions(setId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Browsable emission factor library.
+
+GET /api/emission-factors/
+Supports:
+  ?search=       full-text search on ActivityName and ActivityCategory
+  ?scope=        filter by Scope (1, 2, 3)
+  ?scope3=       filter by Scope3Category (1ΓÇô15)
+  ?set_id=       filter by EmissionFactorSets.SetId
+  ?gas=          filter by Gas (CO2, CH4, N2O ΓÇª)
+  ?country=      filter by CountryCode (ISO2)
+  ?year=         filter by ApplicableYear
+ */
+export const emissionFactorsList = (
+    params?: EmissionFactorsListParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<PaginatedEmissionFactorsList>(
+      {url: `/api/emission-factors/`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionFactorsListQueryKey = (params?: EmissionFactorsListParams,) => {
+    return [
+    `/api/emission-factors/`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getEmissionFactorsListQueryOptions = <TData = Awaited<ReturnType<typeof emissionFactorsList>>, TError = unknown>(params?: EmissionFactorsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionFactorsListQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionFactorsList>>> = ({ signal }) => emissionFactorsList(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionFactorsListQueryResult = NonNullable<Awaited<ReturnType<typeof emissionFactorsList>>>
+export type EmissionFactorsListQueryError = unknown
+
+
+export function useEmissionFactorsList<TData = Awaited<ReturnType<typeof emissionFactorsList>>, TError = unknown>(
+ params: undefined |  EmissionFactorsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorsList<TData = Awaited<ReturnType<typeof emissionFactorsList>>, TError = unknown>(
+ params?: EmissionFactorsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorsList>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorsList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorsList<TData = Awaited<ReturnType<typeof emissionFactorsList>>, TError = unknown>(
+ params?: EmissionFactorsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionFactorsList<TData = Awaited<ReturnType<typeof emissionFactorsList>>, TError = unknown>(
+ params?: EmissionFactorsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsList>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionFactorsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Browsable emission factor library.
+
+GET /api/emission-factors/
+Supports:
+  ?search=       full-text search on ActivityName and ActivityCategory
+  ?scope=        filter by Scope (1, 2, 3)
+  ?scope3=       filter by Scope3Category (1ΓÇô15)
+  ?set_id=       filter by EmissionFactorSets.SetId
+  ?gas=          filter by Gas (CO2, CH4, N2O ΓÇª)
+  ?country=      filter by CountryCode (ISO2)
+  ?year=         filter by ApplicableYear
+ */
+export const emissionFactorsRetrieve = (
+    factorId: number | undefined | null,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionFactors>(
+      {url: `/api/emission-factors/${factorId}/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getEmissionFactorsRetrieveQueryKey = (factorId?: number | undefined | null,) => {
+    return [
+    `/api/emission-factors/${factorId}/`
+    ] as const;
+    }
+
+    
+export const getEmissionFactorsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError = unknown>(factorId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEmissionFactorsRetrieveQueryKey(factorId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof emissionFactorsRetrieve>>> = ({ signal }) => emissionFactorsRetrieve(factorId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(factorId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type EmissionFactorsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emissionFactorsRetrieve>>>
+export type EmissionFactorsRetrieveQueryError = unknown
+
+
+export function useEmissionFactorsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError = unknown>(
+ factorId: number | undefined | null, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError = unknown>(
+ factorId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emissionFactorsRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof emissionFactorsRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useEmissionFactorsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError = unknown>(
+ factorId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useEmissionFactorsRetrieve<TData = Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError = unknown>(
+ factorId: number | undefined | null, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emissionFactorsRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getEmissionFactorsRetrieveQueryOptions(factorId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
  * Mixin for tenant-scoped ModelViewSets.
 
 The Django middleware runs before DRF authentication, so request.user may
@@ -8523,6 +9430,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const treeRemovalsUpdate = (
+    treeRemovalId: number | undefined | null,
+    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<TreeRemovalsDetail>(
+      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: treeRemovalsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getTreeRemovalsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+
+const mutationKey = ['treeRemovalsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
+          const {treeRemovalId,data} = props ?? {};
+
+          return  treeRemovalsUpdate(treeRemovalId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TreeRemovalsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsUpdate>>>
+    export type TreeRemovalsUpdateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsUpdateMutationError = unknown
+
+    export const useTreeRemovalsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof treeRemovalsUpdate>>,
+        TError,
+        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getTreeRemovalsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const treeRemovalsRetrieve = (
     treeRemovalId: number | undefined | null,
  signal?: AbortSignal
@@ -8610,72 +9583,6 @@ export function useTreeRemovalsRetrieve<TData = Awaited<ReturnType<typeof treeRe
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const treeRemovalsUpdate = (
-    treeRemovalId: number | undefined | null,
-    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: treeRemovalsDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getTreeRemovalsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
-
-const mutationKey = ['treeRemovalsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
-          const {treeRemovalId,data} = props ?? {};
-
-          return  treeRemovalsUpdate(treeRemovalId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TreeRemovalsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsUpdate>>>
-    export type TreeRemovalsUpdateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsUpdateMutationError = unknown
-
-    export const useTreeRemovalsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsUpdate>>,
-        TError,
-        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getTreeRemovalsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -9557,6 +10464,72 @@ The Django middleware runs before DRF authentication, so request.user may
 still be anonymous when the middleware sets request.entity_id.  We
 re-resolve entity_id in initial() once DRF has authenticated the user.
  */
+export const restorationsUpdate = (
+    restorationId: number | undefined | null,
+    restorationsDetailRequest: RestorationsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<RestorationsDetail>(
+      {url: `/api/restorations/${restorationId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: restorationsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getRestorationsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
+
+const mutationKey = ['restorationsUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
+          const {restorationId,data} = props ?? {};
+
+          return  restorationsUpdate(restorationId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestorationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsUpdate>>>
+    export type RestorationsUpdateMutationBody = RestorationsDetailRequest
+    export type RestorationsUpdateMutationError = unknown
+
+    export const useRestorationsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof restorationsUpdate>>,
+        TError,
+        {restorationId: number | undefined | null;data: RestorationsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getRestorationsUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  We
+re-resolve entity_id in initial() once DRF has authenticated the user.
+ */
 export const restorationsRetrieve = (
     restorationId: number | undefined | null,
  signal?: AbortSignal
@@ -9644,72 +10617,6 @@ export function useRestorationsRetrieve<TData = Awaited<ReturnType<typeof restor
 
 
 
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  We
-re-resolve entity_id in initial() once DRF has authenticated the user.
- */
-export const restorationsUpdate = (
-    restorationId: number | undefined | null,
-    restorationsDetailRequest: RestorationsDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<RestorationsDetail>(
-      {url: `/api/restorations/${restorationId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: restorationsDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getRestorationsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
-
-const mutationKey = ['restorationsUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
-          const {restorationId,data} = props ?? {};
-
-          return  restorationsUpdate(restorationId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RestorationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsUpdate>>>
-    export type RestorationsUpdateMutationBody = RestorationsDetailRequest
-    export type RestorationsUpdateMutationError = unknown
-
-    export const useRestorationsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof restorationsUpdate>>,
-        TError,
-        {restorationId: number | undefined | null;data: RestorationsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getRestorationsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -10192,6 +11099,99 @@ const {mutation: mutationOptions} = options ?
       return useMutation(mutationOptions, queryClient);
     }
     
+/**
+ * GET /api/shared/audit-log/
+Returns the entity's audit log entries, newest first.
+Admin and SuperAdmin only ΓÇö enforced by IsEntityAdmin permission.
+Supports ?action=, ?table=, ?days= query params.
+ */
+export const sharedAuditLogRetrieve = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/shared/audit-log/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getSharedAuditLogRetrieveQueryKey = () => {
+    return [
+    `/api/shared/audit-log/`
+    ] as const;
+    }
+
+    
+export const getSharedAuditLogRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSharedAuditLogRetrieveQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>> = ({ signal }) => sharedAuditLogRetrieve(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type SharedAuditLogRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>>
+export type SharedAuditLogRetrieveQueryError = unknown
+
+
+export function useSharedAuditLogRetrieve<TData = Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sharedAuditLogRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof sharedAuditLogRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useSharedAuditLogRetrieve<TData = Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sharedAuditLogRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof sharedAuditLogRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useSharedAuditLogRetrieve<TData = Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useSharedAuditLogRetrieve<TData = Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof sharedAuditLogRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getSharedAuditLogRetrieveQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
 export const notificationsList = (
     params?: NotificationsListParams,
  signal?: AbortSignal
@@ -10368,7 +11368,7 @@ export function useNotificationsRetrieve<TData = Awaited<ReturnType<typeof notif
 
 
 /**
- * PATCH {id}/ — only IsRead can be updated.
+ * PATCH {id}/ ΓÇö only IsRead can be updated.
  */
 export const notificationsPartialUpdate = (
     id: string | undefined | null,
@@ -10576,6 +11576,65 @@ const {mutation: mutationOptions} = options ?
       return useMutation(mutationOptions, queryClient);
     }
     
+export const blogUpdate = (
+    blogId: number | undefined | null,
+    blogsDetailRequest: BlogsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<BlogsDetail>(
+      {url: `/api/blog/${blogId}/`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: blogsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getBlogUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
+
+const mutationKey = ['blogUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
+          const {blogId,data} = props ?? {};
+
+          return  blogUpdate(blogId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BlogUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogUpdate>>>
+    export type BlogUpdateMutationBody = BlogsDetailRequest
+    export type BlogUpdateMutationError = unknown
+
+    export const useBlogUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof blogUpdate>>,
+        TError,
+        {blogId: number | undefined | null;data: BlogsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getBlogUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 export const blogRetrieve = (
     blogId: number | undefined | null,
  signal?: AbortSignal
@@ -10663,65 +11722,6 @@ export function useBlogRetrieve<TData = Awaited<ReturnType<typeof blogRetrieve>>
 
 
 
-export const blogUpdate = (
-    blogId: number | undefined | null,
-    blogsDetailRequest: BlogsDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<BlogsDetail>(
-      {url: `/api/blog/${blogId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: blogsDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getBlogUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
-
-const mutationKey = ['blogUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
-          const {blogId,data} = props ?? {};
-
-          return  blogUpdate(blogId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BlogUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogUpdate>>>
-    export type BlogUpdateMutationBody = BlogsDetailRequest
-    export type BlogUpdateMutationError = unknown
-
-    export const useBlogUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blogUpdate>>,
-        TError,
-        {blogId: number | undefined | null;data: BlogsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getBlogUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 export const blogPartialUpdate = (
     blogId: number | undefined | null,
     blogsDetailRequest: BlogsDetailRequest,
