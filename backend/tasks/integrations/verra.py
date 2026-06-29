@@ -56,8 +56,11 @@ def sync_verra_registry(self):
 
     logger.info("Verra CSV: %d valid serial numbers loaded", len(valid_serials))
 
-    # Validate pending offsets
+    # Validate pending offsets. Only touch credits flagged as Verra (or unflagged
+    # legacy rows) — never mark a Gold Standard credit invalid against the VCS list.
+    from django.db.models import Q
     pending = EmissionsOffsets.objects.filter(
+        Q(CreditRegistry="verra") | Q(CreditRegistry__isnull=True),
         RegistryValidationStatus__in=["pending", "unverified"],
         CreditSerialNumber__isnull=False,
     )

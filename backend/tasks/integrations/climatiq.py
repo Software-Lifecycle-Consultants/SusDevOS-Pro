@@ -52,6 +52,61 @@ def fetch_climatiq_factor(activity_id: str, region: str, year: int):
     return results[0] if results else None
 
 
+def _get_climatiq_set():
+    """Get-or-create the shared 'Climatiq Aggregated' EmissionFactorSets row."""
+    from apps.emissions.models import EmissionFactorSets
+    ef_set, _ = EmissionFactorSets.objects.get_or_create(
+        SetName="Climatiq Aggregated",
+        Publisher="Climatiq",
+        defaults={"GeographicScope": "Global", "IsActive": True},
+    )
+    return ef_set
+
+
+def lookup_or_fetch_factor(*, activity_id: str, region: str, year: int,
+                           scope: int, gas: str = "CO2e"):
+    """
+    On-demand emission-factor resolution (api_integrations §1 fallback path).
+
+    Returns a cached EmissionFactors row when a fresh (<7-day) one exists for
+    (ClimatiqActivityId, CountryCode, ApplicableYear); otherwise fetches from
+    Climatiq, upserts, and returns it. Returns None if unconfigured or no match.
+    """
+    from apps.emissions.models import EmissionFactors
+
+    cached = EmissionFactors.objects.filter(
+        ClimatiqActivityId=activity_id,
+        CountryCode=region or None,
+        ApplicableYear=year,
+    ).first()
+    if cached and cached.ExternalSyncedAt and cached.ExternalSyncedAt >= now() - STALE_AFTER:
+        return cached
+
+    result = fetch_climatiq_factor(activity_id=activity_id, region=region, year=year)
+    if not result:
+        return cached  # fall back to a stale cached row if the API is unavailable
+
+    co2e = result.get("factor", {}).get("co2e")
+    if co2e is None:
+        return cached
+
+    obj, _ = EmissionFactors.objects.update_or_create(
+        ClimatiqActivityId=activity_id,
+        CountryCode=region or None,
+        ApplicableYear=year,
+        defaults={
+            "SetId": _get_climatiq_set(),
+            "ActivityName": result.get("name", activity_id),
+            "ActivityCategory": result.get("category"),
+            "Scope": scope,
+            "Gas": gas,
+            "FactorValue": Decimal(str(co2e)),
+            "ExternalSyncedAt": now(),
+        },
+    )
+    return obj
+
+
 def _refresh_factor(factor) -> bool:
     """Refresh one EmissionFactors row from Climatiq. Returns True if updated."""
     result = fetch_climatiq_factor(

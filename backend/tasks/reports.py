@@ -70,45 +70,16 @@ def generate_report(self, report_job_id: int):
 
 def _render_report(job):
     """
-    Dispatch to report-type-specific renderer.
-    Returns (s3_key, file_size_bytes).
+    Gather data for the report type and render it to the requested format
+    (JSON / CSV / PDF). Returns (s3_key, file_size_bytes).
     """
-    from apps.emissions.models import EmissionsData
-    import json
-
-    entity_id = job.EntityId_id
-    params = job.Parameters or {}
-
-    if job.ReportType == "emissions_summary":
-        records = list(
-            EmissionsData.objects.filter(
-                EntityId_id=entity_id, Status__lt=4
-            ).values(
-                "EmissionsId", "Title", "Scope", "Gas",
-                "EmissionsAmountTonnes", "ReportingYear", "VerificationStatus",
-            )
-        )
-        content = json.dumps({"records": records}, default=str).encode()
-
-    elif job.ReportType == "ghg_inventory":
-        from apps.emissions.models import GHGInventories
-        inventories = list(
-            GHGInventories.objects.filter(EntityId_id=entity_id).values(
-                "InventoryId", "ReportingYear", "VerificationStatus",
-                "TotalScope1Tonnes", "TotalScope2LocationTonnes",
-                "TotalScope2MarketTonnes", "TotalScope3Tonnes", "NetEmissionsTonnes",
-            )
-        )
-        content = json.dumps({"inventories": inventories}, default=str).encode()
-
-    else:
-        content = json.dumps({"message": f"Report type '{job.ReportType}' generated",
-                              "parameters": params}).encode()
-
-    # In production: upload to S3 and return key.
-    # In development: store as temp file and return a placeholder key.
     import uuid
-    key = f"node-1/{entity_id}/reports/{uuid.uuid4()}.{job.Format}"
+    from apps.reports.renderers import build_report_data, render
+
+    data = build_report_data(job)
+    content = render(data, job.Format)
+
+    key = f"node-1/{job.EntityId_id}/reports/{uuid.uuid4()}.{job.Format}"
     _upload_to_storage(key, content, job.Format)
     return key, len(content)
 

@@ -19,6 +19,12 @@ REGISTRY_VALIDATION_STATUS = [
     ("invalid", "Invalid"), ("unverified", "Unverified"),
 ]
 
+CREDIT_REGISTRY_CHOICES = [
+    ("verra", "Verra (VCS)"),
+    ("gold_standard", "Gold Standard"),
+    ("other", "Other / Unlisted"),
+]
+
 CONSOLIDATION_APPROACH_CHOICES = [
     (1, "Equity Share"), (2, "Financial Control"), (3, "Operational Control"),
 ]
@@ -311,6 +317,10 @@ class EmissionsOffsets(BaseAuditMixin):
     ValidTo = models.DateField(null=True, blank=True)
     Remarks = models.TextField(null=True, blank=True)
     CreditSerialNumber = models.CharField(max_length=200, null=True, blank=True)
+    CreditRegistry = models.CharField(
+        max_length=20, null=True, blank=True, choices=CREDIT_REGISTRY_CHOICES,
+        help_text="Which registry validates this credit (drives the registry-sync task).",
+    )
     RegistryValidatedAt = models.DateTimeField(null=True, blank=True)
     RegistryValidationStatus = models.CharField(
         max_length=20, null=True, blank=True, choices=REGISTRY_VALIDATION_STATUS, default="unverified"

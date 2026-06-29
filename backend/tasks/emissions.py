@@ -73,8 +73,8 @@ def _compute_inventory_totals(inventory):
     ).aggregate(t=models.Sum("OffsetAmountTonnes"))["t"]
     total_offsets = Decimal(str(offsets or 0))
 
-    # Net uses market-based Scope 2 as the primary method (GHG Protocol Scope 2 Guidance,
-    # SBTi requirement). Location-based remains stored for dual reporting.
+    # Net uses market-based Scope 2 as the primary method (GHG Protocol Scope 2
+    # Guidance). Location-based remains stored for dual reporting.
     net = scope1 + scope2m + scope3 - total_offsets
 
     inventory.TotalScope1Tonnes          = scope1

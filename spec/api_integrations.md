@@ -354,6 +354,13 @@ Same pattern as DEFRA — download Excel, read the `SRL` (Subregion) sheet, upse
 
 ## 5. SBTi Registry — Target Validation Status (Monthly Sync)
 
+> ⚠️ **DEPRECATED / NOT IMPLEMENTED — do not build.** SBTi was removed from the
+> product scope in the nature/MRV + TNFD refocus (commit "remove SBTi, CDP, NDC,
+> RE100"). This section is retained for historical reference only. There is no
+> SBTi sync task, no beat entry, and no `Targets.ValidationStatus` wiring. Other
+> stale SBTi mentions remain in `marketing_site.md` (`/features/sbti-progress`),
+> `ghg_calculation_spec.md`, and `celery_tasks.md` — clean those up separately.
+
 **Purpose:** Auto-update `Targets.ValidationStatus` for SBTi-framework targets by matching the entity against the public SBTi companies list.
 
 **Source:** `https://sciencebasedtargets.org/companies-taking-action` — CSV download (no API).

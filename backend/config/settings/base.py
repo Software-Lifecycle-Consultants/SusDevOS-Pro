@@ -244,6 +244,7 @@ OPEN_EXCHANGE_RATES_API_KEY = config("OPEN_EXCHANGE_RATES_API_KEY", default="")
 IUCN_API_KEY                = config("IUCN_API_KEY", default="")
 DEFRA_EF_SPREADSHEET_URL    = config("DEFRA_EF_SPREADSHEET_URL", default="")
 VERRA_CSV_URL               = config("VERRA_CSV_URL", default="")
+GOLD_STANDARD_API_URL       = config("GOLD_STANDARD_API_URL", default="")
 EPA_EGRID_URL               = config("EPA_EGRID_URL", default="")
 
 # ── GHG Protocol defaults ─────────────────────────────────────────────────────

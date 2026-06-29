@@ -61,7 +61,7 @@ def _compute_scope2(instance, qty) -> None:
     Dual-method Scope 2 (GHG Protocol Scope 2 Guidance, critical rule #5).
     Uses separate EFLocationBased / EFMarketBased inputs when provided; falls back
     to the generic EmissionFactor result so legacy records still populate both.
-    The primary EmissionsAmount uses market-based when available (SBTi requirement).
+    The primary EmissionsAmount uses market-based when available (GHG Protocol Scope 2 Guidance).
     """
     fallback = instance.EmissionsAmount  # qty × EmissionFactor × gwp, already computed
 

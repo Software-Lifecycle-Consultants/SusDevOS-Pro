@@ -1,4 +1,6 @@
-﻿from rest_framework.permissions import IsAuthenticated
+﻿from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Ecosystem, Species
@@ -47,8 +49,20 @@ class SpeciesViewSet(ModelViewSet):
         entity_id = getattr(self.request, "entity_id", None)
         return qs.filter(EntityId=entity_id) if entity_id else qs.none()
 
+    @action(detail=False, methods=["get"], url_path="search")
+    def search(self, request):
+        """GBIF taxonomy lookup. GET ?q=<common or scientific name> → top matches."""
+        from .integrations import search_species
+        return Response(search_species(request.query_params.get("q", "")))
+
     def perform_create(self, serializer):
-        serializer.save(EntityId=self.request.entity_id, CreatedBy=self.request.user.UserId)
+        species = serializer.save(EntityId=self.request.entity_id, CreatedBy=self.request.user.UserId)
+        # Best-effort GBIF/IUCN enrichment (never blocks create on external failure).
+        from .integrations import enrich_species
+        try:
+            enrich_species(species)
+        except Exception:  # defensive — integrations already swallow errors
+            pass
 
     def perform_destroy(self, instance):
         instance.Status = 4

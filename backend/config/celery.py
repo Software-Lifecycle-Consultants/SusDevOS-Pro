@@ -24,6 +24,7 @@ app.conf.imports = (
     "tasks.billing",
     "tasks.integrations.fx",
     "tasks.integrations.verra",
+    "tasks.integrations.gold_standard",
     "tasks.integrations.climatiq",
 )
 
@@ -47,6 +48,11 @@ app.conf.beat_schedule = {
     "sync-verra-registry-daily": {
         "task": "tasks.integrations.sync_verra_registry",
         "schedule": crontab(hour=3, minute=0),
+        "options": {"expires": 3600},
+    },
+    "sync-gold-standard-registry-daily": {
+        "task": "tasks.integrations.sync_gold_standard_registry",
+        "schedule": crontab(hour=3, minute=30),
         "options": {"expires": 3600},
     },
 
