@@ -32,11 +32,8 @@ app.conf.beat_schedule = {
         "options": {"expires": 86400},
     },
 
-    "sync-sbti-registry-monthly": {
-        "task": "tasks.integrations.sync_sbti_registry",
-        "schedule": crontab(hour=2, minute=0, day_of_month=1),
-        "options": {"expires": 86400},
-    },
+    # NOTE: SBTi registry sync removed (out of product scope — see CLAUDE.md § Product scope).
+    # A Gold Standard registry sync runs daily at 03:30 alongside Verra (see config/celery.py).
 
     "sync-verra-registry-daily": {
         "task": "tasks.integrations.sync_verra_registry",
@@ -234,61 +231,12 @@ def sync_climatiq_emission_factors(self):
 
 ---
 
-### `sync_sbti_registry` — Monthly, 1st of month 02:00 UTC
+### ~~`sync_sbti_registry`~~ — REMOVED (out of scope)
 
-```python
-# tasks/integrations/sbti.py
-
-@shared_task(
-    name="tasks.integrations.sync_sbti_registry",
-    bind=True,
-    max_retries=2,
-    default_retry_delay=1800,
-)
-def sync_sbti_registry(self):
-    """
-    Download SBTi Companies Taking Action CSV and update Targets.ValidationStatus.
-    Match strategy: exact SBTiCompanyId first, fuzzy EntityName second.
-    Fuzzy matches with confidence < 0.85 are queued for manual review.
-    """
-    try:
-        resp = requests.get(settings.SBTI_COMPANIES_CSV_URL, timeout=60)
-        resp.raise_for_status()
-    except requests.RequestException as exc:
-        raise self.retry(exc=exc)
-
-    reader = csv.DictReader(StringIO(resp.text))
-    matched = 0
-    review_queue = []
-
-    for row in reader:
-        sbti_id = row.get("ID", "").strip()
-        name = row.get("Company Name", "").strip()
-        status = row.get("Target Status", "").strip()
-
-        entity = Entities.objects.filter(SBTiCompanyId=sbti_id).first() if sbti_id else None
-
-        if not entity:
-            entity, confidence = _fuzzy_match_entity(name)
-            if entity and confidence < 0.85:
-                review_queue.append({"sbti_name": name, "matched_entity": entity.EntityId, "confidence": confidence})
-                entity = None   # don't apply until reviewed
-
-        if entity:
-            Targets.objects.filter(EntityId=entity, Framework=1).update(
-                SBTiStatus=status,
-                SBTiLastSyncedAt=now(),
-                ValidationStatus=_map_sbti_status(status),
-            )
-            entity.SBTiCompanyId = sbti_id or entity.SBTiCompanyId
-            entity.save(update_fields=["SBTiCompanyId"])
-            matched += 1
-
-    if review_queue:
-        _create_review_notification(review_queue)
-
-    logger.info("SBTi sync: %d entities matched, %d queued for review", matched, len(review_queue))
-```
+> **REMOVED — out of product scope.** SBTi was dropped in the nature/MRV + TNFD
+> refocus (see CLAUDE.md § Product scope). There is no `sync_sbti_registry` task,
+> no beat entry, and no `Targets.Framework`/`SBTiStatus`/`SBTiCompanyId` wiring.
+> This section is retained only as a historical record of the deprecated design.
 
 ---
 

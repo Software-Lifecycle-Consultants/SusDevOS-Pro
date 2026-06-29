@@ -1,5 +1,12 @@
 # Marketing Site Specification — SusDevOS
 
+> ⚠️ **Scope note (nature/MRV + TNFD refocus).** SBTi and CDP are **out of product
+> scope** (see CLAUDE.md § Product scope). The dedicated SBTi feature page, the
+> `/standards` SBTi & CDP entries, and the SBTi integration have been removed, and all
+> positioning copy (homepage hero, SEO, trust-bar badges, guides, blog calendar) has
+> been reframed around the GHG Protocol, IPCC, TNFD, and carbon-credit MRV
+> (Verra/Gold Standard). Do not reintroduce SBTi/CDP as product capabilities.
+
 The marketing site is a separate Next.js app (or static site via Astro/Hugo) deployed at the root domain. The Django app serves `/app/*`. All marketing pages are publicly accessible, fully SEO-indexed, and link to `/app/register` for signup CTAs.
 
 ---
@@ -11,7 +18,6 @@ The marketing site is a separate Next.js app (or static site via Astro/Hugo) dep
 /features
 /features/ghg-reporting
 /features/ecosystem-tracking
-/features/sbti-progress
 /features/team-and-verification
 /pricing
 /standards
@@ -38,15 +44,15 @@ The marketing site is a separate Next.js app (or static site via Astro/Hugo) dep
 
 **SEO**
 - Title: `SusDevOS — GHG Reporting & Ecosystem Tracking for Development Projects`
-- Description: `Calculate your Scope 1, 2 and 3 emissions, track biodiversity impacts, and generate GHG Protocol-conformant reports. Free to start. Built for SBTi, CDP and TNFD.`
-- Keywords: `GHG reporting software, carbon footprint calculator, Scope 3 emissions, SBTi target tracking, TNFD biodiversity, emissions inventory`
+- Description: `Calculate your Scope 1, 2 and 3 emissions, track biodiversity and ecosystem impacts, and generate GHG Protocol-conformant reports. Free to start. Built on GHG Protocol, IPCC and TNFD.`
+- Keywords: `GHG reporting software, carbon footprint calculator, Scope 3 emissions, TNFD biodiversity reporting, IPCC biomass carbon, carbon credit MRV, emissions inventory`
 - OG image: Dashboard screenshot showing a completed GHG inventory summary
 
 **Section 1 — Hero**
 
 Headline (H1): `Your GHG inventory, verified and submission-ready — without the spreadsheet hell.`
 
-Sub-headline: `SusDevOS calculates Scope 1, 2 and 3 emissions, tracks ecosystem impacts, and generates audit-ready reports aligned to GHG Protocol, SBTi, CDP and TNFD. Free to start.`
+Sub-headline: `SusDevOS calculates Scope 1, 2 and 3 emissions, tracks ecosystem and biodiversity impacts, and generates audit-ready reports aligned to the GHG Protocol, IPCC and TNFD. Free to start.`
 
 Two CTAs side by side:
 - Primary: `Start for free` → `/app/register`
@@ -57,7 +63,7 @@ Visual: Animated mockup cycling between (a) the emissions data entry form with a
 **Section 2 — Trust bar**
 
 Text: `Aligned to the standards that matter`
-Logos/badges (inline, greyscale): GHG Protocol Corporate Standard, SBTi, CDP, IPCC, TNFD, UN-SDGs
+Logos/badges (inline, greyscale): GHG Protocol Corporate Standard, IPCC, TNFD, Verra, Gold Standard, UN-SDGs
 Copy underneath each: short one-liner explaining the alignment (e.g. "GHG Protocol — all 15 Scope 3 categories supported")
 
 **Section 3 — Problem statement**
@@ -79,10 +85,10 @@ Step 1 — `Enter your activity data`
 Copy: Enter fuel consumption, electricity use, business travel, purchased goods — in the units you already have. Emission factors from DEFRA, EPA and the IPCC are applied automatically.
 
 Step 2 — `Review your calculated inventory`
-Copy: See your Scope 1, 2 and 3 totals in real time. Track progress against SBTi targets. Flag data quality issues before they become audit findings.
+Copy: See your Scope 1, 2 and 3 totals in real time. Track progress against your emissions reduction targets. Flag data quality issues before they become audit findings.
 
 Step 3 — `Generate and submit your report`
-Copy: One click produces a GHG Protocol-conformant PDF, ready for CDP submission, verifier review, or internal disclosure. Full calculation methodology included.
+Copy: One click produces a GHG Protocol-conformant PDF, ready for verifier review, assurance, or internal disclosure. Full calculation methodology included.
 
 **Section 5 — Feature highlights (persona tabs)**
 
@@ -91,9 +97,9 @@ Tab labels: `For sustainability managers` / `For ESG consultants` / `For develop
 **Sustainability managers tab:**
 - Auto-populated emission factors (DEFRA 2024, EPA eGRID, Climatiq)
 - Scope 3 relevance assessment — guided checklist for all 15 categories
-- SBTi target tracking with milestone progress
+- Emissions reduction targets with milestone progress tracking
 - Verification workflow — internal review → third-party sign-off
-- CDP-ready export
+- Audit-ready PDF & CSV export
 
 **ESG consultants tab:**
 - Manage up to 25 client entities from one login
@@ -142,25 +148,24 @@ Columns: Product (Features, Pricing, Integrations, Changelog) / Resources (Blog,
 
 Social: LinkedIn, GitHub (if open-sourcing any components), Twitter/X
 
-Bottom bar: `© 2025 SusDevOS. GHG Protocol, SBTi, CDP, TNFD and IPCC are trademarks of their respective owners.`
+Bottom bar: `© 2025 SusDevOS. GHG Protocol, TNFD, IPCC, Verra and Gold Standard are trademarks of their respective owners.`
 
 ---
 
 ## 2. Features `/features`
 
 **SEO**
-- Title: `Features — GHG Reporting, Ecosystem Tracking & SBTi Progress | SusDevOS`
-- Description: `Explore SusDevOS features: automated emission factor lookup, Scope 1/2/3 calculation, IPCC biomass carbon, SBTi target tracking, verification workflow and TNFD-aligned reporting.`
+- Title: `Features — GHG Reporting, Ecosystem Tracking & TNFD Nature Reporting | SusDevOS`
+- Description: `Explore SusDevOS features: automated emission factor lookup, Scope 1/2/3 calculation, IPCC biomass carbon, carbon-credit MRV, verification workflow and TNFD-aligned reporting.`
 
 **Structure:**
 
 Hero: `Everything you need for credible climate disclosure` + link to all four feature detail pages.
 
-Four feature cards linking to sub-pages:
+Three feature cards linking to sub-pages:
 1. GHG Reporting — DEFRA/EPA EFs, Scope 2 dual method, Scope 3 categories
-2. Ecosystem Tracking — land parcels, tree removals, IPCC biomass, restorations
-3. SBTi Progress — target setting, milestone tracking, market-based Scope 2
-4. Team & Verification — roles, approval workflow, third-party verification
+2. Ecosystem Tracking — land parcels, tree removals, IPCC biomass, restorations, TNFD
+3. Team & Verification — roles, approval workflow, third-party verification
 
 ---
 
@@ -176,7 +181,7 @@ Four feature cards linking to sub-pages:
 **Sections:**
 1. Hero: "Calculate every scope. Miss nothing."
 2. Scope 1 — stationary combustion, mobile, fugitives. Show fuel → tCO2e calculation inline.
-3. Scope 2 — dual method (location-based + market-based). Explain why both matter for SBTi.
+3. Scope 2 — dual method (location-based + market-based). Explain why both matter under the GHG Protocol Scope 2 Guidance.
 4. Scope 3 — all 15 categories. Interactive checklist showing relevance assessment flow.
 5. Emission factor library — DEFRA 2024, EPA eGRID, Climatiq, IPCC. Auto-updates annually.
 6. Biogenic CO2 — explain why it's reported separately and where it appears in the report.
@@ -197,19 +202,12 @@ Four feature cards linking to sub-pages:
 5. TNFD alignment — map to TNFD LEAP framework (Locate, Evaluate, Assess, Prepare)
 6. Species tracking — GBIF/IUCN integration, conservation status disclosure
 
-### `/features/sbti-progress`
+### ~~`/features/sbti-progress`~~ — REMOVED (out of scope)
 
-**SEO**
-- Title: `SBTi Target Setting & Progress Tracking | SusDevOS`
-- Description: `Set science-based targets aligned to the 1.5°C pathway. Track absolute contraction, sector decarbonization (SDA), and intensity-based targets with milestone progress dashboards.`
-
-**Sections:**
-1. Hero: "Know exactly where you stand against your science-based targets."
-2. Target types — Absolute Contraction, SDA, Intensity-Based. Visual explainer of each.
-3. Milestone tracking — year-by-year progress chart showing actual vs expected reduction
-4. Market-based Scope 2 — explain why this is the SBTi-required method
-5. SBTi registry sync — automatic validation status updates from the SBTi companies list
-6. Near-term vs long-term — support for separate 2030 and 2050 targets
+> SBTi is out of product scope (nature/MRV + TNFD refocus — see CLAUDE.md § Product
+> scope). This dedicated page is removed. Generic emissions targets and milestone
+> tracking (the `Targets` model) remain and can be surfaced within the GHG Reporting
+> page if needed — but not framed as an SBTi feature.
 
 ### `/features/team-and-verification`
 
@@ -253,19 +251,13 @@ Four feature cards linking to sub-pages:
 ## 5. Standards & Compliance `/standards`
 
 **SEO**
-- Title: `GHG Protocol, SBTi, CDP, TNFD & IPCC Compliance | SusDevOS`
-- Description: `SusDevOS is built on the GHG Protocol Corporate Standard, IPCC 2006 Guidelines, and SBTi methodology. Understand how each standard is implemented.`
+- Title: `GHG Protocol, IPCC, TNFD & SDG Compliance | SusDevOS`
+- Description: `SusDevOS is built on the GHG Protocol Corporate Standard, IPCC 2006 Guidelines, and the TNFD framework. Understand how each standard is implemented.`
 
 **Sections — one per standard:**
 
 **GHG Protocol Corporate Standard**
 What it requires → how SusDevOS implements it (Scope 1/2/3, consolidation approaches, biogenic CO2, Scope 2 dual method, Scope 3 relevance assessment). Link to ghg_calculation_spec.md (public version).
-
-**SBTi (Science Based Targets initiative)**
-Near-term 1.5°C targets, sector decarbonization, required Scope 3 threshold. How target types map to SusDevOS `Targets` model. SBTi registry sync.
-
-**CDP (Carbon Disclosure Project)**
-CDP questionnaire sections addressed by SusDevOS data. Export format compatibility.
 
 **TNFD (Taskforce on Nature-related Financial Disclosures)**
 LEAP framework (Locate, Evaluate, Assess, Prepare). How land parcel + ecosystem module maps to TNFD disclosure requirements. Status: aligned, not formally reviewed.
@@ -301,9 +293,6 @@ ECB, Open Exchange Rates — daily FX rates for spend-based Scope 3.
 **Biodiversity**
 GBIF, IUCN Red List — species scientific name, taxonomy, conservation status.
 
-**Climate targets**
-SBTi Companies Taking Action — monthly validation status sync.
-
 **"Want an integration we don't have?"** — link to contact form with "Integration request" subject pre-filled.
 
 ---
@@ -312,16 +301,16 @@ SBTi Companies Taking Action — monthly validation status sync.
 
 **SEO**
 - Title: `Sustainability Reporting Resources, Guides & Tools | SusDevOS`
-- Description: `Free guides, checklists and tools for GHG reporting, Scope 3 assessment, SBTi target setting and TNFD disclosure. No login required.`
+- Description: `Free guides, checklists and tools for GHG reporting, Scope 3 assessment, IPCC biomass carbon and TNFD disclosure. No login required.`
 
 **Sub-pages:**
 
 ### Guides (gated by email)
 - "Your first GHG inventory: a step-by-step guide" (PDF, ~20 pages)
 - "GHG Protocol Scope 3: assessing relevance across all 15 categories" (PDF)
-- "How to set an SBTi-aligned science-based target" (PDF)
+- "How to set and track a credible emissions reduction target" (PDF)
 - "TNFD for development projects: a practical introduction" (PDF)
-- "Preparing for CDP disclosure: what data you need and where to find it" (PDF)
+- "Carbon credit MRV: validating Verra & Gold Standard retirements" (PDF)
 
 ### Tools (no gate)
 - **Carbon estimator** (`/resources/tools/carbon-estimator`) — same tool as homepage section, standalone page for SEO
@@ -337,13 +326,13 @@ Public changelog of new features. Builds trust and gives existing users visibili
 
 **SEO**
 - Title: `Sustainability & GHG Reporting Blog | SusDevOS`
-- Description: `Practical guides on carbon accounting, Scope 3 reporting, SBTi targets, TNFD, biodiversity impact and sustainable development — written for sustainability managers.`
+- Description: `Practical guides on carbon accounting, Scope 3 reporting, IPCC biomass carbon, TNFD, biodiversity impact and sustainable development — written for sustainability managers.`
 
 **Categories:**
 - GHG Reporting (calculation methodology, emission factors, standards)
 - Scope 3 (category-by-category guides, supplier engagement)
 - Nature & Biodiversity (TNFD, ecosystem, land use)
-- SBTi & Targets (target setting, progress tracking)
+- Targets & MRV (emissions targets, carbon-credit validation)
 - Regulation & Policy (CSRD, SEC climate rules, UK TCFD mandate)
 - Product Updates (when significant features ship)
 
@@ -354,11 +343,11 @@ Public changelog of new features. Builds trust and gives existing users visibili
 | How to calculate Scope 2 emissions: location-based vs market-based | "scope 2 emissions calculation" | GHG Reporting | Informational |
 | DEFRA 2024 emission factors: what's changed and how to apply them | "DEFRA 2024 emission factors" | GHG Reporting | Informational |
 | GHG Protocol Scope 3: which of the 15 categories apply to your business? | "scope 3 categories" | Scope 3 | Informational |
-| What is an SBTi 1.5°C target? A plain-English guide | "SBTi target" | SBTi & Targets | Informational |
+| How to set a credible corporate emissions reduction target | "emissions reduction target" | Targets & MRV | Informational |
 | How to calculate IPCC Tier 1 biomass carbon from tree removals | "IPCC biomass carbon calculation" | Nature & Biodiversity | Informational |
 | TNFD vs TCFD: the key differences and which you need | "TNFD vs TCFD" | Nature & Biodiversity | Informational |
 | UK electricity emission factor 2024: grid average and market-based options | "UK electricity emission factor 2024" | GHG Reporting | Informational |
-| How to prepare for your first CDP submission | "CDP disclosure first time" | Regulation & Policy | Informational |
+| Preparing for TNFD nature-related disclosure: a first-timer's guide | "TNFD disclosure" | Nature & Biodiversity | Informational |
 | What counts as biogenic CO2 and why does it matter? | "biogenic CO2 reporting" | GHG Reporting | Informational |
 | Scope 3 Category 1: calculating purchased goods & services emissions | "scope 3 category 1 purchased goods" | Scope 3 | Informational |
 

@@ -18,7 +18,7 @@ All external API keys are stored in environment variables (never in DB or code).
 | DEFRA | Scheduled download | Annual (March) | `EmissionFactors` |
 | EPA eGRID | Scheduled download | Annual (Jan) | `EmissionFactors` |
 | IEA Electricity | Scheduled download | Annual | `EmissionFactors` |
-| SBTi Registry | Scheduled download | Monthly | `Targets` |
+| ~~SBTi Registry~~ | REMOVED — out of scope (nature/MRV + TNFD refocus) | — | — |
 | ECB / Open Exchange Rates | Scheduled | Daily | `ExchangeRates` |
 | Verra Registry | On-demand | At offset save | `EmissionsOffsets` |
 | Gold Standard Registry | On-demand | At offset save | `EmissionsOffsets` |

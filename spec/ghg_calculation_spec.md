@@ -149,7 +149,7 @@ If an entity holds 100% renewable EACs covering all consumption: `EFMarketBased 
 
 ### 4.3 Reporting Rule
 
-`GHGInventories.TotalScope2LocationBasedTonnes` and `TotalScope2MarketBasedTonnes` are both computed and reported. The inventory narrative must state which method is used as the primary figure for target-setting. For SBTi targets, market-based is the required primary method.
+`GHGInventories.TotalScope2LocationBasedTonnes` and `TotalScope2MarketBasedTonnes` are both computed and reported. The inventory narrative must state which method is used as the primary figure for target-setting and verification. Market-based is the default primary method (GHG Protocol Scope 2 Guidance).
 
 ### 4.4 Implementation
 
@@ -298,7 +298,7 @@ Pre-calculated carbon values entered directly. `BiomassCalculationMethod = 4`. `
 LULUCF biogenic CO2 is **not** included in the entity's Scope 1 total under GHG Protocol Corporate Standard. It is:
 - Summed into `GHGInventories.TotalBiogenicCO2Tonnes`
 - Reported separately in the inventory as "biogenic CO2 from LULUCF"
-- Disclosed to CDP and TCFD as a contextual metric
+- Disclosed in TNFD / TCFD reporting as a contextual metric
 
 ---
 
@@ -392,7 +392,7 @@ def compute_inventory_totals(inventory_id):
 
 ```
 NetEmissionsTonnes = TotalScope1Tonnes
-                   + TotalScope2MarketBasedTonnes   (primary Scope 2 method for SBTi)
+                   + TotalScope2MarketBasedTonnes   (primary Scope 2 method)
                    + TotalScope3Tonnes
                    − TotalOffsetsAppliedTonnes
 ```
@@ -473,9 +473,12 @@ IntensityReduction (%) = (BaselineIntensity − CurrentIntensity) / BaselineInte
 
 `OutputMetric` (revenue, FTE, m², MWh produced) is entered manually per year. Units must match `Targets.IntensityMetric`.
 
-### 10.3 SBTi Sector Decarbonization Approach (SDA)
+### 10.3 ~~SBTi Sector Decarbonization Approach (SDA)~~ — REMOVED (out of scope)
 
-SDA targets align emissions intensity to a sector-specific benchmark pathway (e.g. cement, steel, power). Progress is assessed by comparing `CurrentIntensity` against the SDA benchmark value for that year (sourced from SBTi sector guidance). SDA benchmark values are entered as annual milestones in `TargetMilestones.ExpectedIntensity`.
+> SDA is an SBTi-specific target methodology, removed in the nature/MRV + TNFD
+> refocus (see CLAUDE.md § Product scope). Generic intensity targets remain
+> supported via `Targets`/`TargetMilestones`; the sector-benchmark pathway logic
+> is not built.
 
 ---
 
@@ -551,7 +554,6 @@ The default dataset is configured via `DEFAULT_GWP_DATASET_ID` env var. Entities
 | Limitation | Mitigation | Future work |
 |------------|------------|-------------|
 | Spend-based Scope 3 EFs not seeded | Manual entry via admin | Add EEIO (Environmentally Extended Input-Output) dataset per region |
-| SDA pathway benchmarks not stored | Manual milestone entry | Ingest SBTi sector benchmark tables as fixtures |
 | Upstream T&D tonnage not linked | Manual entry | Link to logistics/supply chain module |
 | Restoration survival rate not in schema | Hardcoded default 0.85 | Add `SurvivalEstimatePct` to `Restorations` model |
 | Multi-year recalculation on EF update | Not supported | Add `recalculate_inventory` Celery task |

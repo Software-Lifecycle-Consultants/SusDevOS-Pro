@@ -25,7 +25,7 @@ Sustainability managers are often solo or in a team of 2. Seat pricing underchar
 
 ### Professional
 **Price:** £199/month (£159/month billed annually)
-**Intended user:** A mid-size company with subsidiaries, or an ESG manager who needs verification workflows and SBTi tracking.
+**Intended user:** A mid-size company with subsidiaries, or an ESG manager who needs verification workflows and TNFD-aligned nature reporting.
 **Limits:** 5 entities, unlimited years, 20 users, all modules.
 **Entity add-on:** £25/month per additional entity beyond 5.
 
@@ -59,9 +59,7 @@ Sustainability managers are often solo or in a team of 2. Seat pricing underchar
 | **Emission factor library (DEFRA/EPA/Climatiq)** | ✓ (DEFRA only) | ✓ | ✓ | ✓ | ✓ |
 | **GHG inventory (formal, versioned)** | — ↑ | ✓ | ✓ | ✓ | ✓ |
 | **GWP dataset selection (AR4/AR5/AR6)** | — | ✓ | ✓ | ✓ | ✓ |
-| **SBTi target setting** | — ↑ | ✓ | ✓ | ✓ | ✓ |
-| **SBTi milestone tracking** | — | ✓ | ✓ | ✓ | ✓ |
-| **SBTi registry sync** | — | — | ✓ | ✓ | ✓ |
+| **Emissions targets & milestone tracking** | — ↑ | ✓ | ✓ | ✓ | ✓ |
 | **Ecosystem tracking (basic)** | — ↑ | ✓ | ✓ | ✓ | ✓ |
 | **IPCC biomass carbon (Tier 1)** | — | ✓ | ✓ | ✓ | ✓ |
 | **IPCC biomass carbon (Tier 2/3)** | — | — ↑ | ✓ | ✓ | ✓ |
@@ -78,7 +76,6 @@ Sustainability managers are often solo or in a team of 2. Seat pricing underchar
 | **PDF report (unbranded)** | — | ✓ | ✓ | — | — |
 | **PDF report (white-label)** | — | — | — ↑ | ✓ | ✓ |
 | **CSV / JSON export** | — | ✓ | ✓ | ✓ | ✓ |
-| **CDP export format** | — | — ↑ | ✓ | ✓ | ✓ |
 | **Audit log (30 days)** | ✓ | ✓ | — | — | — |
 | **Audit log (1 year)** | — | — | ✓ | ✓ | — |
 | **Audit log (7 years)** | — | — | — | — | ✓ |
@@ -105,7 +102,7 @@ Upgrade prompts appear contextually — at the moment a user tries to use a gate
 
 **Scope 2 market-based (Free → Starter)**
 Trigger: User adds a Scope 2 emission record and selects "Market-based method".
-Prompt: *"Market-based Scope 2 is required for SBTi target reporting. Available on Starter (£49/month)."*
+Prompt: *"Market-based Scope 2 reflects your contractual energy purchases (RECs/PPAs) under the GHG Protocol Scope 2 Guidance. Available on Starter (£49/month)."*
 CTA: `Upgrade to Starter` / `Learn why this matters`
 
 **Scope 3 (Free → Starter)**
@@ -115,7 +112,7 @@ CTA: `Upgrade to Starter`
 
 **Formal GHG inventory (Free → Starter)**
 Trigger: User tries to create a GHGInventory record (required for verification).
-Prompt: *"A formal GHG inventory is required for CDP submission and third-party verification. Available on Starter."*
+Prompt: *"A formal GHG inventory is required for third-party verification and assurance. Available on Starter."*
 
 **Second reporting year (Free → Starter)**
 Trigger: User tries to view or add data for a year other than the current year.

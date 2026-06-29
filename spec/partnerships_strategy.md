@@ -1,5 +1,14 @@
 # Partnerships & Credibility Strategy — SusDevOS
 
+> ⚠️ **Scope note.** Following the nature/MRV + TNFD refocus (see CLAUDE.md § Product
+> scope), the **CDP Software Partner Program** and **SBTi tools ecosystem listing**
+> tracks below are **out of current product scope** — they require CDP-export /
+> SBTi-validation features the product no longer builds. They are retained here as
+> historical GTM analysis and possible future options, **not** as active plans.
+> Prioritise the in-scope rungs: GHG Protocol conformant-tools list, **TNFD Data &
+> Tools Landscape**, Cyber Essentials, and carbon-credit-registry (Verra/Gold
+> Standard) credibility. Revisit CDP/SBTi only if product scope changes.
+
 Getting mentioned by UNFCCC or adopted by international bodies is a multi-year process, but it follows a clear ladder. Each rung builds the credibility needed for the next. This document lays out that ladder honestly — what's achievable when, what it requires, and what the payoff is.
 
 **The core principle:** international bodies do not endorse commercial software directly. What they do is maintain lists of conformant tools, host partner ecosystems, and feature organisations doing credible work at their events. The goal is to be in those lists and at those events.

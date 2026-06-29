@@ -263,7 +263,6 @@ class EmissionsData(BaseAuditMixin):
     )
     VerifiedAt = models.DateTimeField(null=True, blank=True)
     VerificationNotes = models.TextField(null=True, blank=True)
-    CountsTowardNDC = models.BooleanField(default=False)
 
     class Meta:
         db_table = "emissions_data"
