@@ -97,4 +97,6 @@ def test_pdf_render_smoke(entity, gwp_dataset):
         pdf = render(data, "pdf")
     except OSError as exc:                  # pango/cairo not installed in the image
         pytest.skip(f"weasyprint system libraries unavailable: {exc}")
+    except AttributeError as exc:           # weasyprint/pydyf version mismatch (pin pydyf==0.10.0, rebuild)
+        pytest.skip(f"weasyprint/pydyf version mismatch: {exc}")
     assert pdf[:4] == b"%PDF"

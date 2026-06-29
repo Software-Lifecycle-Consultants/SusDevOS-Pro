@@ -35,7 +35,7 @@ function FitPoly({ geo }: { geo: object }) {
   const map = useMap();
   useEffect(() => {
     try {
-      const layer = L.geoJSON(geo as L.GeoJSON);
+      const layer = L.geoJSON(geo as GeoJSON.GeoJsonObject);
       const bounds = layer.getBounds();
       if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32] });
     } catch { /* skip */ }

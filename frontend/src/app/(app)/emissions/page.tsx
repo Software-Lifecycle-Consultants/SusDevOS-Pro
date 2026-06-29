@@ -131,7 +131,7 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
   }
 
   const estTonnes = selectedEF && form.QuantityOrCost
-    ? (parseFloat(form.QuantityOrCost) * selectedEF.FactorValue / 1000).toFixed(4)
+    ? (parseFloat(form.QuantityOrCost) * parseFloat(selectedEF.FactorValue) / 1000).toFixed(4)
     : null;
 
   return (

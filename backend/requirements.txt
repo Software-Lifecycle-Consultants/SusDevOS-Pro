@@ -26,6 +26,7 @@ boto3==1.35.69                            # AWS SDK (required by django-storages
 
 # ─── PDF generation ────────────────────────────────────────────────────────────
 weasyprint==62.3                          # HTML → PDF report generation
+pydyf==0.10.0                             # pin: weasyprint 62.3 breaks on pydyf >=0.11 ('transform' AttributeError)
 
 # ─── Email ─────────────────────────────────────────────────────────────────────
 # Uses Django's built-in email backend; configure SMTP or SES via settings

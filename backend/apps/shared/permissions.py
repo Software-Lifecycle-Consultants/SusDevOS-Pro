@@ -80,7 +80,7 @@ def _resolve_privilege(user, interface_key: str, permission_type: int) -> bool:
         InterfaceId=interface,
         PermissionType__in=[permission_type, 5],  # 5 = All
         Status=1,
-    ).order_by("OverrideAction").first()  # 2=Revoke sorts after 1=Grant; we want Revoke to win
+    ).order_by("-OverrideAction").first()  # 2=Revoke first (desc) → Revoke wins over Grant
     if override:
         # If any active override is Revoke → deny; if Grant → allow
         return override.OverrideAction == 1

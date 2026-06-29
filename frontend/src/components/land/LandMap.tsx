@@ -27,7 +27,12 @@ function FitBounds({ parcels }: { parcels: Parcel[] }) {
     const withGeo = parcels.filter((p) => p.BoundaryGeoJSON);
     if (!withGeo.length) return;
     try {
-      const layer = L.geoJSON(withGeo.map((p) => p.BoundaryGeoJSON) as L.GeoJSON[]);
+      // Leaflet's geoJSON accepts an array of GeoJSON objects at runtime (addData
+      // iterates); the cast is through unknown because the typings only declare a
+      // single GeoJsonObject parameter.
+      const layer = L.geoJSON(
+        withGeo.map((p) => p.BoundaryGeoJSON) as unknown as GeoJSON.GeoJsonObject,
+      );
       const bounds = layer.getBounds();
       if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32] });
     } catch { /* invalid GeoJSON — skip */ }
