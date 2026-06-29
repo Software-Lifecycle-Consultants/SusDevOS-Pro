@@ -147,3 +147,26 @@ class EntityApiKeysIntermediary(models.Model):
 
     class Meta:
         db_table = "entity_api_keys_intermediary"
+
+
+class EntityMembers(models.Model):
+    """
+    Grants a user access to an entity beyond their primary EntityId — the
+    mechanism for multi-entity users (consultants, group admins) to switch
+    tenant context via the X-Entity-ID header.
+
+    Membership-only: it grants *access*; the user's existing global role applies
+    within each entity (per-entity roles are intentionally out of scope for now).
+    """
+    id = models.AutoField(primary_key=True)
+    UserId = models.ForeignKey("users.Users", on_delete=models.CASCADE, related_name="entity_memberships")
+    EntityId = models.ForeignKey(Entities, on_delete=models.CASCADE, related_name="members")
+    CreatedAt = models.DateTimeField(auto_now_add=True)
+    CreatedBy = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "entity_members"
+        constraints = [
+            models.UniqueConstraint(fields=["UserId", "EntityId"], name="unique_user_entity_membership"),
+        ]
+        indexes = [models.Index(fields=["UserId"], name="idx_entity_member_user")]

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
@@ -300,7 +301,9 @@ export default function EcosystemPage() {
               <tbody>
                 {ecos.map((e) => (
                   <tr key={e.EcosystemId}>
-                    <td className="font-medium text-surface-900">{e.EcosystemName}</td>
+                    <td className="font-medium">
+                      <Link href={`/ecosystem/${e.EcosystemId}`} className="text-brand-700 hover:underline">{e.EcosystemName}</Link>
+                    </td>
                     <td>{e.EcosystemType
                       ? <span className="badge badge-slate text-xs">{e.EcosystemType}</span>
                       : <span className="text-surface-400 text-xs">—</span>}
@@ -339,7 +342,9 @@ export default function EcosystemPage() {
               <tbody>
                 {specs.map((s) => (
                   <tr key={s.SpeciesId}>
-                    <td className="font-medium text-surface-900">{s.CommonName}</td>
+                    <td className="font-medium">
+                      <Link href={`/species/${s.SpeciesId}`} className="text-brand-700 hover:underline">{s.CommonName}</Link>
+                    </td>
                     <td className="italic text-surface-600 text-sm">{s.ScientificName ?? "—"}</td>
                     <td className="text-surface-500 text-sm">{s.Family ?? "—"}</td>
                     <td className="text-surface-500 text-sm">{s.Kingdom ?? "—"}</td>

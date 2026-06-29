@@ -35,8 +35,10 @@ class TenantViewSetMixin:
         if header_id and getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             request.entity_id = header_id
         elif header_id:
-            # Non-SA: verify they belong to the requested entity
-            if getattr(user, "EntityId_id", None) == header_id:
+            # Non-SA: verify they can access the requested entity (primary or
+            # an EntityMembers grant — multi-entity users).
+            from apps.entities.services import user_can_access_entity
+            if user_can_access_entity(user, header_id):
                 request.entity_id = header_id
             # else leave as-is (middleware already denied or set correctly)
         elif not getattr(request, "entity_id", None):

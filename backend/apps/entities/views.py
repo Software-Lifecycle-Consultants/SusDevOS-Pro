@@ -7,12 +7,14 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.shared.models import Contacts, Documents, EntityApiKeys, Locations
 from apps.shared.permissions import IsEntityAdmin, IsSuperAdmin
+from .services import accessible_entity_ids, user_can_access_entity
 from .models import (
     Entities,
     EntityApiKeysIntermediary,
     EntityContacts,
     EntityDocuments,
     EntityLocations,
+    EntityMembers,
 )
 from .serializers import (
     ApiKeyCreateResponseSerializer,
@@ -47,7 +49,7 @@ class EntitiesViewSet(ModelViewSet):
                 header_id = None
         if header_id and getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             request.entity_id = header_id
-        elif header_id and getattr(user, "EntityId_id", None) == header_id:
+        elif header_id and user_can_access_entity(user, header_id):
             request.entity_id = header_id
         elif not getattr(request, "entity_id", None):
             request.entity_id = getattr(user, "EntityId_id", None)
@@ -218,4 +220,84 @@ class EntitiesViewSet(ModelViewSet):
             if field in allowed:
                 setattr(entity, field, value)
         entity.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # ── Consolidation roll-up (G20) ─────────────────────────────────────────────
+
+    @action(detail=True, methods=["get"], url_path="consolidated-emissions")
+    def consolidated_emissions(self, request, pk=None):
+        """
+        Consolidated Scope 1/2/3 for the entity + its subsidiaries per the
+        GHG Protocol consolidation approach (ghg_calculation_spec §9).
+        Query params: ?year=YYYY (default current year), ?approach=1|2|3 (override).
+        """
+        from datetime import date
+        from apps.entities.services import compute_consolidated_emissions
+
+        entity = self.get_object()  # scoped by get_queryset (own + branches / SA)
+        try:
+            year = int(request.query_params.get("year", date.today().year))
+        except (ValueError, TypeError):
+            return Response({"code": "invalid_year", "detail": "year must be an integer."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        approach = request.query_params.get("approach")
+        approach = int(approach) if approach and approach.isdigit() else None
+
+        data = compute_consolidated_emissions(entity=entity, reporting_year=year, approach=approach)
+        return Response(data)
+
+    # ── Multi-entity membership (G21) ───────────────────────────────────────────
+
+    @action(detail=False, methods=["get"], url_path="accessible")
+    def accessible(self, request):
+        """Entities the current user can switch into (primary + memberships).
+        Drives the frontend entity switcher. SuperAdmin sees all active entities."""
+        if getattr(request.user, "IsSuperAdmin", False):
+            qs = Entities.objects.filter(Status__lt=4)
+        else:
+            qs = Entities.objects.filter(
+                EntityId__in=accessible_entity_ids(request.user), Status__lt=4)
+        primary = getattr(request.user, "EntityId_id", None)
+        return Response([
+            {"EntityId": e.EntityId, "EntityName": e.EntityName, "IsPrimary": e.EntityId == primary}
+            for e in qs.order_by("EntityName")
+        ])
+
+    @action(detail=True, methods=["get", "post"], url_path="members")
+    def members(self, request, pk=None):
+        """GET: list members of this entity. POST (SuperAdmin): grant a user access."""
+        entity = self.get_object()
+        if request.method == "GET":
+            links = EntityMembers.objects.filter(EntityId=entity).select_related("UserId")
+            return Response([
+                {"UserId": m.UserId.UserId, "username": m.UserId.username, "email": m.UserId.email}
+                for m in links
+            ])
+
+        if not getattr(request.user, "IsSuperAdmin", False):
+            return Response({"code": "permission_denied", "detail": "Only SuperAdmin can grant entity access."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        from apps.users.models import Users
+        ident = request.data.get("UserId") or request.data.get("email")
+        if not ident:
+            return Response({"code": "missing_user", "detail": "Provide UserId or email."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        lookup = {"UserId": ident} if str(ident).isdigit() else {"email": ident}
+        user = get_object_or_404(Users, **lookup)
+
+        EntityMembers.objects.get_or_create(
+            UserId=user, EntityId=entity,
+            defaults={"CreatedBy": request.user.UserId},
+        )
+        return Response({"UserId": user.UserId, "username": user.username, "email": user.email},
+                        status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["delete"], url_path=r"members/(?P<user_id>\d+)")
+    def remove_member(self, request, pk=None, user_id=None):
+        if not getattr(request.user, "IsSuperAdmin", False):
+            return Response({"code": "permission_denied", "detail": "Only SuperAdmin can revoke entity access."},
+                            status=status.HTTP_403_FORBIDDEN)
+        entity = self.get_object()
+        EntityMembers.objects.filter(EntityId=entity, UserId_id=user_id).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

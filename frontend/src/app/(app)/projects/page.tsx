@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth";
 import axiosInstance from "@/lib/axios-instance";
@@ -164,7 +165,9 @@ export default function ProjectsPage() {
             <tbody>
               {projects.map((p) => (
                 <tr key={p.ProjectId}>
-                  <td className="font-medium">{p.ProjectName}</td>
+                  <td className="font-medium">
+                    <Link href={`/projects/${p.ProjectId}`} className="text-brand-700 hover:underline">{p.ProjectName}</Link>
+                  </td>
                   <td className="text-surface-500">{p.ProjectType ?? "—"}</td>
                   <td className="text-surface-500">{p.Country ?? "—"}</td>
                   <td className="text-surface-500">{p.StartDate ?? "—"}</td>

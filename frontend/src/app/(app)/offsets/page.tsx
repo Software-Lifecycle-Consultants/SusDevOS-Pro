@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X, ExternalLink, RefreshCw } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
@@ -278,7 +279,9 @@ export default function OffsetsPage() {
                 return (
                   <tr key={o.OffsetId}>
                     <td>
-                      <p className="font-medium text-surface-900 leading-snug">{o.Title}</p>
+                      <p className="font-medium leading-snug">
+                        <Link href={`/offsets/${o.OffsetId}`} className="text-brand-700 hover:underline">{o.Title}</Link>
+                      </p>
                       {o.RegistryProjectName && (
                         <p className="text-xs text-surface-400 mt-0.5 truncate max-w-[200px]">
                           {o.RegistryProjectName}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X, TreePine, Sprout } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
@@ -348,7 +349,11 @@ export default function RestorationsPage() {
               <tbody>
                 {rems.map((r) => (
                   <tr key={r.TreeRemovalId}>
-                    <td className="font-medium text-surface-900">{r.RemovalReference ?? `#${r.TreeRemovalId}`}</td>
+                    <td className="font-medium">
+                      <Link href={`/tree-removals/${r.TreeRemovalId}`} className="text-brand-700 hover:underline">
+                        {r.RemovalReference ?? `#${r.TreeRemovalId}`}
+                      </Link>
+                    </td>
                     <td className="text-surface-500 text-sm">
                       {r.RemovalDate ? new Date(r.RemovalDate).toLocaleDateString() : "—"}
                     </td>
@@ -394,7 +399,9 @@ export default function RestorationsPage() {
               <tbody>
                 {rests.map((r) => (
                   <tr key={r.RestorationId}>
-                    <td className="font-medium text-surface-900">{r.RestorationName}</td>
+                    <td className="font-medium">
+                      <Link href={`/restorations/${r.RestorationId}`} className="text-brand-700 hover:underline">{r.RestorationName}</Link>
+                    </td>
                     <td className="text-surface-500 text-sm">
                       {r.StartDate ? new Date(r.StartDate).toLocaleDateString() : "—"}
                     </td>

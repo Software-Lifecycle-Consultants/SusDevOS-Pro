@@ -48,7 +48,6 @@ class TenantQueryMiddleware:
         return self.get_response(request)
 
     def _user_belongs_to_entity(self, user, entity_id: int) -> bool:
-        if getattr(user, "EntityId_id", None) == entity_id:
-            return True
-        # TODO: extend for EntityMembers junction table (multi-entity users)
-        return False
+        # Primary entity or an EntityMembers grant (multi-entity users).
+        from apps.entities.services import user_can_access_entity
+        return user_can_access_entity(user, entity_id)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { X, Upload } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
@@ -386,7 +387,9 @@ export default function EmissionsPage() {
                 const verif = VERIF_LABELS[r.VerificationStatus] ?? VERIF_LABELS[1];
                 return (
                   <tr key={r.EmissionsId}>
-                    <td className="max-w-[240px] truncate font-medium">{r.Title}</td>
+                    <td className="max-w-[240px] truncate font-medium">
+                      <Link href={`/emissions/${r.EmissionsId}`} className="text-brand-700 hover:underline">{r.Title}</Link>
+                    </td>
                     <td><span className="badge badge-slate">{SCOPE_LABELS[r.Scope]}</span></td>
                     <td className="text-surface-500">{r.Gas}</td>
                     <td className="text-right tabular-nums">

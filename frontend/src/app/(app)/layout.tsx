@@ -7,6 +7,7 @@ import { Bell } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore, displayName } from "@/store/auth";
 import axiosInstance from "@/lib/axios-instance";
+import { EntitySwitcher } from "@/components/EntitySwitcher";
 
 interface NavItem {
   href:  string;
@@ -100,6 +101,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {pathname.split("/").filter(Boolean)[0]?.replace(/-/g, " ") ?? "Dashboard"}
           </h1>
 
+          <div className="flex items-center gap-3">
+          {/* Entity switcher (multi-entity users) */}
+          <EntitySwitcher />
+
           {/* Notifications bell */}
           <Link
             href="/notifications"
@@ -113,6 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </span>
             )}
           </Link>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-6 animate-fade-in">

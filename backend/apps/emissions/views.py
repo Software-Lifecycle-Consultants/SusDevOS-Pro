@@ -233,6 +233,33 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
             return err
         return super().destroy(request, *args, **kwargs)
 
+    @action(detail=True, methods=["post"], url_path="unlock")
+    def unlock(self, request, pk=None):
+        """Reset a verified inventory to Unverified. SuperAdmin only; audited."""
+        if not getattr(request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return Response({"code": "permission_denied",
+                             "detail": "Only SuperAdmin can unlock verified inventories."},
+                            status=status.HTTP_403_FORBIDDEN)
+        inventory = self.get_object()
+        reason = request.data.get("reason", "")
+        if not reason:
+            return Response({"code": "reason_required",
+                             "detail": "A reason is required to unlock a verified inventory."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        inventory.VerificationStatus = 1
+        inventory.VerifiedBy = None
+        inventory.VerifiedAt = None
+        inventory.save(update_fields=["VerificationStatus", "VerifiedBy", "VerifiedAt"])
+
+        from apps.shared.audit import audit_log
+        audit_log(
+            action="Unlock_Verified", table_name="ghg_inventories",
+            record_id=inventory.InventoryId,
+            description=f"Unlocked verified inventory. Reason: {reason}",
+            request=request, retention_tier=3,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TargetsViewSet(TenantViewSetMixin, ModelViewSet):
     queryset = Targets.objects.all()
