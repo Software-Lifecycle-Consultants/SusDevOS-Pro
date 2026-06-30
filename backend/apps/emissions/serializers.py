@@ -1,34 +1,55 @@
 ﻿from rest_framework import serializers
+
 from .models import (
-    EmissionFactorSets, EmissionFactors,
-    EmissionsData, EmissionsDetails, EmissionsOffsets,
-    GwpDatasets, GwpValues, GHGInventories, Targets, TargetMilestones,
+    EmissionFactors,
+    EmissionFactorSets,
+    EmissionsData,
+    EmissionsDetails,
+    EmissionsOffsets,
+    GHGInventories,
+    GwpDatasets,
+    GwpValues,
+    TargetMilestones,
+    Targets,
 )
 
 
 class EmissionFactorSetsSerializer(serializers.ModelSerializer):
     class Meta:
-        model  = EmissionFactorSets
+        model = EmissionFactorSets
         fields = (
-            "SetId", "SetName", "Publisher", "Version",
-            "ApplicableYear", "GeographicScope", "IsActive",
+            "SetId",
+            "SetName",
+            "Publisher",
+            "Version",
+            "ApplicableYear",
+            "GeographicScope",
+            "IsActive",
         )
 
 
 class EmissionFactorsSerializer(serializers.ModelSerializer):
-    unit          = serializers.SerializerMethodField()
-    set_name      = serializers.SerializerMethodField()
+    unit = serializers.SerializerMethodField()
+    set_name = serializers.SerializerMethodField()
     set_publisher = serializers.SerializerMethodField()
 
     class Meta:
-        model  = EmissionFactors
+        model = EmissionFactors
         fields = (
-            "FactorId", "SetId", "set_name", "set_publisher",
-            "ActivityName", "ActivityCategory",
-            "Scope", "Scope3Category",
-            "Gas", "GasSubtype",
-            "FactorValue", "unit",
-            "CountryCode", "ApplicableYear",
+            "FactorId",
+            "SetId",
+            "set_name",
+            "set_publisher",
+            "ActivityName",
+            "ActivityCategory",
+            "Scope",
+            "Scope3Category",
+            "Gas",
+            "GasSubtype",
+            "FactorValue",
+            "unit",
+            "CountryCode",
+            "ApplicableYear",
         )
 
     def get_unit(self, obj):
@@ -40,13 +61,19 @@ class EmissionFactorsSerializer(serializers.ModelSerializer):
     def get_set_publisher(self, obj):
         return obj.SetId.Publisher if obj.SetId_id else None
 
+
 # Fields the server always computes — never writable from client
 CALCULATED_FIELDS = (
-    "EmissionsAmount", "EmissionsAmountTonnes",
-    "EmissionsAmountLocationBased", "EmissionsAmountMarketBased",
-    "EmissionsReduced", "EmissionsReducedTonnes",
+    "EmissionsAmount",
+    "EmissionsAmountTonnes",
+    "EmissionsAmountLocationBased",
+    "EmissionsAmountMarketBased",
+    "EmissionsReduced",
+    "EmissionsReducedTonnes",
     "BiogenicCO2AmountTonnes",
-    "SpendAmountUSD", "ExchangeRateToUSD", "ExchangeRateDate",
+    "SpendAmountUSD",
+    "ExchangeRateToUSD",
+    "ExchangeRateDate",
     "QuantityCanonical",
 )
 
@@ -62,17 +89,31 @@ class GwpDatasetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GwpDatasets
-        fields = ("GwpDatasetId", "Name", "Version", "Horizon", "IsDefault",
-                  "PublishedYear", "gwp_values")
+        fields = (
+            "GwpDatasetId",
+            "Name",
+            "Version",
+            "Horizon",
+            "IsDefault",
+            "PublishedYear",
+            "gwp_values",
+        )
 
 
 class EmissionsDataListSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmissionsData
         fields = (
-            "EmissionsId", "Title", "Scope", "Scope3Category",
-            "Gas", "EmissionsAmountTonnes", "VerificationStatus",
-            "ProjectId", "ReportingYear", "Status",
+            "EmissionsId",
+            "Title",
+            "Scope",
+            "Scope3Category",
+            "Gas",
+            "EmissionsAmountTonnes",
+            "VerificationStatus",
+            "ProjectId",
+            "ReportingYear",
+            "Status",
         )
 
 
@@ -81,9 +122,15 @@ class EmissionsDataSerializer(serializers.ModelSerializer):
         model = EmissionsData
         fields = "__all__"
         read_only_fields = (
-            ("EmissionsId", "EntityId", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy",
-             "VerifiedBy", "VerifiedAt") + CALCULATED_FIELDS
-        )
+            "EmissionsId",
+            "EntityId",
+            "CreatedAt",
+            "UpdatedAt",
+            "CreatedBy",
+            "UpdatedBy",
+            "VerifiedBy",
+            "VerifiedAt",
+        ) + CALCULATED_FIELDS
 
     def validate(self, data):
         # Strip any client-submitted calculated values — rule #1 from CLAUDE.md
@@ -96,15 +143,22 @@ class EmissionsDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmissionsDetails
         fields = "__all__"
-        read_only_fields = ("DetailId", "EntityId", "EmissionsAmount",
-                            "EmissionsAmountTonnes", "CreatedAt", "UpdatedAt")
+        read_only_fields = (
+            "DetailId",
+            "EntityId",
+            "EmissionsId",
+            "EmissionsAmount",
+            "EmissionsAmountTonnes",
+            "CreatedAt",
+            "UpdatedAt",
+        )
 
 
 class EmissionsOffsetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmissionsOffsets
         fields = "__all__"
-        read_only_fields = ("OffsetId", "EntityId", "CreatedAt", "UpdatedAt")
+        read_only_fields = ("OffsetId", "EntityId", "EmissionsId", "CreatedAt", "UpdatedAt")
 
 
 class GHGInventoriesSerializer(serializers.ModelSerializer):
@@ -112,11 +166,18 @@ class GHGInventoriesSerializer(serializers.ModelSerializer):
         model = GHGInventories
         fields = "__all__"
         read_only_fields = (
-            "InventoryId", "EntityId", "VerifiedBy", "VerifiedAt",
-            "TotalScope1Tonnes", "TotalScope2LocationTonnes",
-            "TotalScope2MarketTonnes", "TotalScope3Tonnes",
-            "TotalOffsetsTonnes", "NetEmissionsTonnes",
-            "CreatedAt", "UpdatedAt",
+            "InventoryId",
+            "EntityId",
+            "VerifiedBy",
+            "VerifiedAt",
+            "TotalScope1Tonnes",
+            "TotalScope2LocationTonnes",
+            "TotalScope2MarketTonnes",
+            "TotalScope3Tonnes",
+            "TotalOffsetsTonnes",
+            "NetEmissionsTonnes",
+            "CreatedAt",
+            "UpdatedAt",
         )
 
 
