@@ -233,6 +233,22 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
             return err
         return super().destroy(request, *args, **kwargs)
 
+    def perform_update(self, serializer):
+        """Record who verified the inventory and when, on the transition to
+        Verified (VerificationStatus >= 3).  Without this an inventory could
+        become verified with no provenance — unacceptable for MRV/audit."""
+        extra = {}
+        new_status = serializer.validated_data.get("VerificationStatus")
+        if (
+            new_status is not None
+            and new_status >= VERIFIED
+            and serializer.instance.VerificationStatus < VERIFIED
+        ):
+            extra = {"VerifiedBy": self.request.user, "VerifiedAt": timezone.now()}
+        instance = serializer.save(UpdatedBy=self.request.user.UserId, **extra)
+        self._audit("Update", instance)
+        return instance
+
     @action(detail=True, methods=["post"], url_path="unlock")
     def unlock(self, request, pk=None):
         """Reset a verified inventory to Unverified. SuperAdmin only; audited."""

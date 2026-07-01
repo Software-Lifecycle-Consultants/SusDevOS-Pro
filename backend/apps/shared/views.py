@@ -36,11 +36,20 @@ class TenantViewSetMixin:
             request.entity_id = header_id
         elif header_id:
             # Non-SA: verify they can access the requested entity (primary or
-            # an EntityMembers grant — multi-entity users).
+            # an EntityMembers grant — multi-entity users).  A header naming an
+            # entity the user has no membership in is a spoof attempt: reject it
+            # with 403 rather than silently returning an empty result set.  The
+            # equivalent check in TenantQueryMiddleware never fires for JWT
+            # requests because that middleware runs before DRF authentication.
             from apps.entities.services import user_can_access_entity
             if user_can_access_entity(user, header_id):
                 request.entity_id = header_id
-            # else leave as-is (middleware already denied or set correctly)
+            else:
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied(
+                    {"code": "forbidden_entity",
+                     "detail": "You do not have access to this entity."}
+                )
         elif not getattr(request, "entity_id", None):
             request.entity_id = getattr(user, "EntityId_id", None)
 

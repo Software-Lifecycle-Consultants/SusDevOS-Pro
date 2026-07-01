@@ -73,11 +73,16 @@ def _compute_inventory_totals(inventory):
 
     # Only 'valid' credits reduce the net total — CLAUDE.md critical rule.
     # 'unverified', 'pending', and 'invalid' offsets must never be deducted.
+    # Offsets are scoped to the inventory's ReportingYear via their linked
+    # emissions record, so a credit for one year cannot deduct from another
+    # year's net total — see spec/ghg_calculation_spec.md §8.1.
     offsets = EmissionsOffsets.objects.filter(
         EntityId=inventory.EntityId,
+        EmissionsId__ReportingYear=inventory.ReportingYear,
         Status__lt=4,
         RegistryValidationStatus="valid",
     ).aggregate(t=models.Sum("OffsetAmountTonnes"))["t"]
+
     total_offsets = Decimal(str(offsets or 0))
 
     # Net uses market-based Scope 2 as the primary method (GHG Protocol Scope 2

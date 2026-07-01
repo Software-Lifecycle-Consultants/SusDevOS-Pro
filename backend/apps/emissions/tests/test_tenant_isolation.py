@@ -154,21 +154,22 @@ class TestHeaderSpoofing:
     """
     A user who sends X-Entity-ID belonging to another entity must NOT gain
     access to that entity's data.  TenantViewSetMixin validates that the
-    authenticated user has a membership in the requested entity.
+    authenticated user has a membership in the requested entity and rejects a
+    spoofed header with 403 forbidden_entity (not a silent empty result set).
     """
 
-    def test_spoofed_header_cannot_read_other_entity_records(self, two_entities):
-        # user_a sends X-Entity-ID of entity_b — should be denied or see nothing
+    def test_spoofed_header_is_rejected_with_403(self, two_entities):
+        # user_a sends X-Entity-ID of entity_b — must be denied outright.
         spoofed = _client_for(two_entities["user_a"], two_entities["entity_b"].EntityId)
         resp = spoofed.get(EMISSIONS_URL)
-        assert resp.status_code == status.HTTP_200_OK
-        ids = [r["EmissionsId"] for r in resp.data["results"]]
-        assert two_entities["record_b"] not in ids
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data.get("code") == "forbidden_entity"
 
     def test_spoofed_header_cannot_get_detail_of_other_entity(self, two_entities):
         spoofed = _client_for(two_entities["user_a"], two_entities["entity_b"].EntityId)
         resp = spoofed.get(f"{EMISSIONS_URL}{two_entities['record_b']}/")
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data.get("code") == "forbidden_entity"
 
 
 class TestUnauthenticated:

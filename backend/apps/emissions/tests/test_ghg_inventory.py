@@ -125,6 +125,16 @@ class TestInventoryVerification:
         assert resp.status_code == status.HTTP_200_OK
         assert resp.data["VerificationStatus"] == VERIFIED
 
+    def test_verify_stamps_verifier_identity(self, auth_client, admin_user, gwp_dataset):
+        """Verifying an inventory must record who verified it and when."""
+        inv_id = self._create(auth_client, gwp_dataset)
+        resp = auth_client.patch(
+            f"{INV_URL}{inv_id}/", {"VerificationStatus": VERIFIED}, format="json"
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.data["VerifiedBy"] == admin_user.UserId
+        assert resp.data["VerifiedAt"] is not None
+
     def test_patch_verified_inventory_returns_403(self, auth_client, gwp_dataset):
         inv_id = self._create(auth_client, gwp_dataset)
         self._verify(auth_client, inv_id)

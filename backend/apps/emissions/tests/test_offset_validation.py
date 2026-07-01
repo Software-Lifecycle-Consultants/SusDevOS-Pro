@@ -36,7 +36,7 @@ DIESEL_EF = "2.63900000"
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 
-def _post_record(client, gwp_id):
+def _post_record(client, gwp_id, year=2024):
     resp = client.post(
         EMISSIONS_URL,
         {
@@ -48,7 +48,7 @@ def _post_record(client, gwp_id):
             "EmissionFactorSource": "DEFRA 2024",
             "Gas": "CO2",
             "GwpDatasetId": gwp_id,
-            "ReportingYear": 2024,
+            "ReportingYear": year,
         },
         format="json",
     )
@@ -56,12 +56,12 @@ def _post_record(client, gwp_id):
     return resp.data["EmissionsId"]
 
 
-def _create_inventory(entity, gwp_dataset):
+def _create_inventory(entity, gwp_dataset, year=2024):
     return GHGInventories.objects.create(
         EntityId=entity,
-        ReportingYear=2024,
-        ReportingPeriodFrom="2024-01-01",
-        ReportingPeriodTo="2024-12-31",
+        ReportingYear=year,
+        ReportingPeriodFrom=f"{year}-01-01",
+        ReportingPeriodTo=f"{year}-12-31",
         GwpDatasetId=gwp_dataset,
     )
 
@@ -242,3 +242,29 @@ class TestOffsetNetTotalRule:
         assert inventory.TotalOffsetsTonnes == Decimal("1.500000")
         expected_net = inventory.TotalScope1Tonnes - Decimal("1.500000")
         assert inventory.NetEmissionsTonnes == expected_net
+
+    def test_valid_offset_in_other_year_does_not_reduce_this_years_net(
+        self, auth_client, gwp_dataset, entity
+    ):
+        """
+        A valid offset attached to a 2023 emissions record must NOT reduce the
+        2024 inventory's net total.  Offsets are scoped to the inventory's
+        ReportingYear via their linked emissions record, so credits cannot leak
+        across years.  Regression test for the entity-wide offset sum bug.
+        """
+        # 2024 inventory with a 2024 record but no 2024 offsets.
+        _post_record(auth_client, gwp_dataset.GwpDatasetId, year=2024)
+        inv_2024 = _create_inventory(entity, gwp_dataset, year=2024)
+
+        # A valid credit, but attached to a 2023 record.
+        eid_2023 = _post_record(auth_client, gwp_dataset.GwpDatasetId, year=2023)
+        _add_offset(entity, eid_2023, "1.000000", "valid")
+
+        from tasks.emissions import _compute_inventory_totals
+
+        _compute_inventory_totals(inv_2024)
+        inv_2024.refresh_from_db()
+
+        # The 2023 credit must not touch 2024's totals.
+        assert inv_2024.TotalOffsetsTonnes == Decimal("0.000000")
+        assert inv_2024.NetEmissionsTonnes == inv_2024.TotalScope1Tonnes
