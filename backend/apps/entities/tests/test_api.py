@@ -156,3 +156,49 @@ class TestEntitySettings:
         assert resp.status_code == status.HTTP_204_NO_CONTENT
         entity.refresh_from_db()
         assert entity.ShareEmissionsWithPartners is True
+
+
+def _member_client(entity):
+    """Authenticated APIClient for a non-admin member of `entity`."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    member = UsersFactory(EntityId=entity, email="member@testcorp.com", username="member1")
+    client = APIClient()
+    client.credentials(
+        HTTP_AUTHORIZATION=f"Bearer {str(RefreshToken.for_user(member).access_token)}",
+        HTTP_X_ENTITY_ID=str(entity.EntityId),
+    )
+    return client
+
+
+@pytest.mark.django_db
+class TestEntitySettingsAuthz:
+    """A non-admin member must not be able to change entity settings or mint keys."""
+
+    def test_member_cannot_patch_settings(self, entity):
+        client = _member_client(entity)
+        resp = client.patch(
+            f"/api/entities/{entity.EntityId}/settings/",
+            {"ShareEmissionsWithPartners": True},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        entity.refresh_from_db()
+        assert entity.ShareEmissionsWithPartners is not True
+
+    def test_member_cannot_mint_api_key(self, entity):
+        client = _member_client(entity)
+        resp = client.post(
+            f"/api/entities/{entity.EntityId}/api-keys/",
+            {"AuthorizedByFor": "steal"},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_admin_can_still_patch_settings(self, auth_client, entity):
+        resp = auth_client.patch(
+            f"/api/entities/{entity.EntityId}/settings/",
+            {"ShareEmissionsWithPartners": True},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_204_NO_CONTENT

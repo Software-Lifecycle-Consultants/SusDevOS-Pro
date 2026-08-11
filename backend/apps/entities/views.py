@@ -71,6 +71,17 @@ class EntitiesViewSet(ModelViewSet):
             EntityId__in=[entity_id] + related_ids, Status__lt=4
         )
 
+    def _is_entity_admin(self, request) -> bool:
+        """True if the caller is SuperAdmin or holds the entity 'admin' role.
+
+        Mirrors apps.shared.permissions.IsEntityAdmin; used inline so privileged
+        nested actions return the viewset's standard permission_denied envelope.
+        """
+        user = request.user
+        if getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return True
+        return user.user_roles.filter(RoleId__RoleKey="admin", Status=1).exists()
+
     def get_serializer_class(self):
         if self.action == "create":
             return EntityCreateSerializer
@@ -180,6 +191,13 @@ class EntitiesViewSet(ModelViewSet):
     @action(detail=True, methods=["get", "post"], url_path="api-keys")
     def api_keys(self, request, pk=None):
         entity = self.get_object()
+        # API keys are long-lived tenant credentials — restrict both minting and
+        # enumeration to entity admins (SuperAdmin bypasses).
+        if not self._is_entity_admin(request):
+            return Response(
+                {"code": "permission_denied", "detail": "Only entity admins can manage API keys."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         if request.method == "GET":
             keys = EntityApiKeys.objects.filter(
                 entity_links__EntityId=entity, Status__lt=4
@@ -199,6 +217,11 @@ class EntitiesViewSet(ModelViewSet):
     def revoke_api_key(self, request, pk=None, key_id=None):
         from apps.entities.services import revoke_api_key
         entity = self.get_object()
+        if not self._is_entity_admin(request):
+            return Response(
+                {"code": "permission_denied", "detail": "Only entity admins can revoke API keys."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         key = get_object_or_404(EntityApiKeys, ApiKeyId=key_id, entity_links__EntityId=entity)
         revoke_api_key(key=key)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -215,6 +238,13 @@ class EntitiesViewSet(ModelViewSet):
                 "FiscalYearEndMonth":         entity.FiscalYearEndMonth,
                 "ConsolidationApproach":      entity.ConsolidationApproach,
             })
+        # Settings govern data-sharing (ShareEmissionsWithPartners) and the base
+        # currency that drives FX conversions — mutation is entity-admin only.
+        if not self._is_entity_admin(request):
+            return Response(
+                {"code": "permission_denied", "detail": "Only entity admins can change entity settings."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         allowed = {"ShareEmissionsWithPartners", "BaseCurrency", "FiscalYearEndMonth", "ConsolidationApproach"}
         for field, value in request.data.items():
             if field in allowed:
