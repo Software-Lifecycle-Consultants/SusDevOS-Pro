@@ -118,6 +118,21 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         unlock_record(instance, reason=reason, unlocked_by=request.user, entity_id=request.entity_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @staticmethod
+    def _verified_lock_response(record):
+        """Return a 403 Response if the parent record is verified, else None.
+
+        Detail/offset line items feed the recomputed emissions total, so allowing
+        them to change on a verified record would mutate the audit-locked figure
+        without going through the SuperAdmin unlock path (CLAUDE.md rule #3)."""
+        if record.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "Line items of a verified record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
     # ── Details (line items) ───────────────────────────────────────────────────
 
     @action(detail=True, methods=["get", "post"], url_path="details")
@@ -126,6 +141,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "GET":
             return Response(EmissionsDetailsSerializer(
                 record.details.filter(Status__lt=4), many=True).data)
+        locked = self._verified_lock_response(record)
+        if locked:
+            return locked
         s = EmissionsDetailsSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         detail = s.save(EmissionsId=record, EntityId_id=request.entity_id,
@@ -136,6 +154,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             url_path=r"details/(?P<detail_id>\d+)")
     def detail_item(self, request, pk=None, detail_id=None):
         record = self.get_object()
+        locked = self._verified_lock_response(record)
+        if locked:
+            return locked
         item = get_object_or_404(EmissionsDetails, DetailId=detail_id, EmissionsId=record)
         if request.method == "PATCH":
             s = EmissionsDetailsSerializer(item, data=request.data, partial=True)
@@ -154,6 +175,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "GET":
             return Response(EmissionsOffsetsSerializer(
                 record.offsets.filter(Status__lt=4), many=True).data)
+        locked = self._verified_lock_response(record)
+        if locked:
+            return locked
         s = EmissionsOffsetsSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         offset = s.save(EmissionsId=record, EntityId_id=request.entity_id,
@@ -164,6 +188,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             url_path=r"offsets/(?P<offset_id>\d+)")
     def offset_item(self, request, pk=None, offset_id=None):
         record = self.get_object()
+        locked = self._verified_lock_response(record)
+        if locked:
+            return locked
         item = get_object_or_404(EmissionsOffsets, OffsetId=offset_id, EmissionsId=record)
         if request.method == "PATCH":
             s = EmissionsOffsetsSerializer(item, data=request.data, partial=True)

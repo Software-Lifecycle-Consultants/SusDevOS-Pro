@@ -196,6 +196,49 @@ class TestVerificationImmutability:
         second = auth_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "again"}, format="json")
         assert second.status_code == status.HTTP_400_BAD_REQUEST
 
+    def _detail_payload(self, gwp_id):
+        return {
+            "Description": "Sub-meter A", "QuantityOrCost": "10.0000", "Unit": "litres",
+            "EmissionFactor": DIESEL_EF, "EmissionFactorSource": "DEFRA 2024",
+            "Gas": "CO2", "GwpDatasetId": gwp_id,
+        }
+
+    def test_line_items_of_verified_record_are_immutable(self, auth_client, gwp_dataset, entity):
+        """Detail/offset line items feed the recomputed total, so they must be
+        locked once the parent record is verified (CLAUDE.md rule #3)."""
+        gwp_id = gwp_dataset.GwpDatasetId
+        eid = auth_client.post(BASE_URL, _payload(
+            scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_id,
+        ), format="json").data["EmissionsId"]
+
+        # Add a detail while the record is still editable.
+        detail = auth_client.post(
+            f"{BASE_URL}{eid}/details/", self._detail_payload(gwp_id), format="json")
+        assert detail.status_code == status.HTTP_201_CREATED
+        detail_id = detail.data["DetailId"]
+
+        # Verify → record is now audit-locked.
+        auth_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "ok"}, format="json")
+
+        # Every nested write path must now be rejected.
+        add = auth_client.post(
+            f"{BASE_URL}{eid}/details/", self._detail_payload(gwp_id), format="json")
+        assert add.status_code == status.HTTP_403_FORBIDDEN
+        assert add.data["code"] == "verified_immutable"
+
+        patch = auth_client.patch(
+            f"{BASE_URL}{eid}/details/{detail_id}/", {"QuantityOrCost": "999.0000"}, format="json")
+        assert patch.status_code == status.HTTP_403_FORBIDDEN
+
+        delete = auth_client.delete(f"{BASE_URL}{eid}/details/{detail_id}/")
+        assert delete.status_code == status.HTTP_403_FORBIDDEN
+
+        offset = auth_client.post(f"{BASE_URL}{eid}/offsets/", {
+            "Title": "Credit", "OffsetType": "avoidance", "Provider": "Verra",
+            "OffsetAmountTonnes": "1.000000",
+        }, format="json")
+        assert offset.status_code == status.HTTP_403_FORBIDDEN
+
 
 @pytest.mark.django_db
 class TestUnlock:
