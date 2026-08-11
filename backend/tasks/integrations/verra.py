@@ -56,6 +56,17 @@ def sync_verra_registry(self):
 
     logger.info("Verra CSV: %d valid serial numbers loaded", len(valid_serials))
 
+    # A truncated/empty download parses to zero (or a suspiciously tiny number of)
+    # serials AFTER raise_for_status has already passed. Validating against it
+    # would flip every genuinely-valid credit to "invalid", and because the
+    # requery below only reconsiders pending/unverified rows, that corruption is
+    # sticky. Abort rather than mass-invalidate on an empty registry.
+    if not valid_serials:
+        logger.error(
+            "Verra CSV yielded 0 serial numbers — aborting to avoid mass-invalidation"
+        )
+        return {"skipped": "empty or unparseable CSV", "validated": 0, "invalidated": 0}
+
     # Validate pending offsets. Only touch credits flagged as Verra (or unflagged
     # legacy rows) — never mark a Gold Standard credit invalid against the VCS list.
     from django.db.models import Q
