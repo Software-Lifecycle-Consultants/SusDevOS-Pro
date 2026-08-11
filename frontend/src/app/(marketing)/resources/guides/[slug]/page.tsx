@@ -169,7 +169,7 @@ To change or override the grid factor: **Settings → Entity → Electricity Gri
 
 ## In Reports
 
-Your GHG Protocol PDF report and CSV export include both figures with clear labelling. Most voluntary frameworks (CDP, SBTi context) ask for market-based as the "primary" Scope 2 total, with location-based disclosed in a supplementary table.
+Your GHG Protocol PDF report and CSV export include both figures with clear labelling. Most voluntary reporting frameworks ask for market-based as the "primary" Scope 2 total, with location-based disclosed in a supplementary table.
     `.trim(),
   },
 
