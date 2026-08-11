@@ -65,16 +65,20 @@ def _compute_scope2(instance, qty) -> None:
     """
     fallback = instance.EmissionsAmount  # qty × EmissionFactor × gwp, already computed
 
+    # Location/Market amounts are server-computed (CALCULATED_FIELDS) and must be
+    # recomputed on every save. Using `else` (not `elif ... is None`) keeps them
+    # idempotent: on a re-save of a fallback record they refresh from the freshly
+    # computed fallback instead of retaining a stale value from the prior save.
     if instance.EFLocationBased is not None:
         lb_kg = qty * instance.EFLocationBased
         instance.EmissionsAmountLocationBased = lb_kg.quantize(Decimal("0.0001"))
-    elif instance.EmissionsAmountLocationBased is None:
+    else:
         instance.EmissionsAmountLocationBased = fallback
 
     if instance.EFMarketBased is not None:
         mb_kg = qty * instance.EFMarketBased
         instance.EmissionsAmountMarketBased = mb_kg.quantize(Decimal("0.0001"))
-    elif instance.EmissionsAmountMarketBased is None:
+    else:
         instance.EmissionsAmountMarketBased = instance.EmissionsAmountLocationBased
 
     # Primary figure: market-based when available, else location-based.

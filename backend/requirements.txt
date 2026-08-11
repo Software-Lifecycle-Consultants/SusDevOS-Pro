@@ -32,6 +32,9 @@ pydyf==0.10.0                             # pin: weasyprint 62.3 breaks on pydyf
 # Uses Django's built-in email backend; configure SMTP or SES via settings
 # For Celery-based async email, no extra package needed
 
+# ─── HTTP client ───────────────────────────────────────────────────────────────
+requests==2.32.3                          # Used by all tasks/integrations/* Celery tasks + shared/ecosystem integrations
+
 # ─── Utilities ─────────────────────────────────────────────────────────────────
 python-decouple==3.8                      # Read .env variables cleanly
 Pillow==11.0.0                            # Image processing (thumbnails, validation)

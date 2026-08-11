@@ -50,6 +50,27 @@ def test_scope2_market_falls_back_to_location_when_absent(entity, gwp_dataset):
     assert rec.EmissionsAmountMarketBased == Decimal("500.0000")
 
 
+def test_scope2_fallback_amounts_refresh_on_edit(entity, gwp_dataset):
+    """A legacy Scope 2 record with no explicit EF* factors must recompute all
+    amounts when re-saved. Regression: the fallback branches previously only ran
+    when the field was still None, so an edit left LB/MB (and the primary
+    EmissionsAmount derived from MB) at their stale first-save values."""
+    rec = _emission(
+        entity, gwp_dataset, Scope=2,
+        QuantityOrCost=Decimal("100"), EmissionFactor=Decimal("0.5"),
+    )
+    assert rec.EmissionsAmount == Decimal("50.0000")
+    assert rec.EmissionsAmountMarketBased == Decimal("50.0000")
+
+    # Double the activity and re-save — all figures must double.
+    rec.QuantityOrCost = Decimal("200")
+    rec.save()
+    rec.refresh_from_db()
+    assert rec.EmissionsAmount == Decimal("100.0000")
+    assert rec.EmissionsAmountLocationBased == Decimal("100.0000")
+    assert rec.EmissionsAmountMarketBased == Decimal("100.0000")
+
+
 def test_biogenic_co2_computed_and_excluded_from_total(entity, gwp_dataset):
     """Biogenic CO2 is reported separately and NOT folded into EmissionsAmount."""
     rec = _emission(

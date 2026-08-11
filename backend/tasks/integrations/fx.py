@@ -118,11 +118,19 @@ def sync_oer_fx_rates(self):
         for currency in CURRENCIES:
             if currency not in rates:
                 continue
+            # OER's default base is USD, so rates[currency] is units of `currency`
+            # per 1 USD. ExchangeRates.Rate is consumed as USD-per-FromCurrency
+            # (usd_amount = amount * Rate), matching the ECB path — so invert.
+            oer_rate = Decimal(str(rates[currency]))
+            if oer_rate <= 0:
+                logger.warning("OER returned non-positive rate for %s: %s", currency, oer_rate)
+                continue
+            usd_per_currency = Decimal("1") / oer_rate
             ExchangeRates.objects.update_or_create(
                 FromCurrency=currency,
                 ToCurrency="USD",
                 RateDate=date.today(),
-                defaults={"Rate": Decimal(str(rates[currency])), "Source": "OpenExchangeRates"},
+                defaults={"Rate": usd_per_currency, "Source": "OpenExchangeRates"},
             )
             created += 1
         logger.info("OER FX sync: %d rates upserted", created)
