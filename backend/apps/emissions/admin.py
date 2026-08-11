@@ -46,7 +46,16 @@ class EmissionsDataAdmin(admin.ModelAdmin):
     list_filter = ("Scope", "VerificationStatus", "Status", "Gas")
     search_fields = ("Title",)
     raw_id_fields = ("EntityId", "ProjectId")
-    readonly_fields = ("EmissionsAmount", "EmissionsAmountTonnes", "QuantityCanonical")
+    # All server-computed fields are read-only in admin too — a staff user must
+    # not be able to type over the calculated GHG figures (CLAUDE.md rule #1).
+    # Mirrors CALCULATED_FIELDS in serializers.py.
+    readonly_fields = (
+        "EmissionsAmount", "EmissionsAmountTonnes",
+        "EmissionsAmountLocationBased", "EmissionsAmountMarketBased",
+        "EmissionsReduced", "EmissionsReducedTonnes",
+        "BiogenicCO2AmountTonnes", "SpendAmountUSD",
+        "ExchangeRateToUSD", "ExchangeRateDate", "QuantityCanonical",
+    )
 
 @admin.register(Targets)
 class TargetsAdmin(admin.ModelAdmin):
