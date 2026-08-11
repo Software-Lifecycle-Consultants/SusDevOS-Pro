@@ -21,6 +21,20 @@ interface Parcel {
   LandUseType:     string | null;
 }
 
+// Leaflet's bindPopup renders raw HTML, so tenant-supplied strings must be
+// escaped to prevent stored XSS via a crafted parcel name / land-use type.
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&": return "&amp;";
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case '"': return "&quot;";
+      default:  return "&#39;";
+    }
+  });
+}
+
 function FitBounds({ parcels }: { parcels: Parcel[] }) {
   const map = useMap();
   useEffect(() => {
@@ -62,8 +76,8 @@ export default function LandMap({ parcels }: { parcels: Parcel[] }) {
               style={{ color: "#16a34a", weight: 2, fillOpacity: 0.15 }}
               onEachFeature={(_, layer) => {
                 layer.bindPopup(`
-                  <strong>${p.ParcelName}</strong><br/>
-                  ${p.LandUseType ?? ""}${p.AreaHectares ? ` · ${parseFloat(p.AreaHectares).toFixed(2)} ha` : ""}
+                  <strong>${escapeHtml(p.ParcelName)}</strong><br/>
+                  ${escapeHtml(p.LandUseType ?? "")}${p.AreaHectares ? ` · ${parseFloat(p.AreaHectares).toFixed(2)} ha` : ""}
                 `);
               }}
             />
