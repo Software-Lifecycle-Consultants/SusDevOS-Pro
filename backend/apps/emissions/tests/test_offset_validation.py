@@ -268,3 +268,89 @@ class TestOffsetNetTotalRule:
         # The 2023 credit must not touch 2024's totals.
         assert inv_2024.TotalOffsetsTonnes == Decimal("0.000000")
         assert inv_2024.NetEmissionsTonnes == inv_2024.TotalScope1Tonnes
+
+
+# ── Verified-record immutability on the standalone offsets endpoint ────────────
+
+
+def _enable_offsets_feature(entity):
+    """Seed a plan + subscription that includes 'carbon_offsets' so the
+    standalone /api/emissions-offsets/ endpoint is reachable (FeatureGateMixin)."""
+    from apps.billing.models import EntitySubscriptions, PlanFeatures, Plans
+
+    plan, _ = Plans.objects.get_or_create(
+        PlanKey="offsets_test",
+        defaults={
+            "PlanName": "Offsets (test)",
+            "PriceMonthlyGBP": 99,
+            "PriceAnnualGBP": 990,
+            "MaxEntities": 0,
+            "MaxUsersPerEntity": 0,
+            "MaxReportingYears": 0,
+            "SupportTier": "standard",
+        },
+    )
+    PlanFeatures.objects.get_or_create(
+        PlanId=plan,
+        FeatureKey="carbon_offsets",
+        defaults={"IsEnabled": True, "UpgradeMessage": "Upgrade to manage offsets."},
+    )
+    EntitySubscriptions.objects.get_or_create(
+        EntityId=entity,
+        defaults={"PlanId": plan, "Status": "active"},
+    )
+
+
+class TestStandaloneOffsetVerifiedLock:
+    """The standalone offsets endpoint (/api/emissions-offsets/{id}/) must honour
+    the verified-record immutability lock (CLAUDE.md rule #3), exactly like the
+    nested /api/emissions/{id}/offsets/{id}/ action.  Without this an offset on a
+    verified (audit-locked) record could be silently edited or deleted, changing
+    the recomputed net-emissions figure without the SuperAdmin unlock path."""
+
+    OFFSETS_URL = "/api/emissions-offsets/"
+
+    def _make_offset_on_verified_record(self, auth_client, gwp_id):
+        eid = _post_record(auth_client, gwp_id)
+        created = auth_client.post(
+            f"{EMISSIONS_URL}{eid}/offsets/",
+            {
+                "Title": "Credit A",
+                "OffsetType": "vcs",
+                "Provider": "Verra",
+                "OffsetAmountTonnes": "2.000000",
+                "CreditRegistry": "verra",
+            },
+            format="json",
+        )
+        assert created.status_code == status.HTTP_201_CREATED, created.data
+        offset_id = created.data["OffsetId"]
+        # Verify (locks) the parent record.
+        verify = auth_client.post(f"{EMISSIONS_URL}{eid}/verify/", {"notes": "ok"}, format="json")
+        assert verify.status_code == status.HTTP_204_NO_CONTENT
+        return offset_id
+
+    def test_patch_offset_on_verified_record_is_forbidden(self, auth_client, gwp_dataset, entity):
+        _enable_offsets_feature(entity)
+        offset_id = self._make_offset_on_verified_record(auth_client, gwp_dataset.GwpDatasetId)
+
+        resp = auth_client.patch(
+            f"{self.OFFSETS_URL}{offset_id}/",
+            {"OffsetAmountTonnes": "999.000000"},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN, resp.data
+        assert resp.data["code"] == "verified_immutable"
+
+        offset = EmissionsOffsets.objects.get(OffsetId=offset_id)
+        assert offset.OffsetAmountTonnes == Decimal("2.000000")  # unchanged
+
+    def test_delete_offset_on_verified_record_is_forbidden(self, auth_client, gwp_dataset, entity):
+        _enable_offsets_feature(entity)
+        offset_id = self._make_offset_on_verified_record(auth_client, gwp_dataset.GwpDatasetId)
+
+        resp = auth_client.delete(f"{self.OFFSETS_URL}{offset_id}/")
+        assert resp.status_code == status.HTTP_403_FORBIDDEN, resp.data
+
+        offset = EmissionsOffsets.objects.get(OffsetId=offset_id)
+        assert offset.Status != 4  # not soft-deleted

@@ -216,11 +216,42 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
     lookup_field     = "OffsetId"
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
+    def _reject_if_parent_verified(self, instance):
+        """Return a 403 Response if the offset's parent emissions record is
+        verified, else None.
+
+        Offsets feed the recomputed net-emissions total, so mutating or
+        deleting one attached to a verified (audit-locked) record would change
+        an audit-locked figure without going through the SuperAdmin unlock path.
+        The nested offset actions on EmissionsDataViewSet enforce this; this
+        standalone endpoint must apply the same lock (CLAUDE.md rule #3)."""
+        parent = instance.EmissionsId
+        if parent and parent.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "Offsets on a verified emissions record cannot be changed. "
+                           "Use /unlock/ first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
     def perform_create(self, serializer):
         serializer.save(
             EntityId_id = self.request.entity_id,
             CreatedBy   = self.request.user.UserId,
         )
+
+    def update(self, request, *args, **kwargs):
+        locked = self._reject_if_parent_verified(self.get_object())
+        if locked:
+            return locked
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        locked = self._reject_if_parent_verified(self.get_object())
+        if locked:
+            return locked
+        return super().destroy(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
         instance.Status = 4
