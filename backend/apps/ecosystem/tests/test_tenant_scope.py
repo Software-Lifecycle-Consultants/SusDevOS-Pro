@@ -9,8 +9,9 @@ before authentication and leaves request.entity_id None for token requests.
 Regression test: without EntityScopeInitialMixin, a JWT create writes
 EntityId=None (a NOT-NULL violation → HTTP 500) and reads return an empty set.
 """
-import pytest
 from rest_framework import status
+
+import pytest
 
 pytestmark = pytest.mark.django_db
 
@@ -40,6 +41,7 @@ def test_ecosystem_list_returns_own_entity_rows(auth_client, entity):
 def test_ecosystem_not_visible_to_other_entity(auth_client, entity):
     """A row created by one entity must not appear for another entity."""
     from rest_framework.test import APIClient
+
     from rest_framework_simplejwt.tokens import RefreshToken
 
     from apps.entities.tests.factories import EntitiesFactory
