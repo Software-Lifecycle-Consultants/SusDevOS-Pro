@@ -4,11 +4,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.shared.views import EntityScopeInitialMixin
+
 from .models import Notifications
 from .serializers import NotificationsSerializer
 
 
-class NotificationsViewSet(ModelViewSet):
+class NotificationsViewSet(EntityScopeInitialMixin, ModelViewSet):
     serializer_class = NotificationsSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch", "head", "options"]

@@ -13,45 +13,72 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class TenantViewSetMixin:
+def resolve_request_entity_id(request):
+    """Re-resolve ``request.entity_id`` after DRF authentication.
+
+    TenantQueryMiddleware runs before DRF authentication, so for JWT requests
+    ``request.user`` is still anonymous when the middleware runs and it leaves
+    ``request.entity_id`` = None.  This helper repeats the middleware's
+    header/membership checks once DRF has authenticated the user, and must be
+    called from ``initial()`` (after ``super().initial()``).
+
+    Mutates ``request.entity_id`` in place.  Raises ``PermissionDenied`` when a
+    non-SuperAdmin supplies an X-Entity-ID header for an entity they cannot
+    access (a spoof attempt).
+    """
+    user = request.user
+    header_id = request.META.get("HTTP_X_ENTITY_ID")
+    if header_id:
+        try:
+            header_id = int(header_id)
+        except (ValueError, TypeError):
+            header_id = None
+    if header_id and getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+        request.entity_id = header_id
+    elif header_id:
+        # Non-SA: verify they can access the requested entity (primary or
+        # an EntityMembers grant — multi-entity users).  A header naming an
+        # entity the user has no membership in is a spoof attempt: reject it
+        # with 403 rather than silently returning an empty result set.  The
+        # equivalent check in TenantQueryMiddleware never fires for JWT
+        # requests because that middleware runs before DRF authentication.
+        from apps.entities.services import user_can_access_entity
+        if user_can_access_entity(user, header_id):
+            request.entity_id = header_id
+        else:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied(
+                {"code": "forbidden_entity",
+                 "detail": "You do not have access to this entity."}
+            )
+    elif not getattr(request, "entity_id", None):
+        request.entity_id = getattr(user, "EntityId_id", None)
+
+
+class EntityScopeInitialMixin:
+    """Re-resolve ``request.entity_id`` after DRF authentication.
+
+    Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
+    but cannot use the full :class:`TenantViewSetMixin` — e.g. viewsets whose
+    model stores ``EntityId`` as a plain IntegerField (ecosystem.Ecosystem,
+    ecosystem.Species) and views with a bespoke ``get_queryset``.  Without this,
+    ``request.entity_id`` is None for JWT requests and tenant scoping silently
+    fails (empty reads, NOT-NULL violations on create)."""
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)  # runs DRF auth + perms
+        resolve_request_entity_id(request)
+
+
+class TenantViewSetMixin(EntityScopeInitialMixin):
     """
     Mixin for tenant-scoped ModelViewSets.
 
     The Django middleware runs before DRF authentication, so request.user may
-    still be anonymous when the middleware sets request.entity_id.  We
-    re-resolve entity_id in initial() once DRF has authenticated the user.
+    still be anonymous when the middleware sets request.entity_id.  entity_id is
+    re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+    authenticated the user.
     """
-
-    def initial(self, request, *args, **kwargs):
-        """Re-resolve entity_id after DRF authentication has set request.user."""
-        super().initial(request, *args, **kwargs)  # runs DRF auth + perms
-        user = request.user
-        header_id = request.META.get("HTTP_X_ENTITY_ID")
-        if header_id:
-            try:
-                header_id = int(header_id)
-            except (ValueError, TypeError):
-                header_id = None
-        if header_id and getattr(user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
-            request.entity_id = header_id
-        elif header_id:
-            # Non-SA: verify they can access the requested entity (primary or
-            # an EntityMembers grant — multi-entity users).  A header naming an
-            # entity the user has no membership in is a spoof attempt: reject it
-            # with 403 rather than silently returning an empty result set.  The
-            # equivalent check in TenantQueryMiddleware never fires for JWT
-            # requests because that middleware runs before DRF authentication.
-            from apps.entities.services import user_can_access_entity
-            if user_can_access_entity(user, header_id):
-                request.entity_id = header_id
-            else:
-                from rest_framework.exceptions import PermissionDenied
-                raise PermissionDenied(
-                    {"code": "forbidden_entity",
-                     "detail": "You do not have access to this entity."}
-                )
-        elif not getattr(request, "entity_id", None):
-            request.entity_id = getattr(user, "EntityId_id", None)
 
     def get_queryset(self):
         qs = super().get_queryset().filter(Status__lt=4)

@@ -9,6 +9,8 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from apps.shared.views import EntityScopeInitialMixin
+
 from .models import Blogs
 from .serializers import BlogsDetailSerializer, BlogsListSerializer, PublicBlogSerializer
 
@@ -22,7 +24,7 @@ class PublicReadThrottle(AnonRateThrottle):
     scope = "public_read"
 
 
-class BlogsViewSet(ModelViewSet):
+class BlogsViewSet(EntityScopeInitialMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Blogs.objects.all()
 

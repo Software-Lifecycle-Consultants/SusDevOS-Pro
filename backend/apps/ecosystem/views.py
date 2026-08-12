@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.shared.views import EntityScopeInitialMixin
+
 from .models import Ecosystem, Species
 from .serializers import (
     EcosystemDetailSerializer, EcosystemListSerializer,
@@ -10,7 +12,7 @@ from .serializers import (
 )
 
 
-class EcosystemViewSet(ModelViewSet):
+class EcosystemViewSet(EntityScopeInitialMixin, ModelViewSet):
     """Ecosystem uses IntegerField for EntityId — uses a custom queryset filter."""
     permission_classes = [IsAuthenticated]
     queryset = Ecosystem.objects.all()
@@ -34,7 +36,7 @@ class EcosystemViewSet(ModelViewSet):
         instance.save()
 
 
-class SpeciesViewSet(ModelViewSet):
+class SpeciesViewSet(EntityScopeInitialMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Species.objects.all()
 

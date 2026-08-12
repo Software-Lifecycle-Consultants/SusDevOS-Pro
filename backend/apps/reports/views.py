@@ -5,11 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.shared.views import EntityScopeInitialMixin
+
 from .models import ReportJobs
 from .serializers import ReportJobCreateSerializer, ReportJobSerializer
 
 
-class ReportJobsViewSet(ModelViewSet):
+class ReportJobsViewSet(EntityScopeInitialMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post", "head", "options"]
 
