@@ -94,7 +94,7 @@ export default function PrivacyPage() {
       <ul>
         <li>
           <strong>Right of access</strong> — request a copy of all personal data we hold about you.
-          Submit via <a href="/app/settings">Account Settings</a> or email <a href="mailto:dpo@susdevos.com">dpo@susdevos.com</a>.
+          Submit via <a href="/settings">Account Settings</a> or email <a href="mailto:dpo@susdevos.com">dpo@susdevos.com</a>.
           We will respond within 30 days and provide a machine-readable export.
         </li>
         <li>
