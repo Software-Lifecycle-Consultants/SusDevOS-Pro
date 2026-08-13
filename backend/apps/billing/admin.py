@@ -1,5 +1,7 @@
 ﻿from django.contrib import admin
-from .models import Plans, PlanFeatures, EntitySubscriptions, UsageTracking
+
+from .models import EntitySubscriptions, PlanFeatures, Plans, UsageTracking
+
 
 class PlanFeaturesInline(admin.TabularInline):
     model = PlanFeatures

@@ -15,7 +15,6 @@ RevokedTokens: server-side JWT refresh token revocation list.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

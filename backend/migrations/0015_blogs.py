@@ -19,7 +19,6 @@ in the CMS (60 chars for SeoTitle, 160 for SeoDescription).
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

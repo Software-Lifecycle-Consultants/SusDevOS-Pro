@@ -13,11 +13,13 @@ import logging
 from datetime import timedelta
 from decimal import Decimal
 
-import requests
-from celery import shared_task
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
+
+import requests
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

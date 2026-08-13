@@ -10,10 +10,12 @@ Safe when unconfigured or when the registry is unreachable: offsets are left
 """
 import logging
 
-import requests
-from celery import shared_task
 from django.conf import settings
 from django.utils.timezone import now
+
+import requests
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

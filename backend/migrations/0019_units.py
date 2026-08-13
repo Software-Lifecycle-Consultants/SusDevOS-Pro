@@ -23,7 +23,6 @@ ConversionFactor: multiply the raw quantity by this to get canonical units.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

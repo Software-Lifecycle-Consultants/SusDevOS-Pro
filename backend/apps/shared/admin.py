@@ -2,11 +2,11 @@ from django.contrib import admin
 
 from .models import (
     Contacts,
-    DocumentTags,
     Documents,
+    DocumentTags,
     EntityApiKeys,
-    ImageTags,
     Images,
+    ImageTags,
     Locations,
     Tags,
 )

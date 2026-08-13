@@ -10,9 +10,10 @@ Usage:
     python manage.py seed_modules
 """
 import os
-import yaml
+
 from django.core.management.base import BaseCommand
 
+import yaml
 
 # Default role privilege matrix — mirrors spec/privilege_system_resolved.md
 # Format: (role_key, module_key, interface_key_or_None, permission_type)
@@ -90,7 +91,7 @@ class Command(BaseCommand):
     help = "Seed Modules, Interfaces, Roles, and default RolePrivileges from fixtures/modules.yml"
 
     def handle(self, *args, **options):
-        from apps.users.models import Modules, Interfaces, Roles, RolePrivileges
+        from apps.users.models import Interfaces, Modules, RolePrivileges, Roles
 
         fixture_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),

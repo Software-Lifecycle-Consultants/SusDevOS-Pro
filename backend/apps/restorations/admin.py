@@ -1,12 +1,29 @@
 ﻿from django.contrib import admin
+
 from .models import (
-    TreeRemovals, TreeRemovalEcosystems, TreeRemovalTags, TreeRemovalContacts,
-    TreeRemovalDocuments, TreeRemovalLandParcels, TreeRemovalEntities,
-    TreeRemovalImages, TreeRemovalRemovedSpecies, TreeRemovalAffectedSpecies,
-    Restorations, RestorationEcosystems, RestorationTags, RestorationDevelopmentProjects,
-    RestorationEntities, RestorationSpecies, RestorationLandParcels,
-    RestorationLocations, RestorationContacts, RestorationDocuments, RestorationImages,
+    RestorationContacts,
+    RestorationDevelopmentProjects,
+    RestorationDocuments,
+    RestorationEcosystems,
+    RestorationEntities,
+    RestorationImages,
+    RestorationLandParcels,
+    RestorationLocations,
+    Restorations,
+    RestorationSpecies,
+    RestorationTags,
+    TreeRemovalAffectedSpecies,
+    TreeRemovalContacts,
+    TreeRemovalDocuments,
+    TreeRemovalEcosystems,
+    TreeRemovalEntities,
+    TreeRemovalImages,
+    TreeRemovalLandParcels,
+    TreeRemovalRemovedSpecies,
+    TreeRemovals,
+    TreeRemovalTags,
 )
+
 
 @admin.register(TreeRemovals)
 class TreeRemovalsAdmin(admin.ModelAdmin):

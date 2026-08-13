@@ -9,7 +9,6 @@ IPCC AR6 GWP100 dataset as the default.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

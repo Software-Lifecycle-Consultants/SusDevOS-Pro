@@ -9,7 +9,6 @@ from decimal import Decimal
 
 from django.utils import timezone
 
-
 # ── GHG Calculation ───────────────────────────────────────────────────────────
 
 def compute_emissions(instance) -> None:

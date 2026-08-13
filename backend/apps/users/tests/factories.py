@@ -5,10 +5,8 @@ from apps.entities.tests.factories import EntitiesFactory
 from apps.users.models import (
     Interfaces,
     Modules,
-    PasswordResetTokens,
     RolePrivileges,
     Roles,
-    RevokedTokens,
     UserPrivilegeOverrides,
     UserRoles,
     Users,

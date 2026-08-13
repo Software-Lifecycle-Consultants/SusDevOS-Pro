@@ -49,8 +49,6 @@ these require project-level assessment documented in RestorationNotes.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 BIOMASS_CALC_METHOD = [
     (1, 'IPCC Tier 1 — default BEF by forest type'),

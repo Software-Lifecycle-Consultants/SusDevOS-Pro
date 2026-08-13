@@ -8,7 +8,6 @@ import hashlib
 import secrets
 from decimal import Decimal
 
-
 # ── Organisational consolidation (ghg_calculation_spec §9) ──────────────────────
 
 def _entity_scope_totals(entity_id: int, reporting_year: int) -> dict:
@@ -18,6 +17,7 @@ def _entity_scope_totals(entity_id: int, reporting_year: int) -> dict:
     the inventory net-emissions calculation).
     """
     from django.db.models import Sum
+
     from apps.emissions.models import EmissionsData
 
     qs = EmissionsData.objects.filter(
@@ -100,8 +100,8 @@ def generate_api_key(*, entity, created_by_user_id: int, name: str = "", expiry_
 
     Caller is responsible for returning the raw_key to the client exactly once.
     """
-    from apps.shared.models import EntityApiKeys
     from apps.entities.models import EntityApiKeysIntermediary
+    from apps.shared.models import EntityApiKeys
 
     raw_key = secrets.token_urlsafe(32)
     hashed  = hashlib.sha256(raw_key.encode()).hexdigest()

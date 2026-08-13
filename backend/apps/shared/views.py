@@ -9,8 +9,6 @@ Usage:
 For models where EntityId is an IntegerField (ecosystem.Ecosystem, ecosystem.Species):
     override get_queryset and use filter(EntityId=entity_id) directly.
 """
-from rest_framework.response import Response
-from rest_framework import status
 
 
 class TenantViewSetMixin:

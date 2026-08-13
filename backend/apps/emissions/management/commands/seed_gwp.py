@@ -9,7 +9,6 @@ Usage:
 """
 from django.core.management.base import BaseCommand
 
-
 GWP_VALUES = [
     ("CO2",      None,        "1.0000"),
     ("CH4",      "fossil",    "29.8000"),

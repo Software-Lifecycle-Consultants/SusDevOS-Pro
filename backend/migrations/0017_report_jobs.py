@@ -17,8 +17,6 @@ ReportJob rows are retained for 90 days then purged by Celery Beat task.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 REPORT_TYPE_CHOICES = [
     ('emissions_summary', 'Project Emissions Summary'),

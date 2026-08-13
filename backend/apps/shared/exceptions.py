@@ -6,8 +6,8 @@ Wraps all error responses in a consistent envelope:
 Also handles FeatureGatedException → HTTP 402 with upgrade modal payload.
 """
 from rest_framework import status
-from rest_framework.views import exception_handler
 from rest_framework.response import Response
+from rest_framework.views import exception_handler
 
 
 def custom_exception_handler(exc, context):

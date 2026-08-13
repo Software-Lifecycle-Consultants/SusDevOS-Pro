@@ -5,8 +5,10 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Ecosystem, Species
 from .serializers import (
-    EcosystemDetailSerializer, EcosystemListSerializer,
-    SpeciesDetailSerializer, SpeciesListSerializer,
+    EcosystemDetailSerializer,
+    EcosystemListSerializer,
+    SpeciesDetailSerializer,
+    SpeciesListSerializer,
 )
 
 

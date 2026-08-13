@@ -5,9 +5,8 @@ This app is the base of the dependency chain — the 8 lookup models have no FK
 dependencies on other apps (EntityId stored as plain IntegerField). AuditLog
 FKs to entities + users and is added in migration 0002.
 """
-from django.db import models
 from django.conf import settings
-
+from django.db import models
 
 MODULE_KEY_CHOICES = [
     ("entity_management", "Entity Management"),

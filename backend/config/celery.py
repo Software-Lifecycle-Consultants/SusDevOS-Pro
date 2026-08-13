@@ -5,6 +5,7 @@ Beat: DatabaseScheduler (schedule stored in DB, editable via admin).
 """
 
 import os
+
 from celery import Celery
 from celery.schedules import crontab
 

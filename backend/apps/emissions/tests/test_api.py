@@ -14,10 +14,9 @@ All formulas verified against GHG Protocol Corporate Standard and IPCC AR6.
 """
 from decimal import Decimal
 
-import pytest
 from rest_framework import status
-from rest_framework.test import APIClient
 
+import pytest
 
 BASE_URL = "/api/emissions/"
 
@@ -322,8 +321,8 @@ class TestTenantScoping:
         self, auth_client, gwp_dataset, entity
     ):
         # Create a record for a different entity directly in DB
-        from apps.entities.tests.factories import EntitiesFactory
         from apps.emissions.models import EmissionsData
+        from apps.entities.tests.factories import EntitiesFactory
 
         other_entity = EntitiesFactory()
         other_record = EmissionsData.objects.create(

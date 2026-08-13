@@ -6,9 +6,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from apps.shared.views import TenantViewSetMixin
+
 from .models import (
-    DevelopmentProjectLandParcels, DevelopmentProjectPartners,
-    DevelopmentProjects, ProjectPhases,
+    DevelopmentProjectPartners,
+    DevelopmentProjects,
+    ProjectPhases,
 )
 from .serializers import (
     DevelopmentProjectsDetailSerializer,
@@ -78,6 +80,7 @@ class DevelopmentProjectsViewSet(TenantViewSetMixin, ModelViewSet):
     @action(detail=True, methods=["get"], url_path="emissions/summary")
     def emissions_summary(self, request, pk=None):
         from django.db.models import Sum
+
         from apps.emissions.models import EmissionsData
         project = self.get_object()
         qs = EmissionsData.objects.filter(ProjectId=project, Status__lt=4)

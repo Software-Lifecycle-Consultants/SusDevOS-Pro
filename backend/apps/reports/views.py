@@ -1,5 +1,4 @@
-﻿from django.conf import settings
-from rest_framework import status
+﻿from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -59,8 +58,9 @@ class ReportJobsViewSet(ModelViewSet):
         # In production: generate a pre-signed S3 URL (24h expiry)
         # In development: return the S3 key path for manual retrieval
         try:
-            import boto3
             from django.conf import settings as dj_settings
+
+            import boto3
             s3 = boto3.client(
                 "s3",
                 endpoint_url=getattr(dj_settings, "AWS_S3_ENDPOINT_URL", None),

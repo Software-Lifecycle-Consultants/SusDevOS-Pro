@@ -1,8 +1,16 @@
 ﻿from django.contrib import admin
+
 from .models import (
-    LandParcels, LandParcelTags, LandParcelEcosystems, LandParcelContacts,
-    LandParcelDocuments, LandParcelImages, LandParcelEntities, LandParcelLocations,
+    LandParcelContacts,
+    LandParcelDocuments,
+    LandParcelEcosystems,
+    LandParcelEntities,
+    LandParcelImages,
+    LandParcelLocations,
+    LandParcels,
+    LandParcelTags,
 )
+
 
 @admin.register(LandParcels)
 class LandParcelsAdmin(admin.ModelAdmin):

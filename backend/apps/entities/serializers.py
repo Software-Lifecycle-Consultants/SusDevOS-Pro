@@ -1,17 +1,12 @@
-﻿import hashlib
-import secrets
+﻿import secrets
 
 from django.conf import settings
 from rest_framework import serializers
 
 from apps.shared.models import Contacts, Documents, EntityApiKeys, Locations
+
 from .models import (
     Entities,
-    EntityApiKeysIntermediary,
-    EntityContacts,
-    EntityDocuments,
-    EntityLocations,
-    RelatedEntities,
 )
 
 
@@ -52,10 +47,12 @@ class EntityCreateSerializer(serializers.ModelSerializer):
         entity = Entities.objects.create(**validated_data)
 
         # Create the initial admin user (inactive until onboard)
-        from apps.users.models import Roles, UserRoles, Users, PasswordResetTokens
-        from django.utils import timezone
         from datetime import timedelta
+
         from django.core.mail import send_mail
+        from django.utils import timezone
+
+        from apps.users.models import PasswordResetTokens, Roles, UserRoles, Users
 
         user = Users.objects.create_user(
             email=admin_email,

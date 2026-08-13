@@ -14,6 +14,7 @@ class PresignedUploadView(APIView):
         Body: { "filename": "report.pdf", "module_key": "projects", "record_id": 1 }
         """
         import uuid
+
         from django.conf import settings
         filename = request.data.get("filename", "file")
         module_key = request.data.get("module_key", "shared")
@@ -73,8 +74,9 @@ class AuditLogView(APIView):
         if request.query_params.get("table"):
             qs = qs.filter(TableName=request.query_params["table"])
         if request.query_params.get("days"):
-            from django.utils import timezone
             from datetime import timedelta
+
+            from django.utils import timezone
             since = timezone.now() - timedelta(days=int(request.query_params["days"]))
             qs = qs.filter(ChangedOn__gte=since)
 

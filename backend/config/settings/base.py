@@ -4,9 +4,10 @@ Environment-specific settings live in local.py (development) and production.py.
 All secrets come from environment variables via python-decouple.
 """
 
-from pathlib import Path
-from decouple import config, Csv
 from datetime import timedelta
+from pathlib import Path
+
+from decouple import Csv, config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 

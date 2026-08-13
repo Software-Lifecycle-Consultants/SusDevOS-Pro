@@ -11,8 +11,9 @@ breaks because an external service is down.
 """
 import logging
 
-import requests
 from django.conf import settings
+
+import requests
 
 logger = logging.getLogger(__name__)
 

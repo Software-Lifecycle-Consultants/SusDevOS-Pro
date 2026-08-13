@@ -7,8 +7,9 @@ Both tasks run nightly; AuditLog purge respects per-row RetentionTier.
 import logging
 from datetime import timedelta
 
-from celery import shared_task
 from django.utils.timezone import now
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +53,9 @@ def purge_expired_audit_logs():
 @shared_task(name="tasks.auth.prune_old_notifications")
 def prune_old_notifications():
     """Keep max 100 notifications per user — delete oldest beyond that limit."""
-    from apps.notifications.models import Notifications
     from django.db.models import OuterRef, Subquery
+
+    from apps.notifications.models import Notifications
 
     # ORM approach: find the 101st notification (by CreatedAt desc) per user and
     # delete everything older than it.

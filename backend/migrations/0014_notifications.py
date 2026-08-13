@@ -13,8 +13,6 @@ spec section 12.1. These are enforced as a choices field to prevent drift.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 NOTIFICATION_TYPE_CHOICES = [
     ('user_created',          'New User Created'),

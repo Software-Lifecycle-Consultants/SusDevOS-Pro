@@ -8,10 +8,12 @@ import codecs
 import csv
 import logging
 
-import requests
-from celery import shared_task
 from django.conf import settings
 from django.utils.timezone import now
+
+import requests
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

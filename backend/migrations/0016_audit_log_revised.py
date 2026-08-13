@@ -26,8 +26,6 @@ Population:
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 ACTION_CHOICES = [
     ('Create',          'Create'),

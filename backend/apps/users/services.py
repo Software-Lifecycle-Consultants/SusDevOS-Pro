@@ -14,7 +14,6 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 
-
 # ── Self-service signup ───────────────────────────────────────────────────────
 
 @transaction.atomic
@@ -76,7 +75,9 @@ def register_new_entity(
 
 def _unique_username(base: str) -> str:
     """Derive a unique username from the email local-part."""
-    import random, string
+    import random
+    import string
+
     from apps.users.models import Users
 
     candidate = base[:50]
@@ -130,6 +131,7 @@ def invite_user(
     via the onboard link.
     """
     import secrets as secrets_module
+
     from apps.users.models import PasswordResetTokens, Roles, UserRoles, Users
 
     user = Users.objects.create_user(

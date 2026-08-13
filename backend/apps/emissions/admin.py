@@ -1,9 +1,21 @@
 ﻿from django.contrib import admin
+
 from .models import (
-    GwpDatasets, GwpValues, Units, EmissionFactorSets, EmissionFactors,
-    GHGInventories, Scope3RelevanceAssessments, EmissionsData,
-    EmissionsDetails, EmissionsOffsets, ExchangeRates, Targets, TargetMilestones,
+    EmissionFactors,
+    EmissionFactorSets,
+    EmissionsData,
+    EmissionsDetails,
+    EmissionsOffsets,
+    ExchangeRates,
+    GHGInventories,
+    GwpDatasets,
+    GwpValues,
+    Scope3RelevanceAssessments,
+    TargetMilestones,
+    Targets,
+    Units,
 )
+
 
 @admin.register(GwpDatasets)
 class GwpDatasetsAdmin(admin.ModelAdmin):

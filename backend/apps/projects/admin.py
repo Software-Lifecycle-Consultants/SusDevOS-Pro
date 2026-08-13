@@ -1,10 +1,18 @@
 ﻿from django.contrib import admin
+
 from .models import (
-    DevelopmentProjects, ProjectPhases, RelatedProjects,
-    DevelopmentProjectTags, DevelopmentProjectPartners, DevelopmentProjectLandParcels,
-    DevelopmentProjectContacts, DevelopmentProjectDocuments, DevelopmentProjectImages,
+    DevelopmentProjectContacts,
+    DevelopmentProjectDocuments,
     DevelopmentProjectEntities,
+    DevelopmentProjectImages,
+    DevelopmentProjectLandParcels,
+    DevelopmentProjectPartners,
+    DevelopmentProjects,
+    DevelopmentProjectTags,
+    ProjectPhases,
+    RelatedProjects,
 )
+
 
 class ProjectPhasesInline(admin.TabularInline):
     model = ProjectPhases

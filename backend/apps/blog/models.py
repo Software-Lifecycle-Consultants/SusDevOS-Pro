@@ -1,5 +1,6 @@
 """Blog app models. Ref: reference migration 0015_blogs."""
 from django.db import models
+
 from apps.shared.models import BaseAuditMixin
 
 

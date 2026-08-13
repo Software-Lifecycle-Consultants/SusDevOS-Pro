@@ -65,7 +65,7 @@ def _resolve_privilege(user, interface_key: str, permission_type: int) -> bool:
     Returns True if the user has the requested permission on the interface.
     Implements the algorithm from spec/privilege_system_resolved.md.
     """
-    from apps.users.models import Interfaces, UserPrivilegeOverrides, UserRoles, RolePrivileges
+    from apps.users.models import Interfaces, RolePrivileges, UserPrivilegeOverrides, UserRoles
 
     try:
         interface = Interfaces.objects.select_related("ModuleId").get(

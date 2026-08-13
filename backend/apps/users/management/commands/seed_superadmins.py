@@ -12,7 +12,8 @@ Environment variables required:
     SUPERADMIN_2_EMAIL, SUPERADMIN_2_USERNAME, SUPERADMIN_2_PASSWORD
 """
 from django.core.management.base import BaseCommand, CommandError
-from decouple import config, UndefinedValueError
+
+from decouple import UndefinedValueError, config
 
 
 class Command(BaseCommand):
