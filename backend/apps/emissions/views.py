@@ -161,20 +161,28 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         unlock_record(instance, reason=reason, unlocked_by=request.user, entity_id=request.entity_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @staticmethod
-    def _verified_lock_response(record):
-        """Return a 403 Response if the parent record is verified, else None.
+    @classmethod
+    def _verified_lock_response(cls, record):
+        """Return a 403 Response if the record's line items are locked, else None.
 
         Detail/offset line items feed the recomputed emissions total, so allowing
-        them to change on a verified record would mutate the audit-locked figure
-        without going through the SuperAdmin unlock path (CLAUDE.md rule #3)."""
+        them to change on a locked record would mutate the audit-locked figure
+        without going through the SuperAdmin unlock path (CLAUDE.md rule #3).
+
+        Two independent locks apply, mirroring the record-level create/update/
+        destroy guards:
+          * the record's own VerificationStatus (individually verified row), and
+          * the parent GHG inventory's VerificationStatus. A verified inventory
+            freezes its member rows even when a given row was never individually
+            verified — otherwise nested line-item writes are a bypass of the
+            inventory lock the record-level paths already enforce."""
         if record.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",
                  "detail": "Line items of a verified record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        return None
+        return cls._inventory_locked_response(record.InventoryId)
 
     # ── Details (line items) ───────────────────────────────────────────────────
 
@@ -260,18 +268,31 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def _parent_verified_response(self, instance):
-        """Return a 403 if the offset's parent emissions record is verified.
+        """Return a 403 if the offset's parent emissions record is locked.
 
         Offsets feed the recomputed net emissions total, so editing or deleting
-        one attached to a verified (VerificationStatus >= 3) record would mutate
-        the audit-locked figure without going through /unlock/ — the same guard
-        the nested offset actions on EmissionsDataViewSet already enforce
-        (CLAUDE.md rule #3). This standalone viewset must not be a bypass."""
+        one attached to a locked record would mutate the audit-locked figure
+        without going through /unlock/ — the same guard the nested offset actions
+        on EmissionsDataViewSet already enforce (CLAUDE.md rule #3). This
+        standalone viewset must not be a bypass.
+
+        The record is locked when either its own VerificationStatus is verified
+        or its parent GHG inventory is verified (a verified inventory freezes its
+        member rows even when the row itself was never individually verified)."""
         record = instance.EmissionsId
-        if record is not None and record.VerificationStatus >= VERIFIED:
+        if record is None:
+            return None
+        if record.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",
                  "detail": "Offsets on a verified emissions record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        inventory = record.InventoryId
+        if inventory is not None and inventory.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "Offsets on a record in a verified GHG inventory cannot be changed. Unlock the inventory first (SuperAdmin only)."},
                 status=status.HTTP_403_FORBIDDEN,
             )
         return None
