@@ -1,5 +1,4 @@
 from django.db import migrations, models
-import django.db.models.deletion
 
 ENTITY_TYPE_CHOICES = [
     (1, "Limited Company"), (2, "PLC"), (3, "LLP"), (4, "Partnership"),

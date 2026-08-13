@@ -24,8 +24,6 @@ Fields added to existing models:
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 REGISTRY_VALIDATION_STATUS = [
     ('pending',    'Pending — not yet validated'),

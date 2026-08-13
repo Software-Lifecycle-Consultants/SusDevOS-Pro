@@ -1,5 +1,7 @@
 ﻿from django.contrib import admin
-from .models import Ecosystem, EcosystemTags, Species, SpeciesTags, SpeciesLandParcels
+
+from .models import Ecosystem, EcosystemTags, Species, SpeciesLandParcels, SpeciesTags
+
 
 @admin.register(Ecosystem)
 class EcosystemAdmin(admin.ModelAdmin):

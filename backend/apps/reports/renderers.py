@@ -109,6 +109,7 @@ def _ghg_inventory(entity_id, params):
 
 def _phase_progress(entity_id, params):
     from django.db.models import Sum
+
     from apps.emissions.models import EmissionsData
     from apps.projects.models import ProjectPhases
 

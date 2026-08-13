@@ -17,7 +17,6 @@ InputUnitId from Unit text, then a final migration drops the Unit column.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

@@ -1,6 +1,7 @@
-import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+
+import pytest
 
 from apps.shared.models import DocumentTags, ImageTags, Locations, Tags
 from apps.shared.tests.factories import (

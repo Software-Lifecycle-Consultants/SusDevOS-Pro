@@ -9,13 +9,14 @@ Covers:
   - DELETE /api/entities/{id}/ (soft delete, SA only)
   - Tenant scoping: admin cannot see other entities
 """
-import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
 
+import pytest
+
 from apps.entities.models import Entities
 from apps.entities.tests.factories import EntitiesFactory
-from apps.users.tests.factories import SuperAdminFactory, UsersFactory, RolesFactory
+from apps.users.tests.factories import UsersFactory
 
 
 @pytest.mark.django_db
@@ -54,7 +55,7 @@ class TestEntityCreate:
     def test_sa_can_create_entity(self, sa_client, db):
         """POST /entities/ creates entity + initial admin user."""
         # Seed the free plan so EntityCreateSerializer can assign a subscription
-        from apps.billing.models import Plans, PlanFeatures
+        from apps.billing.models import Plans
         plan, _ = Plans.objects.get_or_create(
             PlanKey="free",
             defaults={

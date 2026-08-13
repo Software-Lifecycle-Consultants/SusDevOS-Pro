@@ -1,5 +1,6 @@
 ﻿from rest_framework import serializers
-from .models import DevelopmentProjects, ProjectPhases, DevelopmentProjectPartners
+
+from .models import DevelopmentProjectPartners, DevelopmentProjects, ProjectPhases
 
 
 class ProjectPhaseSerializer(serializers.ModelSerializer):

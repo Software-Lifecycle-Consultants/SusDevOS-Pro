@@ -2,10 +2,10 @@
 Report generation and housekeeping tasks.
 """
 import logging
-from datetime import timedelta
+
+from django.utils.timezone import now
 
 from celery import shared_task
-from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +74,7 @@ def _render_report(job):
     (JSON / CSV / PDF). Returns (s3_key, file_size_bytes).
     """
     import uuid
+
     from apps.reports.renderers import build_report_data, render
 
     data = build_report_data(job)
@@ -104,7 +105,8 @@ def _upload_to_storage(key: str, content: bytes, fmt: str):
         )
     else:
         # Dev: write to /tmp
-        import tempfile, os
+        import os
+        import tempfile
         tmp_path = os.path.join(tempfile.gettempdir(), key.replace("/", "_"))
         with open(tmp_path, "wb") as f:
             f.write(content)

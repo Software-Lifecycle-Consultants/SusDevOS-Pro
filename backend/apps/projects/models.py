@@ -1,5 +1,6 @@
 """Projects app models: DevelopmentProjects, ProjectPhases, RelatedProjects, and junctions."""
 from django.db import models
+
 from apps.shared.models import BaseAuditMixin
 
 CONSOLIDATION_APPROACH_CHOICES = [

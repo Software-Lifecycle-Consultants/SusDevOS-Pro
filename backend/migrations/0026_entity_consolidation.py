@@ -39,7 +39,6 @@ disclosure of double-counting risks in the inventory report.
 
 from django.db import migrations, models
 
-
 CONSOLIDATION_APPROACH_CHOICES = [
     (1, 'Equity Share — report % of emissions equal to equity ownership share'),
     (2, 'Financial Control — report 100% of emissions where financial control exists'),

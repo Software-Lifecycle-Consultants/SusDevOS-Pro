@@ -20,8 +20,6 @@ TargetMilestones store interim checkpoints (e.g. 25% reduction by 2025,
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 TARGET_TYPE_CHOICES = [
     (1, 'Absolute Contraction — reduce total GHG by X% vs base year'),

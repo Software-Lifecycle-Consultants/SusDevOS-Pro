@@ -1,5 +1,7 @@
 ﻿from django.contrib import admin
+
 from .models import ReportJobs
+
 
 @admin.register(ReportJobs)
 class ReportJobsAdmin(admin.ModelAdmin):

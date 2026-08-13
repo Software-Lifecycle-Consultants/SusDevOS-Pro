@@ -34,8 +34,6 @@ The 15 GHG Protocol Scope 3 categories:
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 SCOPE3_CATEGORIES = [
     (1,  'Purchased Goods & Services'),

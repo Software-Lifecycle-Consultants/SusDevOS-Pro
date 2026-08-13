@@ -1,9 +1,8 @@
 """Auth serializers for SusDevOS."""
 from django.contrib.auth import authenticate
-from django.utils import timezone
 from rest_framework import serializers
 
-from .models import PasswordResetTokens, RevokedTokens, Users
+from .models import PasswordResetTokens, Users
 
 
 class LoginSerializer(serializers.Serializer):
@@ -155,7 +154,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ("email", "username", "FirstName", "LastName", "Designation", "role_key")
 
     def validate_role_key(self, value):
-        from .models import Roles
         allowed = ["admin", "manager", "staff"]
         requesting_user = self.context["request"].user
         if not getattr(requesting_user, "IsSuperAdmin", False):
@@ -275,7 +273,11 @@ class PrivilegeOverrideSerializer(serializers.ModelSerializer):
 
 def _patch_rbac_serializers():
     from .models import (
-        Interfaces, Modules, RolePrivileges, Roles, UserPrivilegeOverrides,
+        Interfaces,
+        Modules,
+        RolePrivileges,
+        Roles,
+        UserPrivilegeOverrides,
     )
     RolesSerializer.Meta.model         = Roles
     ModulesSerializer.Meta.model       = Modules

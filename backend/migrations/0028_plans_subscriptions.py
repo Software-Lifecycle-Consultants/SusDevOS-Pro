@@ -22,9 +22,7 @@ via admin after Stripe products are created in the Stripe Dashboard.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 from django.utils import timezone
-
 
 # ── Plan seed data ─────────────────────────────────────────────────────────────
 

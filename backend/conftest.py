@@ -12,9 +12,9 @@ Fixture hierarchy:
     auth_client       — APIClient pre-authenticated as admin_user
     sa_client         — APIClient pre-authenticated as superadmin_user
 """
-import pytest
 from rest_framework.test import APIClient
 
+import pytest
 
 # ── GWP dataset ───────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ def entity(db):
 
 @pytest.fixture
 def admin_user(db, entity):
-    from apps.users.tests.factories import UsersFactory, RolesFactory, UserRolesFactory
+    from apps.users.tests.factories import UsersFactory
 
     role, _ = __import__("apps.users.models", fromlist=["Roles"]).Roles.objects.get_or_create(
         RoleKey="admin", defaults={"RoleName": "Admin"}

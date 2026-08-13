@@ -6,9 +6,9 @@ refresh cookie pattern.
 from datetime import timedelta
 
 from django.conf import settings
-from django.utils import timezone
+
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -19,8 +19,9 @@ class RevokedTokenJWTAuthentication(JWTAuthentication):
         validated = super().get_validated_token(raw_token)
         jti = validated.get("jti")
         if jti:
-            from apps.users.models import RevokedTokens
             import uuid
+
+            from apps.users.models import RevokedTokens
             try:
                 jti_uuid = uuid.UUID(jti)
             except ValueError:

@@ -11,7 +11,7 @@ Endpoints:
   GET  /api/auth/me              – current user profile + full privilege map
 """
 import uuid
-from datetime import timedelta, timezone as dt_timezone
+from datetime import UTC, timedelta
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -20,10 +20,12 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from rest_framework_simplejwt.tokens import RefreshToken, UntypedToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.shared.permissions import build_privilege_map
+
 from .authentication import clear_refresh_cookie, issue_tokens, set_refresh_cookie
 from .models import PasswordResetTokens, RevokedTokens, Users
 from .serializers import (
@@ -131,7 +133,7 @@ class LogoutView(APIView):
                 exp = token.get("exp")
                 if jti_str:
                     expires_at = (
-                        timezone.datetime.fromtimestamp(exp, tz=dt_timezone.utc)
+                        timezone.datetime.fromtimestamp(exp, tz=UTC)
                         if exp else timezone.now() + timedelta(minutes=15)
                     )
                     RevokedTokens.objects.get_or_create(
@@ -150,7 +152,7 @@ class LogoutView(APIView):
                 exp = refresh.get("exp")
                 if jti_str:
                     expires_at = (
-                        timezone.datetime.fromtimestamp(exp, tz=dt_timezone.utc)
+                        timezone.datetime.fromtimestamp(exp, tz=UTC)
                         if exp else timezone.now() + timedelta(days=7)
                     )
                     RevokedTokens.objects.get_or_create(
@@ -263,14 +265,20 @@ class MePasswordView(APIView):
 
 # ── Users CRUD ────────────────────────────────────────────────────────────────
 
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
-from .serializers import (
-    UserCreateSerializer, UsersDetailSerializer, UsersListSerializer,
-    PrivilegeOverrideSerializer, RolesSerializer, ModulesSerializer,
-    InterfacesSerializer, RolePrivilegesSerializer,
-)
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
 from .models import Interfaces, Modules, RolePrivileges, Roles, UserPrivilegeOverrides, UserRoles
+from .serializers import (
+    InterfacesSerializer,
+    ModulesSerializer,
+    PrivilegeOverrideSerializer,
+    RolePrivilegesSerializer,
+    RolesSerializer,
+    UserCreateSerializer,
+    UsersDetailSerializer,
+    UsersListSerializer,
+)
 
 
 class UsersViewSet(ModelViewSet):

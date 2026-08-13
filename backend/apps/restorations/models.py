@@ -1,5 +1,6 @@
 """Restorations app models: TreeRemovals and Restorations with their junction tables."""
 from django.db import models
+
 from apps.shared.models import BaseAuditMixin
 
 BIOMASS_CALC_METHOD_CHOICES = [
@@ -141,7 +142,8 @@ class TreeRemovalRemovedSpecies(models.Model):
 
     def save(self, *args, **kwargs):
         from apps.restorations.services import (
-            compute_removed_species_carbon, recompute_tree_removal_total,
+            compute_removed_species_carbon,
+            recompute_tree_removal_total,
         )
         compute_removed_species_carbon(self)
         super().save(*args, **kwargs)
@@ -266,7 +268,8 @@ class RestorationSpecies(models.Model):
 
     def save(self, *args, **kwargs):
         from apps.restorations.services import (
-            compute_restoration_species_sequestration, recompute_restoration_total,
+            compute_restoration_species_sequestration,
+            recompute_restoration_total,
         )
         compute_restoration_species_sequestration(self)
         super().save(*args, **kwargs)

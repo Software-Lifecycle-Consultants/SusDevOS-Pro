@@ -6,18 +6,15 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from apps.shared.models import Contacts, Documents, EntityApiKeys, Locations
-from apps.shared.permissions import IsEntityAdmin, IsSuperAdmin
-from .services import accessible_entity_ids, user_can_access_entity
+
 from .models import (
     Entities,
-    EntityApiKeysIntermediary,
     EntityContacts,
     EntityDocuments,
     EntityLocations,
     EntityMembers,
 )
 from .serializers import (
-    ApiKeyCreateResponseSerializer,
     ApiKeyListSerializer,
     ContactSerializer,
     DocumentSerializer,
@@ -26,6 +23,7 @@ from .serializers import (
     EntityCreateSerializer,
     LocationSerializer,
 )
+from .services import accessible_entity_ids, user_can_access_entity
 
 
 class EntitiesViewSet(ModelViewSet):
@@ -163,7 +161,6 @@ class EntitiesViewSet(ModelViewSet):
             EntityId=entity.EntityId,
             CreatedBy=request.user.UserId,
         )
-        from .models import EntityContacts
         EntityContacts.objects.create(EntityId=entity, ContactId=contact)
         return Response(ContactSerializer(contact).data, status=status.HTTP_201_CREATED)
 
@@ -262,6 +259,7 @@ class EntitiesViewSet(ModelViewSet):
         Query params: ?year=YYYY (default current year), ?approach=1|2|3 (override).
         """
         from datetime import date
+
         from apps.entities.services import compute_consolidated_emissions
 
         entity = self.get_object()  # scoped by get_queryset (own + branches / SA)

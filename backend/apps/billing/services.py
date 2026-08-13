@@ -72,7 +72,9 @@ def record_api_call(*, entity_id: int) -> dict:
     Semantics (per Plans.MaxApiCallsPerDay help_text): limit 0 == no API access.
     """
     from datetime import date as _date
+
     from django.db.models import F
+
     from apps.billing.models import UsageTracking
 
     plan = get_active_plan(entity_id=entity_id)

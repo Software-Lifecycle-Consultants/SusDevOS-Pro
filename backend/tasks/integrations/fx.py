@@ -9,9 +9,11 @@ import logging
 from datetime import date
 from decimal import Decimal
 
-import requests
-from celery import shared_task
 from django.conf import settings
+
+import requests
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

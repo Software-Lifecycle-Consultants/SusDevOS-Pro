@@ -9,11 +9,11 @@ Covers:
   - POST /api/auth/forgot-password (always 204, no email leak)
   - POST /api/auth/reset-password
 """
-import uuid
 
-import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
+
+import pytest
 
 from apps.users.tests.factories import SuperAdminFactory, UsersFactory
 
@@ -73,7 +73,7 @@ class TestMe:
 
     def test_superadmin_gets_all_privileges_true(self, sa_client, db):
         # Seed at least one module + interface so the privilege map is non-empty
-        from apps.users.tests.factories import ModulesFactory, InterfacesFactory
+        from apps.users.tests.factories import InterfacesFactory, ModulesFactory
         m = ModulesFactory(ModuleKey="emissions_test")
         InterfacesFactory(ModuleId=m, InterfaceKey="view_emissions_test")
 
@@ -135,7 +135,9 @@ class TestResetPassword:
 
     def test_valid_token_sets_new_password(self, db):
         from datetime import timedelta
+
         from django.utils import timezone
+
         from apps.users.models import PasswordResetTokens
 
         user = UsersFactory(email="reset@corp.com")
@@ -158,7 +160,9 @@ class TestResetPassword:
 
     def test_expired_token_rejected(self, db):
         from datetime import timedelta
+
         from django.utils import timezone
+
         from apps.users.models import PasswordResetTokens
 
         user = UsersFactory(email="expired@corp.com")
@@ -174,7 +178,9 @@ class TestResetPassword:
 
     def test_used_token_rejected(self, db):
         from datetime import timedelta
+
         from django.utils import timezone
+
         from apps.users.models import PasswordResetTokens
 
         user = UsersFactory(email="used@corp.com")
@@ -223,8 +229,8 @@ class TestSignup:
     }
 
     def test_creates_entity_user_and_subscription(self, db):
-        from apps.entities.models import Entities
         from apps.billing.models import EntitySubscriptions
+        from apps.entities.models import Entities
         from apps.users.models import Users
 
         resp = APIClient().post(self.URL, self.VALID)
@@ -251,8 +257,8 @@ class TestSignup:
         assert role.RoleId.RoleKey == "admin"
 
     def test_subscription_is_free_plan(self, db):
-        from apps.users.models import Users
         from apps.billing.models import EntitySubscriptions
+        from apps.users.models import Users
         APIClient().post(self.URL, self.VALID)
         user = Users.objects.get(email="alice@newco.com")
         sub = EntitySubscriptions.objects.get(EntityId_id=user.EntityId_id)

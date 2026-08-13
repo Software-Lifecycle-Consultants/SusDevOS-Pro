@@ -1,19 +1,14 @@
 import uuid
 from datetime import timedelta
 
-import pytest
 from django.utils import timezone
 
+import pytest
+
 from apps.users.models import (
-    Interfaces,
-    Modules,
     PasswordResetTokens,
     RevokedTokens,
     RolePrivileges,
-    Roles,
-    UserPrivilegeOverrides,
-    UserRoles,
-    Users,
 )
 from apps.users.tests.factories import (
     InterfacesFactory,

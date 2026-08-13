@@ -16,7 +16,6 @@ FIXES applied vs original Notion spec:
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 # Valid module keys — matches the modules fixture in apps/users/fixtures/modules.yml
 MODULE_KEY_CHOICES = [

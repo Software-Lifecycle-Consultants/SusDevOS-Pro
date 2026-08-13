@@ -1,5 +1,6 @@
 """Land app models: LandParcels and junction tables."""
 from django.db import models
+
 from apps.shared.models import BaseAuditMixin
 
 

@@ -7,30 +7,39 @@ Critical rules enforced here:
   3. Biogenic CO2 excluded from GWP total (enforced in model.save()).
   4. Scope 2 always computes both location-based and market-based.
 """
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from rest_framework.filters import OrderingFilter, SearchFilter
-
 from apps.billing.mixins import FeatureGateMixin
 from apps.shared.views import TenantViewSetMixin
+
 from .models import (
-    EmissionFactorSets, EmissionFactors,
-    EmissionsData, EmissionsDetails, EmissionsOffsets,
-    GHGInventories, GwpDatasets, Targets, TargetMilestones,
+    EmissionFactors,
+    EmissionFactorSets,
+    EmissionsData,
+    EmissionsDetails,
+    EmissionsOffsets,
+    GHGInventories,
+    GwpDatasets,
+    Targets,
 )
 from .serializers import (
-    EmissionFactorSetsSerializer, EmissionFactorsSerializer,
-    EmissionsDataListSerializer, EmissionsDataSerializer,
-    EmissionsDetailsSerializer, EmissionsOffsetsSerializer,
-    GHGInventoriesSerializer, GwpDatasetsSerializer,
-    TargetMilestonesSerializer, TargetsSerializer,
+    EmissionFactorSetsSerializer,
+    EmissionFactorsSerializer,
+    EmissionsDataListSerializer,
+    EmissionsDataSerializer,
+    EmissionsDetailsSerializer,
+    EmissionsOffsetsSerializer,
+    GHGInventoriesSerializer,
+    GwpDatasetsSerializer,
+    TargetMilestonesSerializer,
+    TargetsSerializer,
 )
 
 VERIFIED = 3  # VerificationStatus >= VERIFIED → immutable

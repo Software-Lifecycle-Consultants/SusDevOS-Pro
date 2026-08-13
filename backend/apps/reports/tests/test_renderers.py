@@ -52,8 +52,8 @@ def test_emissions_summary_data_and_csv(entity, gwp_dataset):
 
 
 def test_tree_log_has_two_sections(entity, gwp_dataset):
-    from apps.restorations.models import Restorations, TreeRemovals
     from apps.reports.renderers import build_report_data
+    from apps.restorations.models import Restorations, TreeRemovals
 
     TreeRemovals.objects.create(EntityId=entity, TotalTreesRemoved=5)
     Restorations.objects.create(EntityId=entity, RestorationName="Replant A")
@@ -77,7 +77,7 @@ def test_phase_progress_renders(entity):
 
 
 def test_html_renders_title_and_headers(entity, gwp_dataset):
-    from apps.reports.renderers import build_report_data, _html
+    from apps.reports.renderers import _html, build_report_data
 
     _emission(entity, gwp_dataset)
     html = _html(build_report_data(_job(entity, "emissions_summary")))

@@ -1,5 +1,4 @@
 from django.db import migrations, models
-import django.db.models.deletion
 
 MODULE_KEY_CHOICES = [
     ("entity_management", "Entity Management"),

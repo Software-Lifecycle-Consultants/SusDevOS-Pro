@@ -3,11 +3,11 @@ from factory.django import DjangoModelFactory
 
 from apps.shared.models import (
     Contacts,
-    DocumentTags,
     Documents,
+    DocumentTags,
     EntityApiKeys,
-    ImageTags,
     Images,
+    ImageTags,
     Locations,
     Tags,
 )

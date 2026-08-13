@@ -17,7 +17,6 @@ serializer layer. Only SuperAdmin can unlock via POST /emissions/{id}/unlock/.
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

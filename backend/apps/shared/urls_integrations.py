@@ -15,6 +15,7 @@ class CompaniesHouseLookupView(APIView):
         Calls Companies House API and returns candidate matches.
         """
         from django.conf import settings
+
         import requests
         query = request.data.get("query")
         number = request.data.get("company_number")

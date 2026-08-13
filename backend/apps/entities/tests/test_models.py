@@ -1,5 +1,6 @@
-import pytest
 from django.db import IntegrityError, transaction
+
+import pytest
 
 from apps.entities.models import Entities, EntityLocations, RelatedEntities
 from apps.entities.tests.factories import EntitiesFactory, RelatedEntitiesFactory

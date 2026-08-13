@@ -23,7 +23,7 @@ def _species(entity, **kwargs):
 
 def test_removed_species_carbon_tier1_volume(entity):
     """AGB = V·D·BEF; BGB = AGB·R; C = (AGB+BGB)·CF; CO2e = C·44/12."""
-    from apps.restorations.models import TreeRemovals, TreeRemovalRemovedSpecies
+    from apps.restorations.models import TreeRemovalRemovedSpecies, TreeRemovals
 
     species = _species(
         entity, IPCCForestType="tropical",
@@ -46,7 +46,7 @@ def test_removed_species_carbon_tier1_volume(entity):
 
 def test_tree_removal_total_aggregates_on_save(entity):
     """TreeRemovals.TotalBiomassCarbon is the server-side sum of its removed species."""
-    from apps.restorations.models import TreeRemovals, TreeRemovalRemovedSpecies
+    from apps.restorations.models import TreeRemovalRemovedSpecies, TreeRemovals
 
     species = _species(
         entity, IPCCForestType="tropical",
@@ -64,7 +64,7 @@ def test_tree_removal_total_aggregates_on_save(entity):
 
 
 def test_removed_species_no_volume_leaves_outputs_null(entity):
-    from apps.restorations.models import TreeRemovals, TreeRemovalRemovedSpecies
+    from apps.restorations.models import TreeRemovalRemovedSpecies, TreeRemovals
 
     species = _species(entity, IPCCForestType="tropical")
     removal = TreeRemovals.objects.create(EntityId=entity)

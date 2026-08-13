@@ -8,6 +8,7 @@ Attaches request.entity_id from:
 SuperAdmin may pass any EntityId. Others restricted to their own entity.
 """
 import logging
+
 from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)

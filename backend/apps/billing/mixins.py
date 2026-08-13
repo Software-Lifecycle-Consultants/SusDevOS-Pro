@@ -14,7 +14,6 @@ Rule from CLAUDE.md: feature gates are server-enforced — never rely on fronten
 SuperAdmin bypasses all gates (SUPERADMIN_BYPASS).
 """
 from rest_framework import status
-from rest_framework.response import Response
 
 
 class FeatureGateMixin:

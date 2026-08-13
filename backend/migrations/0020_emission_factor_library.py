@@ -26,8 +26,6 @@ command (python manage.py load_ef_dataset --source defra --year 2024).
 """
 
 from django.db import migrations, models
-import django.db.models.deletion
-
 
 ACTIVITY_CATEGORY_CHOICES = [
     ('stationary_combustion',    'Stationary Combustion'),

@@ -5,6 +5,7 @@ SpeciesLandParcels uses IntegerField for LandParcelId to avoid a circular
 dependency between ecosystem and land apps (documented in spec/app_structure.md).
 """
 from django.db import models
+
 from apps.shared.models import BaseAuditMixin
 
 IUCN_STATUS_CHOICES = [
