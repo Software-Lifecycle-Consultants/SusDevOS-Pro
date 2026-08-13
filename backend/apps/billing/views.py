@@ -2,6 +2,8 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.shared.views import EntityScopeInitialMixin
+
 from .models import EntitySubscriptions, Plans
 from .serializers import EntitySubscriptionsSerializer, PlansSerializer
 
@@ -14,18 +16,14 @@ class PlansListView(APIView):
         return Response(PlansSerializer(plans, many=True).data)
 
 
-class SubscriptionView(APIView):
+class SubscriptionView(EntityScopeInitialMixin, APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Re-resolve entity_id after DRF auth (same logic as TenantViewSetMixin.initial)
+        # entity_id is re-resolved after DRF auth by EntityScopeInitialMixin
+        # (handles the X-Entity-ID header, membership checks, and the fallback
+        # to the user's own entity — the middleware leaves it None under JWT).
         entity_id = getattr(request, "entity_id", None)
-        header_id = request.META.get("HTTP_X_ENTITY_ID")
-        if header_id and getattr(request.user, "IsSuperAdmin", False):
-            try:
-                entity_id = int(header_id)
-            except (ValueError, TypeError):
-                pass
         if not entity_id:
             return Response({"code": "no_entity", "detail": "No entity context."}, status=400)
         try:
