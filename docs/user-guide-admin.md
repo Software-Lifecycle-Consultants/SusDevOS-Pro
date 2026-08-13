@@ -27,14 +27,6 @@ An **Entity** is the top-level organisational boundary in SusDevOS. All data —
    - **Parent Entity** — if your organisation is a subsidiary of a parent also in SusDevOS, link it here.
 4. Click **Save**.
 
-### 1.2 Connect to SBTi (optional)
-
-If your organisation has an SBTi commitment:
-
-1. Navigate to **Settings → SBTi**.
-2. Enter your **SBTi Company ID** (found on the SBTi Companies Taking Action page).
-3. SusDevOS will match your entity to the SBTi registry and sync your commitment status, target type, and deadlines monthly.
-
 ---
 
 ## 2. Inviting and Managing Users
