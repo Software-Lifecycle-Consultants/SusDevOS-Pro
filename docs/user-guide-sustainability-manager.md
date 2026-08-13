@@ -1,13 +1,13 @@
-# SusDevOS Guide for Sustainability Managers — GHG Inventories, Scope 3, SBTi Targets & Reporting
+# SusDevOS Guide for Sustainability Managers — GHG Inventories, Scope 3, Reduction Targets & Reporting
 
 **Who this guide is for:** Sustainability managers and ESG leads responsible for producing an organisation's annual GHG inventory. You may hold the Admin or Manager role. This guide follows the GHG Protocol Corporate Standard and explains how SusDevOS implements each step.
 
 **What you can do:**
 - Record Scope 1, 2, and 3 emissions using DEFRA, EPA, or Climatiq emission factors
 - Build and submit a formal GHG inventory
-- Track SBTi targets and milestone progress
+- Set reduction targets and track milestone progress
 - Manage carbon offsets and validate them against Verra and Gold Standard registries
-- Generate PDF reports and CDP-format exports
+- Generate PDF, CSV, and JSON reports
 
 ---
 
@@ -42,7 +42,7 @@ The workflow is: create an inventory → add emissions records → review totals
 1. Navigate to **Emissions → Inventories → New Inventory**.
 2. Fill in:
    - **Reporting Year** — the calendar or fiscal year you are reporting (e.g. 2024).
-   - **Base Year** — required for SBTi target setting. Usually the first year you have complete data.
+   - **Base Year** — the baseline year your reduction targets are measured against. Usually the first year you have complete data.
    - **Consolidation Approach** — must match your Entity setting (Equity Share, Financial Control, or Operational Control).
    - **Boundary Notes** — describe what is included and excluded (e.g. "Includes UK operations only; excludes leased vehicles below 3.5t GVW").
 3. Click **Create**. The inventory is created with `VerificationStatus = 0` (Draft).
@@ -72,7 +72,7 @@ Scope 1 covers direct combustion, process emissions, and fugitive emissions from
 3. If you hold energy attribute certificates (REGOs, GOs, RECs): enter `0` as the market-based emission factor, or select your supplier's certified zero-carbon tariff from the EF library.
 4. Both `EmissionsAmountLocationBased` and `EmissionsAmountMarketBased` are calculated and stored.
 
-**For GHG Protocol dual reporting:** your inventory report shows both figures. Most voluntary frameworks (CDP, SBTi) ask for market-based as the primary figure, with location-based disclosed separately.
+**For GHG Protocol dual reporting:** your inventory report shows both figures. Under the GHG Protocol Scope 2 Guidance, market-based is typically presented as the primary figure, with location-based disclosed separately.
 
 ### 2.4 Record Scope 3 emissions (value chain)
 
@@ -124,15 +124,17 @@ Only offsets with status **Retired** or **Validated** are subtracted from your g
 
 ---
 
-## 4. Setting and Tracking SBTi Targets
+## 4. Setting and Tracking Reduction Targets
+
+SusDevOS provides generic reduction targets and milestones. You define the base year, target year, and reduction percentage yourself — SusDevOS does not validate targets against, or sync with, any external target registry.
 
 ### 4.1 Create a target
 
 1. Navigate to **Emissions → Targets → New Target**.
 2. Fill in:
-   - **Target type** — Near-term (5–10 year), Long-term (net-zero by 2050), or both.
+   - **Target type** — Near-term (5–10 year), Long-term (e.g. net-zero by 2050), or both.
    - **Base year** — must match your GHG inventory.
-   - **Target year** — typically 2030 (near-term) and 2050 (long-term).
+   - **Target year** — e.g. 2030 (near-term) and 2050 (long-term).
    - **Reduction percentage** — e.g. 50% absolute reduction by 2030.
    - **Scope coverage** — which scopes the target covers.
 3. Click **Save**.
@@ -149,10 +151,6 @@ SusDevOS creates annual milestones (linear interpolation from base year to targe
 
 Milestones link to inventories automatically once an inventory for that year is verified. The Celery task `link_milestone_actuals` runs nightly.
 
-### 4.3 SBTi registry sync
-
-On Professional plan and above, SusDevOS syncs with the SBTi Companies Taking Action registry monthly. If your organisation appears in the registry, your commitment type, submission date, and approval status are updated automatically.
-
 ---
 
 ## 5. Generating Reports
@@ -161,7 +159,7 @@ On Professional plan and above, SusDevOS syncs with the SBTi Companies Taking Ac
 
 1. Navigate to **Reports → New Report**.
 2. Select:
-   - **Report type** — GHG Inventory Summary, Scope 3 Detail, SBTi Progress.
+   - **Report type** — Entity GHG Inventory, Project Emissions Summary, Phase Progress vs Goals, or Tree Removal & Restoration Log.
    - **Inventory** — the reporting year to include.
    - **Format** — PDF.
 3. Click **Queue Report**. Report generation runs as a background task (typically 30–90 seconds).
@@ -172,15 +170,7 @@ On Professional plan and above, SusDevOS syncs with the SBTi Companies Taking Ac
 > - Starter / Professional: unbranded PDF.
 > - Agency: white-label PDF with your logo.
 
-### 5.2 CDP export
-
-> Available on Professional plan and above.
-
-1. Navigate to **Reports → New Report → CDP Export**.
-2. Select the reporting year and CDP questionnaire module (Climate Change C6).
-3. Download the pre-formatted CSV. The file maps SusDevOS fields to CDP question IDs for direct upload.
-
-### 5.3 CSV / JSON export
+### 5.2 CSV / JSON export
 
 Available on Starter and above. Export from **Emissions → Records → Export**. Includes all emission records for the selected inventory with raw quantities, factors, and calculated amounts.
 

@@ -48,9 +48,7 @@ FEEDS = [
      "?keywords=carbon+reporting&organisations[]=department-for-environment-food-rural-affairs"),
 
     # Standards bodies
-    ("SBTi News",         "https://sciencebasedtargets.org/feed"),
     ("GHG Protocol",      "https://ghgprotocol.org/feed"),
-    ("CDP Blog",          "https://www.cdp.net/en/articles.rss"),
 
     # Trade press
     ("Edie",              "https://www.edie.net/rss/"),
@@ -70,7 +68,7 @@ FEEDS = [
 RELEVANCE_KEYWORDS = [
     "greenhouse gas", "ghg", "scope 1", "scope 2", "scope 3",
     "carbon reporting", "secr", "csrd", "tcfd", "tnfd",
-    "net zero", "sbti", "science based target", "cdp",
+    "net zero",
     "emission factor", "defra", "carbon footprint",
     "sustainability reporting", "esg", "climate disclosure",
     "biodiversity", "nature", "lulucf", "land use",
@@ -161,12 +159,12 @@ tracking platform for sustainable development projects.
 
 Your audience: sustainability managers, ESG consultants, and development project
 managers. They care about UK regulatory compliance (SECR, TCFD, CSRD), GHG Protocol
-methodology, SBTi targets, biodiversity reporting (TNFD), and practical tools to
-make their reporting faster and more credible.
+methodology, biodiversity reporting (TNFD), carbon-credit MRV (Verra / Gold Standard),
+and practical tools to make their reporting faster and more credible.
 
 When analysing news, prioritise:
 1. Regulatory changes that require action (DEFRA factor updates, new reporting requirements)
-2. Methodology updates (GHG Protocol, IPCC, SBTi guidance)
+2. Methodology updates (GHG Protocol, IPCC, IPCC LULUCF guidance)
 3. Industry benchmarks or research that reveals a problem SusDevOS solves
 4. Policy signals that will affect development projects (planning, EIA, net zero targets)
 """

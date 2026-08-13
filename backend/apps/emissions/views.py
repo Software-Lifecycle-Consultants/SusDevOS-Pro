@@ -58,6 +58,24 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             qs = qs.filter(ReportingYear=p["reportingYear"])
         return qs
 
+    @staticmethod
+    def _inventory_locked_response(inventory):
+        """Return a 403 if the row's parent GHG inventory is verified.
+
+        A verified inventory (VerificationStatus >= 3) is immutable (CLAUDE.md
+        rule #3) and its totals are frozen — the nightly recompute explicitly
+        skips verified inventories (tasks/emissions.py). Allowing a client to
+        edit, delete, or add the underlying EmissionsData rows would silently
+        diverge the audit-locked totals from the data they represent, so the
+        row-level guard must also honour the parent inventory's lock."""
+        if inventory is not None and inventory.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "This record belongs to a verified GHG inventory and cannot be changed. Unlock the inventory first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
     def perform_create(self, serializer):
         # GwpDatasetId defaults to system default if not provided
         if not serializer.validated_data.get("GwpDatasetId"):
@@ -68,6 +86,16 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             CreatedBy=self.request.user.UserId,
         )
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
+        if locked:
+            return locked
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.VerificationStatus >= VERIFIED:
@@ -76,6 +104,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
                  "detail": "Verified records cannot be edited. Use /unlock/ first (SuperAdmin only)."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        locked = self._inventory_locked_response(instance.InventoryId)
+        if locked:
+            return locked
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
@@ -86,6 +117,9 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
                  "detail": "Verified records cannot be deleted."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        locked = self._inventory_locked_response(instance.InventoryId)
+        if locked:
+            return locked
         return super().destroy(request, *args, **kwargs)
 
     # ── Verify ─────────────────────────────────────────────────────────────────
@@ -215,6 +249,35 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
     permission_classes = [IsAuthenticated]
     lookup_field     = "OffsetId"
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+
+    def _parent_verified_response(self, instance):
+        """Return a 403 if the offset's parent emissions record is verified.
+
+        Offsets feed the recomputed net emissions total, so editing or deleting
+        one attached to a verified (VerificationStatus >= 3) record would mutate
+        the audit-locked figure without going through /unlock/ — the same guard
+        the nested offset actions on EmissionsDataViewSet already enforce
+        (CLAUDE.md rule #3). This standalone viewset must not be a bypass."""
+        record = instance.EmissionsId
+        if record is not None and record.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "Offsets on a verified emissions record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
+    def update(self, request, *args, **kwargs):
+        err = self._parent_verified_response(self.get_object())
+        if err:
+            return err
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        err = self._parent_verified_response(self.get_object())
+        if err:
+            return err
+        return super().destroy(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(

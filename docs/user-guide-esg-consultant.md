@@ -22,7 +22,6 @@ Each client organisation is a separate **Entity** in SusDevOS. Entities are isol
 2. Fill in the client's details:
    - **Legal name** and Companies House number (auto-populate fetches registered address and SIC codes).
    - **Consolidation approach** — confirm with the client: Equity Share, Financial Control, or Operational Control.
-   - **SBTi Company ID** — if the client has an SBTi commitment, link it here for automatic registry sync.
 3. **Parent/subsidiary structure** — if the client is a group, create the parent entity first, then create subsidiary entities and set the `Parent Entity` field.
 
 ### 1.2 Add your team to a client entity
@@ -52,7 +51,7 @@ For each client, the typical annual cycle is:
 | Internal review | Review totals; flag gaps; request missing data from client | May–Jun |
 | Verification prep | Submit for internal approval; share verifier read link | Jun–Jul |
 | Third-party verification | Verifier reviews; mark as verified once complete | Jul–Sep |
-| Reporting | Generate white-label PDF; export CDP format if required | Sep–Oct |
+| Reporting | Generate white-label PDF; export CSV/JSON if required | Sep–Oct |
 
 ### 2.2 Switching between clients
 
@@ -151,31 +150,15 @@ When a client provides utility bills, meter reads, or travel data as a spreadshe
 
 ---
 
-## 6. CDP Export for Clients
+## 6. Billing and Entity Management
 
-For clients with CDP disclosure obligations:
-
-1. Navigate to **[Client Entity] → Reports → CDP Export**.
-2. Select the reporting year and CDP module:
-   - **C6** — Scope 1 and 2 totals, methodology disclosure
-   - **C7** — Emissions breakdown by activity
-   - **C10** — Scope 1 and 2 targets (SBTi)
-3. Download the pre-formatted CSV. CDP field codes are mapped from SusDevOS data automatically.
-4. Upload the CSV directly to CDP's Online Response System (ORS) as a question import.
-
-> CDP export is available on Professional and above.
-
----
-
-## 7. Billing and Entity Management
-
-### 7.1 Adding client entities
+### 6.1 Adding client entities
 
 1. Navigate to **Settings → Billing → Add Entity**.
 2. Each entity beyond your plan limit is billed as an add-on (£15/entity/month on Agency).
 3. The add-on is added to your next Stripe invoice.
 
-### 7.2 Archiving a completed engagement
+### 6.2 Archiving a completed engagement
 
 When an engagement ends, archive the client entity rather than deleting it. Archived entities retain all data, stop generating billing add-on charges, and cannot be edited.
 
@@ -184,23 +167,23 @@ When an engagement ends, archive the client entity rather than deleting it. Arch
 
 To reactivate an archived entity (e.g. the client returns for next year's inventory): contact support.
 
-### 7.3 Non-profit / academic discounts
+### 6.3 Non-profit / academic discounts
 
 If a client is a registered charity or NGO, they may qualify for a 50% discount. Apply via the SusDevOS contact page. Once approved, the discount is applied at the entity subscription level and does not affect your agency plan pricing.
 
 ---
 
-## 8. Quick Reference — Multi-Client Checklist
+## 7. Quick Reference — Multi-Client Checklist
 
 Use this checklist at the start of each annual engagement:
 
 - [ ] Entity created with correct legal name and Companies House number
 - [ ] Consolidation approach confirmed with client
 - [ ] Reporting year created (new GHG inventory)
-- [ ] Base year confirmed (required for SBTi target tracking)
+- [ ] Base year confirmed (baseline for reduction target tracking)
 - [ ] Your team members added as users (correct roles)
 - [ ] Client read-only user invited (optional)
 - [ ] Scope 3 relevance assessment completed (at least Scope 3 categories screened)
 - [ ] Scope 2 EAC/REGO data requested from client
-- [ ] SBTi target linked (if client is SBTi committed)
+- [ ] Reduction target created (if the client tracks one)
 - [ ] White-label branding confirmed
