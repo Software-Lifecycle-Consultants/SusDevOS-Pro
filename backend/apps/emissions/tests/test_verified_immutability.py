@@ -226,3 +226,146 @@ class TestVerifiedInventoryChildRows:
 
         patch = auth_client.patch(f"{EMISSIONS_URL}{rec_id}/", {"Title": "Fine"}, format="json")
         assert patch.status_code == status.HTTP_200_OK
+
+
+# ── F4: line items of a row inside a verified inventory are immutable ──────────
+#
+# The record-level create/update/destroy paths already honour the parent
+# inventory lock (F2/F3 above). But the nested detail/offset line-item routes and
+# the standalone offsets viewset previously guarded ONLY on the row's own
+# VerificationStatus. A row can belong to a verified inventory without ever being
+# individually verified (verifying an inventory does not cascade to member rows),
+# so those routes were a bypass that mutated an audit-locked inventory input.
+
+
+class TestVerifiedInventoryLineItemLock:
+    def _record_with_offset_in_verified_inventory(
+        self, auth_client, entity, gwp_dataset, with_offsets_feature=False
+    ):
+        """Return (rec_id, offset_id) for a record whose parent inventory is
+        verified but which was never itself individually verified.
+
+        Everything is created while the inventory is still unverified, then the
+        inventory is verified last so the row inherits the lock without ever
+        having VerificationStatus >= 3 of its own."""
+        _enable_feature(entity, "ghg_inventory_formal")
+        if with_offsets_feature:
+            _enable_feature(entity, "carbon_offsets")
+        inv = _create_inventory(entity, gwp_dataset)
+        rec_id = _post_record(
+            auth_client, gwp_dataset.GwpDatasetId, inventory_id=inv.InventoryId
+        ).data["EmissionsId"]
+
+        offset_resp = auth_client.post(
+            f"{EMISSIONS_URL}{rec_id}/offsets/",
+            {
+                "Title": "VCS offset",
+                "OffsetType": "vcs",
+                "Provider": "Verra",
+                "OffsetAmountTonnes": "10.000000",
+                "CreditRegistry": "verra",
+            },
+            format="json",
+        )
+        assert offset_resp.status_code == status.HTTP_201_CREATED, offset_resp.data
+        offset_id = offset_resp.data["OffsetId"]
+
+        # Verify the INVENTORY (not the row) — the row keeps VerificationStatus < 3.
+        patch = auth_client.patch(
+            f"{INV_URL}{inv.InventoryId}/", {"VerificationStatus": VERIFIED}, format="json"
+        )
+        assert patch.status_code == status.HTTP_200_OK, patch.data
+        return rec_id, offset_id
+
+    def test_nested_add_detail_to_row_in_verified_inventory_returns_403(
+        self, auth_client, gwp_dataset, entity
+    ):
+        rec_id, _ = self._record_with_offset_in_verified_inventory(auth_client, entity, gwp_dataset)
+        resp = auth_client.post(
+            f"{EMISSIONS_URL}{rec_id}/details/",
+            {
+                "Description": "Line item",
+                "QuantityOrCost": "100.0000",
+                "Unit": "litres",
+                "EmissionFactor": DIESEL_EF,
+                "EmissionFactorSource": "DEFRA 2024",
+                "Gas": "CO2",
+                "GwpDatasetId": gwp_dataset.GwpDatasetId,
+            },
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_nested_add_offset_to_row_in_verified_inventory_returns_403(
+        self, auth_client, gwp_dataset, entity
+    ):
+        rec_id, _ = self._record_with_offset_in_verified_inventory(auth_client, entity, gwp_dataset)
+        resp = auth_client.post(
+            f"{EMISSIONS_URL}{rec_id}/offsets/",
+            {
+                "Title": "Another offset",
+                "OffsetType": "vcs",
+                "Provider": "Verra",
+                "OffsetAmountTonnes": "5.000000",
+                "CreditRegistry": "verra",
+            },
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_nested_delete_offset_item_in_verified_inventory_returns_403(
+        self, auth_client, gwp_dataset, entity
+    ):
+        rec_id, offset_id = self._record_with_offset_in_verified_inventory(
+            auth_client, entity, gwp_dataset
+        )
+        resp = auth_client.delete(f"{EMISSIONS_URL}{rec_id}/offsets/{offset_id}/")
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_standalone_patch_offset_in_verified_inventory_returns_403(
+        self, auth_client, gwp_dataset, entity
+    ):
+        _, offset_id = self._record_with_offset_in_verified_inventory(
+            auth_client, entity, gwp_dataset, with_offsets_feature=True
+        )
+        resp = auth_client.patch(
+            f"{OFFSETS_URL}{offset_id}/", {"OffsetAmountTonnes": "999.000000"}, format="json"
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_standalone_delete_offset_in_verified_inventory_returns_403(
+        self, auth_client, gwp_dataset, entity
+    ):
+        _, offset_id = self._record_with_offset_in_verified_inventory(
+            auth_client, entity, gwp_dataset, with_offsets_feature=True
+        )
+        resp = auth_client.delete(f"{OFFSETS_URL}{offset_id}/")
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_nested_add_offset_to_row_in_unverified_inventory_is_allowed(
+        self, auth_client, gwp_dataset, entity
+    ):
+        """Negative control: the inventory lock must not fire while unverified."""
+        _enable_feature(entity, "ghg_inventory_formal")
+        inv = _create_inventory(entity, gwp_dataset)
+        rec_id = _post_record(
+            auth_client, gwp_dataset.GwpDatasetId, inventory_id=inv.InventoryId
+        ).data["EmissionsId"]
+
+        resp = auth_client.post(
+            f"{EMISSIONS_URL}{rec_id}/offsets/",
+            {
+                "Title": "VCS offset",
+                "OffsetType": "vcs",
+                "Provider": "Verra",
+                "OffsetAmountTonnes": "10.000000",
+                "CreditRegistry": "verra",
+            },
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
