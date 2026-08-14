@@ -76,6 +76,11 @@ nginx/ssl/dhparam.pem
 *.swp
 *.swo
 
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
+# Local-only pre-production tracking notes
+OPEN_ITEMS.md
+
 # ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db

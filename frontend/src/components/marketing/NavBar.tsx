@@ -23,12 +23,6 @@ export function NavBar() {
           <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse" />
           TNFD v1.0 LEAP framework — nature impact reporting now available
         </span>
-        <Link
-          href="/changelog"
-          className="flex items-center gap-1 font-medium text-brand-400 hover:text-brand-300 transition-colors"
-        >
-          See what&apos;s new <ArrowRight className="h-3 w-3" />
-        </Link>
       </div>
 
       {/* Main nav */}

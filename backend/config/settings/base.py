@@ -205,6 +205,14 @@ CORS_ALLOWED_ORIGINS = config(
 )
 CORS_ALLOW_CREDENTIALS = True
 
+# Required in production (HTTPS + cookie-based CSRF/refresh token). Must include
+# scheme, e.g. CSRF_TRUSTED_ORIGINS=https://susdevos.com,https://app.susdevos.com
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://localhost:3000",
+    cast=Csv(),
+)
+
 # ── Celery ────────────────────────────────────────────────────────────────────
 
 CELERY_BROKER_URL  = config("CELERY_BROKER_URL",  default="redis://localhost:6379/0")

@@ -8,7 +8,6 @@ const COLUMNS = [
       { href: "/features",           label: "Features"        },
       { href: "/pricing",            label: "Pricing"         },
       { href: "/integrations",       label: "Integrations"    },
-      { href: "/changelog",          label: "Changelog"       },
       { href: "/demo",               label: "Book a demo"     },
     ],
   },
@@ -16,9 +15,7 @@ const COLUMNS = [
     heading: "Resources",
     links: [
       { href: "/resources/guides",   label: "Guides"          },
-      { href: "/resources/tools/carbon-estimator", label: "Carbon estimator" },
       { href: "/standards",          label: "Standards"       },
-      { href: "/api-docs",           label: "API docs"        },
       { href: "/blog",               label: "Blog"            },
     ],
   },

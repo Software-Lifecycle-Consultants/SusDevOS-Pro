@@ -104,14 +104,12 @@ function Hero() {
           {/* ── Copy ── */}
           <div>
             {/* Badge */}
-            <Link
-              href="/changelog"
-              className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm text-brand-300 transition-colors hover:bg-brand-500/20"
+            <div
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm text-brand-300"
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-400" />
-              TNFD v1.0 LEAP framework support now available →
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+              TNFD v1.0 LEAP framework support now available
+            </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-[1.08] tracking-tight text-white sm:text-6xl">
               Your GHG inventory.{" "}

@@ -71,6 +71,17 @@ services:
       redis: { condition: service_healthy }
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.local
+      # Inside the compose network, reach infra by service name, not localhost.
+      # (.env uses localhost for the host-based dev workflow in CLAUDE.md.)
+      DB_HOST:               db
+      DB_USER:               susdevos
+      DB_PASSWORD:           susdevos
+      DB_NAME:               susdevos
+      REDIS_URL:             redis://redis:6379/0
+      CELERY_BROKER_URL:     redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      CACHE_LOCATION:        redis://redis:6379/3
+      AWS_S3_ENDPOINT_URL:   http://minio:9000
 
   # ── Celery worker (default queue) ─────────────────────────────────────────
   celery_worker:
