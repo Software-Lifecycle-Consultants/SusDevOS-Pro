@@ -11,7 +11,13 @@ DEBUG = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Use local filesystem for file storage instead of S3
+# (DEFAULT_FILE_STORAGE kept as the flag tasks/reports.py reads; STORAGES is
+# what Django 5.1 core reads.)
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
 
 # Allow all hosts in development
 ALLOWED_HOSTS = ["*"]

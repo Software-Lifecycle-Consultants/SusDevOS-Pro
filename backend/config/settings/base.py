@@ -235,6 +235,14 @@ AWS_S3_FILE_OVERWRITE = False
 
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
+# Django 5.1 removed DEFAULT_FILE_STORAGE from core — STORAGES is what Django
+# actually reads now. DEFAULT_FILE_STORAGE above is kept deliberately because
+# tasks/reports.py branches on it as an S3-enabled flag.
+STORAGES = {
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+
 # ── Redis cache ───────────────────────────────────────────────────────────────
 
 CACHES = {

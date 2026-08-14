@@ -5,8 +5,13 @@
  */
 import axios, { type AxiosRequestConfig } from "axios";
 
+// Same-origin in the browser (Nginx/Next rewrite proxy /api/); absolute URL
+// only server-side. Keep in sync with axios-instance.ts.
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
+  baseURL:
+    typeof window === "undefined"
+      ? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+      : "",
   withCredentials: true,
 });
 

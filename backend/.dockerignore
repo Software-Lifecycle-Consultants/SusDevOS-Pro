@@ -1,5 +1,6 @@
 # Development artifacts
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -10,9 +11,13 @@ htmlcov/
 .ruff_cache/
 
 # Dev environment files
+# NB: the old "*.env.*" glob did NOT match ".env.prod" (it needs a leading
+# segment), so the production secrets file was being copied into the image by
+# "COPY . .". ".env.*" matches it.
 .env
-.env.local
-*.env.*
+.env.*
+!.env.example
+!.env.prod.example
 
 # Tests (not needed in production image)
 apps/*/tests/

@@ -6,8 +6,17 @@
 import axios, { type AxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth";
 
+// Browser requests must be same-origin ("" → /api/... on the current host):
+// Nginx routes /api/ to Django in production, and the Next.js rewrite proxies
+// it in dev. NEXT_PUBLIC_API_URL (e.g. http://api:8000 inside Docker) is only
+// resolvable server-side — baking it into the browser bundle breaks every call.
+const baseURL =
+  typeof window === "undefined"
+    ? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+    : "";
+
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
+  baseURL,
   withCredentials: true,       // send HttpOnly refresh cookie
   headers: { "Content-Type": "application/json" },
 });

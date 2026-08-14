@@ -61,20 +61,35 @@ ufw --force enable
 Log out and log back in as `deploy`.
 
 ```bash
-# Clone the repo
+# The repo is private — create a read-only deploy key so the VPS can pull it
+ssh-keygen -t ed25519 -C "susdevos-vps-pull" -f ~/.ssh/repo_deploy -N ""
+cat ~/.ssh/repo_deploy.pub
+# → GitHub: Software-Lifecycle-Consultants/SusDevOS-Pro → Settings → Deploy keys
+#   → Add deploy key → paste → leave "Allow write access" UNCHECKED
+
+# Tell SSH to use that key for github.com
+cat >> ~/.ssh/config << 'EOF'
+Host github.com
+    IdentityFile ~/.ssh/repo_deploy
+    IdentitiesOnly yes
+EOF
+
+# Clone the repo (SSH — the deploy key authenticates the pull)
 sudo mkdir -p /opt/susdevos
 sudo chown deploy:deploy /opt/susdevos
-git clone https://github.com/yourorg/susdevos.git /opt/susdevos
+git clone git@github.com:Software-Lifecycle-Consultants/SusDevOS-Pro.git /opt/susdevos
 cd /opt/susdevos
 
 # Generate Diffie-Hellman params (takes 2–3 minutes — run once)
 openssl dhparam -out nginx/ssl/dhparam.pem 2048
 
-# Create production env files
+# Create the production env file
 cp backend/.env.prod.example backend/.env.prod
 nano backend/.env.prod          # fill in all values
-cp frontend/.env.production.example frontend/.env.production.local
-nano frontend/.env.production.local   # fill in NEXT_PUBLIC_* values
+
+# (Frontend NEXT_PUBLIC_* values come from the top-level .env below — they are
+#  passed to the Next.js image as Docker build args. Local frontend env files
+#  are excluded from the image by frontend/.dockerignore.)
 ```
 
 **Required backend values before continuing:**
@@ -208,11 +223,13 @@ cat ~/.ssh/github_deploy
 
 The deploy job in `.github/workflows/ci.yml` runs after tests pass. It:
 1. SSHes to the VPS
-2. `git pull origin main`
+2. `git pull --ff-only origin main`
 3. Rebuilds the `api`, celery workers, and `nextjs` images
-4. Restarts the updated containers (DB and Redis are untouched)
-5. Runs migrations
-6. Runs `collectstatic`
+4. Runs migrations and `collectstatic` **on the new image** (one-off containers,
+   before traffic switches)
+5. Restarts the updated containers (DB and Redis are untouched)
+6. Waits for `/health/` to respond, then reloads Nginx so it picks up the
+   recreated containers' new IPs (prevents stale-upstream 502s)
 
 ---
 

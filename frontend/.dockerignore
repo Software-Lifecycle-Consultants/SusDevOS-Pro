@@ -1,0 +1,11 @@
+node_modules
+.next
+next-dev.log
+npm-debug.log*
+tsconfig.tsbuildinfo
+
+# Env files must never be baked into image layers.
+# NEXT_PUBLIC_* values are passed as build args by docker-compose.
+.env
+.env.*
+!.env.production.example

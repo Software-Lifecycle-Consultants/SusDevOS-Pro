@@ -162,6 +162,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [backend, frontend]   # only deploy when tests pass
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Never run two deploys against the VPS at once; queue instead of cancel
+    # so every merged commit eventually reaches production.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
 
     steps:
       - name: Deploy via SSH
@@ -171,35 +176,38 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key:      ${{ secrets.VPS_SSH_KEY }}
           # Timeout generous — image builds take time on a small VPS
-          command_timeout: 15m
+          command_timeout: 20m
           script: |
             set -e
             cd /opt/susdevos
 
             echo "==> Pulling latest code"
-            git pull origin main
+            git pull --ff-only origin main
 
             echo "==> Rebuilding app images"
             docker compose -f docker-compose.prod.yml build \
               api celery_worker celery_integrations celery_reports celery_beat nextjs
+
+            echo "==> Running migrations (new image, before switching traffic)"
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py migrate --no-input
+
+            echo "==> Collecting static files"
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py collectstatic --no-input --clear
 
             echo "==> Restarting app services (DB and Redis untouched)"
             docker compose -f docker-compose.prod.yml up -d --no-deps \
               api celery_worker celery_integrations celery_reports celery_beat nextjs
 
             echo "==> Waiting for API to become healthy"
-            timeout 60 sh -c \
+            timeout 90 sh -c \
               'until docker compose -f docker-compose.prod.yml exec -T api \
-                python -c "import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/schema/\")" \
+                python -c "import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health/\")" \
                 2>/dev/null; do sleep 3; done'
 
-            echo "==> Running migrations"
-            docker compose -f docker-compose.prod.yml exec -T api \
-              python manage.py migrate --no-input
-
-            echo "==> Collecting static files"
-            docker compose -f docker-compose.prod.yml exec -T api \
-              python manage.py collectstatic --no-input --clear
+            echo "==> Reloading Nginx (re-resolve recreated container IPs)"
+            docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload
 
             echo "==> Pruning old images"
             docker image prune -f

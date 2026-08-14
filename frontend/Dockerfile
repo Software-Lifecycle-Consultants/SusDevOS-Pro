@@ -3,7 +3,10 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+# Full install: next build needs devDependencies (typescript, tailwindcss,
+# postcss, autoprefixer). The runtime stage copies only the standalone output,
+# so dev deps never reach the final image.
+RUN npm ci
 
 # ── Stage 2: build ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder

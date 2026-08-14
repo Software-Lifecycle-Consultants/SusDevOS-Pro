@@ -24,6 +24,13 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS  = True
 SECURE_HSTS_PRELOAD             = True
 SECURE_PROXY_SSL_HEADER         = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# The Docker healthcheck and the CI deploy gate call http://localhost:8000/health/
+# from inside the container, with no X-Forwarded-Proto header. Without this
+# exemption SecurityMiddleware answers 301 → https://localhost:8000/, urllib
+# follows it into a TLS handshake against plain-HTTP gunicorn, and the container
+# never reports healthy — which also blocks nextjs (depends_on: service_healthy).
+SECURE_REDIRECT_EXEMPT = [r"^health/$"]
+
 # Cookies
 SESSION_COOKIE_SECURE   = True
 CSRF_COOKIE_SECURE      = True
