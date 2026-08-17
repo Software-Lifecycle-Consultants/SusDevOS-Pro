@@ -4,13 +4,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.billing.mixins import FeatureGateMixin
 from apps.shared.views import TenantViewSetMixin
 
 from .models import LandParcelEcosystems, LandParcels
 from .serializers import LandParcelsDetailSerializer, LandParcelsListSerializer
 
 
-class LandParcelsViewSet(TenantViewSetMixin, ModelViewSet):
+class LandParcelsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
+    # GIS land-parcel mapping is a Professional+ feature (CLAUDE.md rule #6:
+    # feature gates are server-enforced, never frontend-only).
+    required_feature = "land_parcel_gis"
     queryset = LandParcels.objects.all()
     permission_classes = [IsAuthenticated]
 

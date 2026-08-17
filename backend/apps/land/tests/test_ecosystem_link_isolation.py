@@ -32,10 +32,13 @@ def _client_for(user, entity_id):
 
 
 @pytest.fixture
-def two_tenants(db):
+def two_tenants(db, enable_feature):
     entity_a = EntitiesFactory(EntityName="Alpha Corp")
     entity_b = EntitiesFactory(EntityName="Beta Corp")
     user_a = UsersFactory(EntityId=entity_a, email="admin@alpha.com", username="land_a")
+    # land-parcel routes are gated (land_parcel_gis); grant it so the tenant
+    # isolation behaviour under test is reachable.
+    enable_feature(entity_a, "land_parcel_gis")
 
     parcel_a = LandParcels.objects.create(EntityId=entity_a, ParcelName="Alpha parcel")
     eco_b = Ecosystem.objects.create(EntityId=entity_b.EntityId, EcosystemName="Beta wetland")
