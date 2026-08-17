@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.billing.mixins import FeatureGateMixin
 from apps.shared.views import EntityScopeInitialMixin
 
 from .models import Ecosystem, Species
@@ -14,8 +15,11 @@ from .serializers import (
 )
 
 
-class EcosystemViewSet(EntityScopeInitialMixin, ModelViewSet):
+class EcosystemViewSet(FeatureGateMixin, EntityScopeInitialMixin, ModelViewSet):
     """Ecosystem uses IntegerField for EntityId — uses a custom queryset filter."""
+    # Ecosystem tracking is a Starter+ feature (CLAUDE.md rule #6: feature
+    # gates are server-enforced, never frontend-only).
+    required_feature = "ecosystem_basic"
     permission_classes = [IsAuthenticated]
     queryset = Ecosystem.objects.all()
 
@@ -38,7 +42,10 @@ class EcosystemViewSet(EntityScopeInitialMixin, ModelViewSet):
         instance.save()
 
 
-class SpeciesViewSet(EntityScopeInitialMixin, ModelViewSet):
+class SpeciesViewSet(FeatureGateMixin, EntityScopeInitialMixin, ModelViewSet):
+    # Species/biodiversity tracking is part of ecosystem tracking — Starter+
+    # (CLAUDE.md rule #6: feature gates are server-enforced, not frontend-only).
+    required_feature = "ecosystem_basic"
     permission_classes = [IsAuthenticated]
     queryset = Species.objects.all()
 
