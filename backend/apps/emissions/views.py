@@ -142,6 +142,16 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self._require_scope3_feature(serializer.validated_data)
+        # Block re-pointing this row INTO a (different) verified inventory. The
+        # guards above only see the row's *current* InventoryId; InventoryId is
+        # client-writable, so without this a PATCH could attach an unverified
+        # row to a frozen inventory — a bypass of rule #3. create() already
+        # validates the *target* inventory, so this makes update() consistent.
+        target_inv = serializer.validated_data.get("InventoryId")
+        if target_inv is not None and target_inv != instance.InventoryId:
+            locked = self._inventory_locked_response(target_inv)
+            if locked:
+                return locked
         self.perform_update(serializer)
         if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}

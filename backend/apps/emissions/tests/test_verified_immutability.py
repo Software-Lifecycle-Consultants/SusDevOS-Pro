@@ -227,6 +227,31 @@ class TestVerifiedInventoryChildRows:
         patch = auth_client.patch(f"{EMISSIONS_URL}{rec_id}/", {"Title": "Fine"}, format="json")
         assert patch.status_code == status.HTTP_200_OK
 
+    def test_reassign_row_into_verified_inventory_returns_403(self, auth_client, gwp_dataset, entity):
+        """Re-pointing an editable row at a verified inventory via PATCH must be
+        rejected — otherwise it attaches new member data to a frozen inventory,
+        a bypass of rule #3 that the create() path already blocks."""
+        inv = self._verified_inventory(auth_client, entity, gwp_dataset)
+        # A separate, currently-editable standalone record (no inventory).
+        rec_id = _post_record(auth_client, gwp_dataset.GwpDatasetId).data["EmissionsId"]
+
+        resp = auth_client.patch(
+            f"{EMISSIONS_URL}{rec_id}/", {"InventoryId": inv.InventoryId}, format="json"
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.data["code"] == "verified_immutable"
+
+    def test_reassign_row_into_unverified_inventory_is_allowed(self, auth_client, gwp_dataset, entity):
+        """The target-inventory guard must not fire for an unverified target."""
+        _enable_feature(entity, "ghg_inventory_formal")
+        inv = _create_inventory(entity, gwp_dataset)
+        rec_id = _post_record(auth_client, gwp_dataset.GwpDatasetId).data["EmissionsId"]
+
+        resp = auth_client.patch(
+            f"{EMISSIONS_URL}{rec_id}/", {"InventoryId": inv.InventoryId}, format="json"
+        )
+        assert resp.status_code == status.HTTP_200_OK, resp.data
+
 
 # ── F4: line items of a row inside a verified inventory are immutable ──────────
 #
