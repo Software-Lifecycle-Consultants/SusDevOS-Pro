@@ -115,6 +115,18 @@ class RefreshView(APIView):
             except ValueError:
                 pass
 
+        # Re-check that the account is still active. The refresh path never loads
+        # the user, so without this a deactivated or deleted account (is_active
+        # cleared by destroy()/deactivation) could keep minting access tokens for
+        # the full 7-day refresh-cookie lifetime — bypassing the login gate.
+        user_id = refresh.get(settings.SIMPLE_JWT["USER_ID_CLAIM"])
+        user = Users.objects.filter(UserId=user_id).only("is_active").first()
+        if user is None or not user.is_active:
+            return Response(
+                {"code": "account_inactive", "detail": "Account is no longer active."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
         return Response({"access_token": str(refresh.access_token)}, status=status.HTTP_200_OK)
 
 
