@@ -103,3 +103,41 @@ def sa_client(superadmin_user):
 def entity_id():
     """The default tenant id used by data-layer factories."""
     return 1
+
+
+# ── Feature-gate helper ───────────────────────────────────────────────────────
+
+@pytest.fixture
+def enable_feature(db):
+    """Grant a plan feature to an entity via an active subscription.
+
+    Returns a helper ``grant(entity, feature_key)`` that provisions (idempotently)
+    a shared test plan, enables ``feature_key`` on it, and subscribes ``entity``.
+    Used by tests that exercise a FeatureGateMixin-gated view so the default,
+    subscription-less test entity is not denied with HTTP 402.
+    """
+    def _grant(entity, feature_key):
+        from apps.billing.models import EntitySubscriptions, PlanFeatures, Plans
+
+        plan, _ = Plans.objects.get_or_create(
+            PlanKey="test_all_features",
+            defaults={
+                "PlanName": "Test (all features)",
+                "PriceMonthlyGBP": 0,
+                "PriceAnnualGBP": 0,
+                "MaxEntities": 0,
+                "MaxUsersPerEntity": 0,
+                "MaxReportingYears": 0,
+                "SupportTier": "standard",
+            },
+        )
+        PlanFeatures.objects.get_or_create(
+            PlanId=plan,
+            FeatureKey=feature_key,
+            defaults={"IsEnabled": True, "UpgradeMessage": f"{feature_key} requires a higher plan."},
+        )
+        EntitySubscriptions.objects.get_or_create(
+            EntityId=entity,
+            defaults={"PlanId": plan, "Status": "active"},
+        )
+    return _grant
