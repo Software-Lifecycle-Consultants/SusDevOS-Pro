@@ -52,6 +52,51 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
     def get_serializer_class(self):
         return EmissionsDataListSerializer if self.action == "list" else EmissionsDataSerializer
 
+    def _check_scope_feature_gates(self, request, instance=None):
+        """Enforce plan gates that depend on a record's scope/method server-side.
+
+        Per spec/pricing.md these are Starter+ features triggered in context:
+          * Scope 3 emissions            → 'scope_3'
+          * market-based Scope 2 (a supplied EFMarketBased factor)
+                                         → 'scope_2_market_based'
+        Scope 1 and location-based Scope 2 are on every plan. The check is
+        field-conditional (a blanket viewset gate would wrongly block free
+        Scope 1/2 records), and must be server-side — frontend hiding does not
+        satisfy CLAUDE.md rule #6. On a partial update, values absent from the
+        request fall back to the stored record."""
+        data = request.data
+
+        def _val(key):
+            if hasattr(data, "__contains__") and key in data:
+                return data.get(key)
+            return getattr(instance, key, None) if instance is not None else None
+
+        raw_scope = _val("Scope")
+        try:
+            scope = int(raw_scope) if raw_scope not in (None, "") else None
+        except (TypeError, ValueError):
+            scope = None
+        ef_market = _val("EFMarketBased")
+
+        if scope == 3:
+            required = "scope_3"
+        elif scope == 2 and ef_market not in (None, ""):
+            required = "scope_2_market_based"
+        else:
+            return
+
+        if getattr(request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+
+        entity_id = getattr(request, "entity_id", None)
+        if not (entity_id and is_feature_enabled(entity_id=entity_id, feature_key=required)):
+            raise FeatureGatedException(
+                feature_key=required,
+                message=get_upgrade_message(feature_key=required),
+            )
+
     def get_queryset(self):
         qs = super().get_queryset()
         p = self.request.query_params
@@ -96,6 +141,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
+        self._check_scope_feature_gates(request)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
@@ -107,6 +153,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+        self._check_scope_feature_gates(request, instance=instance)
         if instance.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",

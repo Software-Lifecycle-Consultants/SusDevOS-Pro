@@ -46,6 +46,15 @@ def _payload(scope, quantity, ef, gas="CO2", gas_subtype=None, gwp_id=1, **extra
     return p
 
 
+@pytest.fixture(autouse=True)
+def _enable_scope_features(entity, enable_feature):
+    """Scope 3 and market-based Scope 2 are gated (spec/pricing.md). Enable them
+    on the shared test entity so the calculation/immutability tests, which create
+    such records via the API, are not blocked by an HTTP 402 feature gate."""
+    enable_feature(entity, "scope_3")
+    enable_feature(entity, "scope_2_market_based")
+
+
 @pytest.mark.django_db
 class TestGHGCalculation:
     """GHG calculation formula tests — the core domain invariant."""
@@ -374,3 +383,75 @@ class TestEmissionsFilters:
 
         verified = auth_client.get(f"{BASE_URL}?verificationStatus=3")
         assert any(r["EmissionsId"] == eid for r in verified.data["results"])
+
+
+@pytest.mark.django_db
+class TestScopeFeatureGates:
+    """Server-side enforcement of scope-dependent plan gates (CLAUDE.md rule #6).
+
+    An entity with no active subscription including the feature must be denied
+    with HTTP 402 feature_gated — the frontend's reactive handling is not a
+    substitute for server enforcement.
+    """
+
+    def _free_client(self, suffix):
+        from rest_framework.test import APIClient
+
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        from apps.entities.tests.factories import EntitiesFactory
+        from apps.users.tests.factories import UsersFactory
+
+        entity = EntitiesFactory(EntityName=f"Free Corp {suffix}")
+        user = UsersFactory(
+            EntityId=entity, email=f"free-{suffix}@corp.com", username=f"free_{suffix}"
+        )
+        client = APIClient()
+        client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(user).access_token}",
+            HTTP_X_ENTITY_ID=str(entity.EntityId),
+        )
+        return client
+
+    def test_scope3_gated_without_plan(self, gwp_dataset):
+        client = self._free_client("s3")
+        resp = client.post(
+            BASE_URL,
+            _payload(3, "300", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId),
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+        assert resp.data.get("code") == "feature_gated"
+        assert resp.data.get("feature") == "scope_3"
+
+    def test_market_based_scope2_gated_without_plan(self, gwp_dataset):
+        client = self._free_client("mb")
+        resp = client.post(
+            BASE_URL,
+            _payload(
+                2, "5000", ELEC_EF, Unit="kWh",
+                gwp_id=gwp_dataset.GwpDatasetId, EFMarketBased="0.05000000",
+            ),
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+        assert resp.data.get("feature") == "scope_2_market_based"
+
+    def test_location_based_scope2_not_gated(self, gwp_dataset):
+        """Location-based Scope 2 (no market factor) is on every plan → allowed."""
+        client = self._free_client("lb")
+        resp = client.post(
+            BASE_URL,
+            _payload(2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId),
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    def test_scope1_not_gated(self, gwp_dataset):
+        client = self._free_client("s1")
+        resp = client.post(
+            BASE_URL,
+            _payload(1, "100", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId),
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
