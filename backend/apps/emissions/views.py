@@ -85,6 +85,27 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             )
         return None
 
+    def _require_scope3_feature(self, validated_data):
+        """Scope 3 emissions accounting is a Starter+ feature (``scope_3``).
+
+        The record is calculated server-side regardless of the frontend, so the
+        gate must live on the write path, not just the UI (CLAUDE.md rule #6:
+        feature gates are server-enforced, never frontend-only). Scope 1 and 2
+        stay available on all plans, so this gates only the Scope 3 case rather
+        than the whole viewset."""
+        if validated_data.get("Scope") != 3:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(entity_id=entity_id, feature_key="scope_3"):
+            raise FeatureGatedException(
+                feature_key="scope_3",
+                message=get_upgrade_message(feature_key="scope_3"),
+            )
+
     def perform_create(self, serializer):
         # GwpDatasetId defaults to system default if not provided
         if not serializer.validated_data.get("GwpDatasetId"):
@@ -98,6 +119,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
         locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
         if locked:
             return locked
@@ -106,6 +128,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         if instance.VerificationStatus >= VERIFIED:
             return Response(
@@ -116,7 +139,23 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         locked = self._inventory_locked_response(instance.InventoryId)
         if locked:
             return locked
-        return super().update(request, *args, **kwargs)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
+        # Block re-pointing this row INTO a (different) verified inventory. The
+        # guards above only see the row's *current* InventoryId; InventoryId is
+        # client-writable, so without this a PATCH could attach an unverified
+        # row to a frozen inventory — a bypass of rule #3. create() already
+        # validates the *target* inventory, so this makes update() consistent.
+        target_inv = serializer.validated_data.get("InventoryId")
+        if target_inv is not None and target_inv != instance.InventoryId:
+            locked = self._inventory_locked_response(target_inv)
+            if locked:
+                return locked
+        self.perform_update(serializer)
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
