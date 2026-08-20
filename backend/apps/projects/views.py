@@ -27,6 +27,17 @@ class DevelopmentProjectsViewSet(TenantViewSetMixin, ModelViewSet):
     def get_serializer_class(self):
         return DevelopmentProjectsListSerializer if self.action == "list" else DevelopmentProjectsDetailSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.action == "list":
+            # Annotate the active-phase count in one query instead of firing a
+            # COUNT per row from the serializer's SerializerMethodField (N+1).
+            from django.db.models import Count, Q
+            qs = qs.annotate(
+                active_phase_count=Count("phases", filter=Q(phases__Status__lt=4)),
+            )
+        return qs
+
     # ── Phases ─────────────────────────────────────────────────────────────────
 
     @action(detail=True, methods=["get", "post"], url_path="phases")

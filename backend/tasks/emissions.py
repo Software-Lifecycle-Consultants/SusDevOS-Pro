@@ -142,7 +142,10 @@ def link_milestone_actuals():
         target = milestone.TargetEmissionsTonnes
 
         milestone.ActualEmissionsTonnes = actual
-        milestone.IsAchieved = bool(target and actual <= target)
+        # `target is not None` (not truthiness): a net-zero milestone has
+        # TargetEmissionsTonnes == 0, which is falsy — `target and ...` would
+        # short-circuit and mark it never-achieved even when actual <= 0.
+        milestone.IsAchieved = bool(target is not None and actual <= target)
         milestone.save(update_fields=["ActualEmissionsTonnes", "IsAchieved"])
         linked += 1
 
