@@ -24,7 +24,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.shared.permissions import build_privilege_map
+from apps.shared.permissions import (
+    IsEntityAdmin,
+    IsManagerOrAbove,
+    build_privilege_map,
+)
+from apps.shared.views import EntityScopeInitialMixin
 
 from .authentication import clear_refresh_cookie, issue_tokens, set_refresh_cookie
 from .models import PasswordResetTokens, RevokedTokens, Users
@@ -114,6 +119,18 @@ class RefreshView(APIView):
                     )
             except ValueError:
                 pass
+
+        # Re-check that the account is still active. The refresh path never loads
+        # the user, so without this a deactivated or deleted account (is_active
+        # cleared by destroy()/deactivation) could keep minting access tokens for
+        # the full 7-day refresh-cookie lifetime — bypassing the login gate.
+        user_id = refresh.get(settings.SIMPLE_JWT["USER_ID_CLAIM"])
+        user = Users.objects.filter(UserId=user_id).only("is_active").first()
+        if user is None or not user.is_active:
+            return Response(
+                {"code": "account_inactive", "detail": "Account is no longer active."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         return Response({"access_token": str(refresh.access_token)}, status=status.HTTP_200_OK)
 
@@ -281,10 +298,37 @@ from .serializers import (
 )
 
 
-class UsersViewSet(ModelViewSet):
+class UsersViewSet(EntityScopeInitialMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
     queryset = Users.objects.all()  # overridden by get_queryset; required by DRF router
+
+    # EntityScopeInitialMixin re-resolves request.entity_id AFTER DRF authentication.
+    # TenantQueryMiddleware runs before auth, so for JWT requests it leaves entity_id
+    # None; without this mixin get_queryset() below would return none() for every
+    # non-SuperAdmin (empty user list, 404 on detail) and user creation
+    # (UserCreateSerializer.create) would attach EntityId=None (orphan user). Every
+    # other tenant-scoped viewset does the same.
+
+    def get_permissions(self):
+        """Authorize user-management actions by role.
+
+        Reads (list / retrieve / privileges) stay tenant-scoped IsAuthenticated.
+        Inviting a user requires manager-or-above; changing a role, granting or
+        removing a privilege override, editing another user, and deactivating a
+        user are entity-admin only. This mirrors the entity-admin guards on the
+        sibling EntitiesViewSet and closes an in-tenant privilege-escalation path
+        (e.g. a staff member self-assigning the admin role via the API, bypassing
+        the disabled UI control). SuperAdmin bypasses both classes."""
+        admin_only = {
+            "assign_role", "add_override", "remove_override",
+            "update", "partial_update", "destroy",
+        }
+        if self.action in admin_only:
+            return [IsAuthenticated(), IsEntityAdmin()]
+        if self.action == "create":
+            return [IsAuthenticated(), IsManagerOrAbove()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         from .models import Users

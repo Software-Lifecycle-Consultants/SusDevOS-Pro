@@ -24,13 +24,15 @@ def _rows(resp):
     return data["results"] if isinstance(data, dict) and "results" in data else data
 
 
-def test_ecosystem_create_is_scoped_to_authenticated_entity(auth_client, entity):
+def test_ecosystem_create_is_scoped_to_authenticated_entity(auth_client, entity, enable_feature):
+    enable_feature(entity, "ecosystem_basic")
     resp = auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
     assert resp.status_code == status.HTTP_201_CREATED, resp.data
     assert resp.data["EntityId"] == entity.EntityId
 
 
-def test_ecosystem_list_returns_own_entity_rows(auth_client, entity):
+def test_ecosystem_list_returns_own_entity_rows(auth_client, entity, enable_feature):
+    enable_feature(entity, "ecosystem_basic")
     auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
     resp = auth_client.get(ECO_URL)
     assert resp.status_code == status.HTTP_200_OK
@@ -38,7 +40,7 @@ def test_ecosystem_list_returns_own_entity_rows(auth_client, entity):
     assert "Mangrove A" in names
 
 
-def test_ecosystem_not_visible_to_other_entity(auth_client, entity):
+def test_ecosystem_not_visible_to_other_entity(auth_client, entity, enable_feature):
     """A row created by one entity must not appear for another entity."""
     from rest_framework.test import APIClient
 
@@ -47,9 +49,11 @@ def test_ecosystem_not_visible_to_other_entity(auth_client, entity):
     from apps.entities.tests.factories import EntitiesFactory
     from apps.users.tests.factories import UsersFactory
 
+    enable_feature(entity, "ecosystem_basic")
     auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
 
     other_entity = EntitiesFactory(EntityName="Other Corp")
+    enable_feature(other_entity, "ecosystem_basic")
     other_user = UsersFactory(
         EntityId=other_entity, email="eco-other@corp.com", username="eco_other"
     )
@@ -63,3 +67,17 @@ def test_ecosystem_not_visible_to_other_entity(auth_client, entity):
     assert resp.status_code == status.HTTP_200_OK
     names = [row["EcosystemName"] for row in _rows(resp)]
     assert "Mangrove A" not in names
+
+
+# ── Feature gate (CLAUDE.md rule #6: server-enforced, not frontend-only) ───────
+
+
+def test_ecosystem_create_denied_without_feature(auth_client, entity):
+    """Ecosystem tracking is Starter+ — a Free entity is denied at the API."""
+    resp = auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
+    assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+
+
+def test_ecosystem_list_denied_without_feature(auth_client, entity):
+    resp = auth_client.get(ECO_URL)
+    assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data

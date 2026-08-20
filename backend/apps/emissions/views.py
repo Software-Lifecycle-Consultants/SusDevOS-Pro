@@ -85,6 +85,51 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             )
         return None
 
+    def _require_scope3_feature(self, validated_data):
+        """Scope 3 emissions accounting is a Starter+ feature (``scope_3``).
+
+        The record is calculated server-side regardless of the frontend, so the
+        gate must live on the write path, not just the UI (CLAUDE.md rule #6:
+        feature gates are server-enforced, never frontend-only). Scope 1 and 2
+        stay available on all plans, so this gates only the Scope 3 case rather
+        than the whole viewset."""
+        if validated_data.get("Scope") != 3:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(entity_id=entity_id, feature_key="scope_3"):
+            raise FeatureGatedException(
+                feature_key="scope_3",
+                message=get_upgrade_message(feature_key="scope_3"),
+            )
+
+    def _require_market_scope2_feature(self, validated_data):
+        """Market-based Scope 2 is a Starter+ feature (``scope_2_market_based``).
+
+        Location-based Scope 2 is on every plan, so the gate triggers only when a
+        contractual/supplier market factor (``EFMarketBased``) is supplied on a
+        Scope 2 record — mirroring the ``scope_3`` gate. Rule #5 is unaffected:
+        both methods are still computed, and a Free-plan Scope 2 record simply
+        cannot set a distinct market factor (market falls back to location).
+        Server-enforced, never frontend-only (CLAUDE.md rule #6)."""
+        if validated_data.get("Scope") != 2 or validated_data.get("EFMarketBased") is None:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(
+            entity_id=entity_id, feature_key="scope_2_market_based"
+        ):
+            raise FeatureGatedException(
+                feature_key="scope_2_market_based",
+                message=get_upgrade_message(feature_key="scope_2_market_based"),
+            )
+
     def perform_create(self, serializer):
         # GwpDatasetId defaults to system default if not provided
         if not serializer.validated_data.get("GwpDatasetId"):
@@ -98,6 +143,8 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
         locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
         if locked:
             return locked
@@ -106,6 +153,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         if instance.VerificationStatus >= VERIFIED:
             return Response(
@@ -116,7 +164,24 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         locked = self._inventory_locked_response(instance.InventoryId)
         if locked:
             return locked
-        return super().update(request, *args, **kwargs)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
+        # Block re-pointing this row INTO a (different) verified inventory. The
+        # guards above only see the row's *current* InventoryId; InventoryId is
+        # client-writable, so without this a PATCH could attach an unverified
+        # row to a frozen inventory — a bypass of rule #3. create() already
+        # validates the *target* inventory, so this makes update() consistent.
+        target_inv = serializer.validated_data.get("InventoryId")
+        if target_inv is not None and target_inv != instance.InventoryId:
+            locked = self._inventory_locked_response(target_inv)
+            if locked:
+                return locked
+        self.perform_update(serializer)
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -161,20 +226,28 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         unlock_record(instance, reason=reason, unlocked_by=request.user, entity_id=request.entity_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @staticmethod
-    def _verified_lock_response(record):
-        """Return a 403 Response if the parent record is verified, else None.
+    @classmethod
+    def _verified_lock_response(cls, record):
+        """Return a 403 Response if the record's line items are locked, else None.
 
         Detail/offset line items feed the recomputed emissions total, so allowing
-        them to change on a verified record would mutate the audit-locked figure
-        without going through the SuperAdmin unlock path (CLAUDE.md rule #3)."""
+        them to change on a locked record would mutate the audit-locked figure
+        without going through the SuperAdmin unlock path (CLAUDE.md rule #3).
+
+        Two independent locks apply, mirroring the record-level create/update/
+        destroy guards:
+          * the record's own VerificationStatus (individually verified row), and
+          * the parent GHG inventory's VerificationStatus. A verified inventory
+            freezes its member rows even when a given row was never individually
+            verified — otherwise nested line-item writes are a bypass of the
+            inventory lock the record-level paths already enforce."""
         if record.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",
                  "detail": "Line items of a verified record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        return None
+        return cls._inventory_locked_response(record.InventoryId)
 
     # ── Details (line items) ───────────────────────────────────────────────────
 
@@ -260,18 +333,31 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def _parent_verified_response(self, instance):
-        """Return a 403 if the offset's parent emissions record is verified.
+        """Return a 403 if the offset's parent emissions record is locked.
 
         Offsets feed the recomputed net emissions total, so editing or deleting
-        one attached to a verified (VerificationStatus >= 3) record would mutate
-        the audit-locked figure without going through /unlock/ — the same guard
-        the nested offset actions on EmissionsDataViewSet already enforce
-        (CLAUDE.md rule #3). This standalone viewset must not be a bypass."""
+        one attached to a locked record would mutate the audit-locked figure
+        without going through /unlock/ — the same guard the nested offset actions
+        on EmissionsDataViewSet already enforce (CLAUDE.md rule #3). This
+        standalone viewset must not be a bypass.
+
+        The record is locked when either its own VerificationStatus is verified
+        or its parent GHG inventory is verified (a verified inventory freezes its
+        member rows even when the row itself was never individually verified)."""
         record = instance.EmissionsId
-        if record is not None and record.VerificationStatus >= VERIFIED:
+        if record is None:
+            return None
+        if record.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",
                  "detail": "Offsets on a verified emissions record cannot be changed. Use /unlock/ first (SuperAdmin only)."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        inventory = record.InventoryId
+        if inventory is not None and inventory.VerificationStatus >= VERIFIED:
+            return Response(
+                {"code": "verified_immutable",
+                 "detail": "Offsets on a record in a verified GHG inventory cannot be changed. Unlock the inventory first (SuperAdmin only)."},
                 status=status.HTTP_403_FORBIDDEN,
             )
         return None

@@ -103,3 +103,41 @@ def sa_client(superadmin_user):
 def entity_id():
     """The default tenant id used by data-layer factories."""
     return 1
+
+
+# ── Feature gates ─────────────────────────────────────────────────────────────
+
+@pytest.fixture
+def enable_feature(db):
+    """Grant a gated feature to an entity via an active test subscription.
+
+    Server-side feature gates (FeatureGateMixin) deny any entity without an
+    active subscription that includes the feature, so tests exercising a gated
+    endpoint must grant the feature first.  Calling more than once accumulates
+    features onto the same shared plan, so an entity can hold several at once.
+    """
+    def _grant(entity, feature_key):
+        from apps.billing.models import EntitySubscriptions, PlanFeatures, Plans
+
+        plan, _ = Plans.objects.get_or_create(
+            PlanKey="test_feature_plan",
+            defaults={
+                "PlanName": "Test Feature Plan",
+                "PriceMonthlyGBP": 0,
+                "PriceAnnualGBP": 0,
+                "MaxEntities": 0,
+                "MaxUsersPerEntity": 0,
+                "MaxReportingYears": 0,
+                "SupportTier": "standard",
+            },
+        )
+        PlanFeatures.objects.get_or_create(
+            PlanId=plan,
+            FeatureKey=feature_key,
+            defaults={"IsEnabled": True, "UpgradeMessage": "Upgrade to use this feature."},
+        )
+        EntitySubscriptions.objects.get_or_create(
+            EntityId=entity,
+            defaults={"PlanId": plan, "Status": "active"},
+        )
+    return _grant

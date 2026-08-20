@@ -359,7 +359,8 @@ class TestTenantScoping:
 
 @pytest.mark.django_db
 class TestEmissionsFilters:
-    def test_filter_by_scope(self, auth_client, gwp_dataset, entity):
+    def test_filter_by_scope(self, auth_client, gwp_dataset, entity, enable_feature):
+        enable_feature(entity, "scope_3")  # Scope 3 is a Starter+ gated feature
         auth_client.post(BASE_URL, _payload(1, "100", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
         auth_client.post(BASE_URL, _payload(2, "200", ELEC_EF,   gwp_id=gwp_dataset.GwpDatasetId), format="json")
         auth_client.post(BASE_URL, _payload(3, "300", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
@@ -374,3 +375,62 @@ class TestEmissionsFilters:
 
         verified = auth_client.get(f"{BASE_URL}?verificationStatus=3")
         assert any(r["EmissionsId"] == eid for r in verified.data["results"])
+
+
+@pytest.mark.django_db
+class TestScope3FeatureGate:
+    """Scope 3 accounting is Starter+ (scope_3). Server-enforced, not
+    frontend-only (CLAUDE.md rule #6). Scope 1/2 stay available on all plans."""
+
+    def test_create_scope3_denied_without_feature(self, auth_client, gwp_dataset, entity):
+        resp = auth_client.post(BASE_URL, _payload(
+            3, "300", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+        assert resp.data["feature"] == "scope_3"
+
+    def test_create_scope1_allowed_without_feature(self, auth_client, gwp_dataset, entity):
+        """Gating Scope 3 must not affect Scope 1/2 (available on all plans)."""
+        resp = auth_client.post(BASE_URL, _payload(
+            1, "100", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    def test_create_scope3_allowed_with_feature(self, auth_client, gwp_dataset, entity, enable_feature):
+        enable_feature(entity, "scope_3")
+        resp = auth_client.post(BASE_URL, _payload(
+            3, "300", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    def test_patch_record_to_scope3_denied_without_feature(self, auth_client, gwp_dataset, entity):
+        """Re-classifying an existing record to Scope 3 is also gated."""
+        created = auth_client.post(BASE_URL, _payload(
+            1, "100", DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        eid = created.data["EmissionsId"]
+        resp = auth_client.patch(f"{BASE_URL}{eid}/", {"Scope": 3}, format="json")
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+
+
+@pytest.mark.django_db
+class TestMarketBasedScope2FeatureGate:
+    """Market-based Scope 2 is Starter+ (scope_2_market_based). Gated only when a
+    contractual market factor (EFMarketBased) is supplied — location-based Scope 2
+    stays on all plans. Server-enforced, not frontend-only (CLAUDE.md rule #6)."""
+
+    def test_market_based_scope2_denied_without_feature(self, auth_client, gwp_dataset, entity):
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId,
+            EFMarketBased="0.05000000"), format="json")
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+        assert resp.data["feature"] == "scope_2_market_based"
+
+    def test_location_based_scope2_allowed_without_feature(self, auth_client, gwp_dataset, entity):
+        """Scope 2 with no market factor is location-based only → available to all."""
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    def test_market_based_scope2_allowed_with_feature(self, auth_client, gwp_dataset, entity, enable_feature):
+        enable_feature(entity, "scope_2_market_based")
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId,
+            EFMarketBased="0.05000000"), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
