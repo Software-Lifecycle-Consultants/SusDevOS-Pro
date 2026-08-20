@@ -5,9 +5,13 @@ All GHG calculation logic, verification state transitions, and audit writing
 live here. Models and views delegate to these functions — they contain no
 domain logic themselves.
 """
+import logging
 from decimal import Decimal
 
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 # ── GHG Calculation ───────────────────────────────────────────────────────────
 
@@ -37,7 +41,10 @@ def _compute_amounts(instance) -> None:
     Scope 2 always gets both location-based and market-based fields populated.
     Biogenic CO₂ is NOT included in EmissionsAmount (GHG Protocol §6.3).
     """
-    qty = instance.QuantityCanonical or instance.QuantityOrCost
+    # Use the unit-converted canonical quantity. `is None` (not truthiness): a
+    # legitimately zero canonical value must not silently revert to the raw,
+    # un-normalized QuantityOrCost.
+    qty = instance.QuantityCanonical if instance.QuantityCanonical is not None else instance.QuantityOrCost
     ef  = instance.EmissionFactor
     gwp = _get_gwp_factor(instance)
 
@@ -50,6 +57,10 @@ def _compute_amounts(instance) -> None:
     if instance.BiogenicCO2FactorKg is not None:
         bio_kg = qty * instance.BiogenicCO2FactorKg
         instance.BiogenicCO2AmountTonnes = (bio_kg / Decimal("1000")).quantize(Decimal("0.000001"))
+    else:
+        # Factor cleared on a re-save must clear the derived figure too, otherwise
+        # a stale biogenic amount is reported after the record stops being biogenic.
+        instance.BiogenicCO2AmountTonnes = None
 
     if instance.Scope == 2:
         _compute_scope2(instance, qty)
@@ -90,13 +101,42 @@ def _compute_scope2(instance, qty) -> None:
 
 
 def _get_gwp_factor(instance) -> Decimal:
-    """Look up GWP₁₀₀ for the gas/subtype combination. Defaults to 1 (CO₂-equivalent passthrough)."""
+    """
+    Look up GWP₁₀₀ for the gas/subtype combination.
+
+    A missing dataset yields the CO₂-equivalent passthrough (1). A *missing row*
+    for a gas that does have GWP data is a data problem, not a passthrough: for
+    non-CO₂ gases (CH₄ ≈ 30×, N₂O ≈ 273×) silently returning 1 would undercount
+    the record by that factor, so we log it loudly instead of swallowing it. When
+    a subtype was supplied but did not match (e.g. an errant subtype on a gas that
+    is stored subtype-agnostically), we retry once without the subtype before
+    falling back, rather than treating the miss as CO₂.
+    """
+    dataset = instance.GwpDatasetId
+    if dataset is None:
+        return Decimal("1")
+
+    subtype = instance.GasSubtype or None
     try:
-        return instance.GwpDatasetId.gwp_values.get(
-            Gas=instance.Gas,
-            GasSubtype=instance.GasSubtype or None,
-        ).GwpFactor
-    except Exception:
+        return dataset.gwp_values.get(Gas=instance.Gas, GasSubtype=subtype).GwpFactor
+    except ObjectDoesNotExist:
+        if subtype is not None:
+            # Retry subtype-agnostically — recovers a canonical (Gas, None) row.
+            try:
+                return dataset.gwp_values.get(Gas=instance.Gas, GasSubtype=None).GwpFactor
+            except (ObjectDoesNotExist, MultipleObjectsReturned):
+                pass
+        logger.warning(
+            "GWP factor not found for gas=%r subtype=%r in dataset %s; "
+            "falling back to 1 (record may be undercounted)",
+            instance.Gas, subtype, getattr(dataset, "pk", dataset),
+        )
+        return Decimal("1")
+    except MultipleObjectsReturned:
+        logger.warning(
+            "Multiple GWP factors match gas=%r subtype=%r in dataset %s; "
+            "falling back to 1", instance.Gas, subtype, getattr(dataset, "pk", dataset),
+        )
         return Decimal("1")
 
 

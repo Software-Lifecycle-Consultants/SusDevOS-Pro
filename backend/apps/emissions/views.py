@@ -52,51 +52,6 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
     def get_serializer_class(self):
         return EmissionsDataListSerializer if self.action == "list" else EmissionsDataSerializer
 
-    def _check_scope_feature_gates(self, request, instance=None):
-        """Enforce plan gates that depend on a record's scope/method server-side.
-
-        Per spec/pricing.md these are Starter+ features triggered in context:
-          * Scope 3 emissions            → 'scope_3'
-          * market-based Scope 2 (a supplied EFMarketBased factor)
-                                         → 'scope_2_market_based'
-        Scope 1 and location-based Scope 2 are on every plan. The check is
-        field-conditional (a blanket viewset gate would wrongly block free
-        Scope 1/2 records), and must be server-side — frontend hiding does not
-        satisfy CLAUDE.md rule #6. On a partial update, values absent from the
-        request fall back to the stored record."""
-        data = request.data
-
-        def _val(key):
-            if hasattr(data, "__contains__") and key in data:
-                return data.get(key)
-            return getattr(instance, key, None) if instance is not None else None
-
-        raw_scope = _val("Scope")
-        try:
-            scope = int(raw_scope) if raw_scope not in (None, "") else None
-        except (TypeError, ValueError):
-            scope = None
-        ef_market = _val("EFMarketBased")
-
-        if scope == 3:
-            required = "scope_3"
-        elif scope == 2 and ef_market not in (None, ""):
-            required = "scope_2_market_based"
-        else:
-            return
-
-        if getattr(request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
-            return
-        from apps.billing.mixins import FeatureGatedException
-        from apps.billing.services import get_upgrade_message, is_feature_enabled
-
-        entity_id = getattr(request, "entity_id", None)
-        if not (entity_id and is_feature_enabled(entity_id=entity_id, feature_key=required)):
-            raise FeatureGatedException(
-                feature_key=required,
-                message=get_upgrade_message(feature_key=required),
-            )
-
     def get_queryset(self):
         qs = super().get_queryset()
         p = self.request.query_params
@@ -130,6 +85,51 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             )
         return None
 
+    def _require_scope3_feature(self, validated_data):
+        """Scope 3 emissions accounting is a Starter+ feature (``scope_3``).
+
+        The record is calculated server-side regardless of the frontend, so the
+        gate must live on the write path, not just the UI (CLAUDE.md rule #6:
+        feature gates are server-enforced, never frontend-only). Scope 1 and 2
+        stay available on all plans, so this gates only the Scope 3 case rather
+        than the whole viewset."""
+        if validated_data.get("Scope") != 3:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(entity_id=entity_id, feature_key="scope_3"):
+            raise FeatureGatedException(
+                feature_key="scope_3",
+                message=get_upgrade_message(feature_key="scope_3"),
+            )
+
+    def _require_market_scope2_feature(self, validated_data):
+        """Market-based Scope 2 is a Starter+ feature (``scope_2_market_based``).
+
+        Location-based Scope 2 is on every plan, so the gate triggers only when a
+        contractual/supplier market factor (``EFMarketBased``) is supplied on a
+        Scope 2 record — mirroring the ``scope_3`` gate. Rule #5 is unaffected:
+        both methods are still computed, and a Free-plan Scope 2 record simply
+        cannot set a distinct market factor (market falls back to location).
+        Server-enforced, never frontend-only (CLAUDE.md rule #6)."""
+        if validated_data.get("Scope") != 2 or validated_data.get("EFMarketBased") is None:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(
+            entity_id=entity_id, feature_key="scope_2_market_based"
+        ):
+            raise FeatureGatedException(
+                feature_key="scope_2_market_based",
+                message=get_upgrade_message(feature_key="scope_2_market_based"),
+            )
+
     def perform_create(self, serializer):
         # GwpDatasetId defaults to system default if not provided
         if not serializer.validated_data.get("GwpDatasetId"):
@@ -141,9 +141,10 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        self._check_scope_feature_gates(request)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
         locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
         if locked:
             return locked
@@ -152,8 +153,8 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        self._check_scope_feature_gates(request, instance=instance)
         if instance.VerificationStatus >= VERIFIED:
             return Response(
                 {"code": "verified_immutable",
@@ -163,7 +164,24 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         locked = self._inventory_locked_response(instance.InventoryId)
         if locked:
             return locked
-        return super().update(request, *args, **kwargs)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
+        # Block re-pointing this row INTO a (different) verified inventory. The
+        # guards above only see the row's *current* InventoryId; InventoryId is
+        # client-writable, so without this a PATCH could attach an unverified
+        # row to a frozen inventory — a bypass of rule #3. create() already
+        # validates the *target* inventory, so this makes update() consistent.
+        target_inv = serializer.validated_data.get("InventoryId")
+        if target_inv is not None and target_inv != instance.InventoryId:
+            locked = self._inventory_locked_response(target_inv)
+            if locked:
+                return locked
+        self.perform_update(serializer)
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

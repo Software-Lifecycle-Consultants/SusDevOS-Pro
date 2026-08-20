@@ -4,48 +4,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.billing.mixins import FeatureGateMixin
 from apps.shared.views import TenantViewSetMixin
 
 from .models import LandParcelEcosystems, LandParcels
 from .serializers import LandParcelsDetailSerializer, LandParcelsListSerializer
 
 
-class LandParcelsViewSet(TenantViewSetMixin, ModelViewSet):
+class LandParcelsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
+    # GIS land-parcel mapping is a Professional+ feature (CLAUDE.md rule #6:
+    # feature gates are server-enforced, never frontend-only).
+    required_feature = "land_parcel_gis"
     queryset = LandParcels.objects.all()
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         return LandParcelsListSerializer if self.action == "list" else LandParcelsDetailSerializer
-
-    def _check_gis_gate(self):
-        """Enforce the land_parcel_gis feature (Professional+, spec/pricing.md)
-        server-side whenever a request supplies polygon geometry.
-
-        Per spec, the gate triggers on "creating a LandParcel with polygon
-        geometry" — non-GIS parcels (no BoundaryGeoJSON) stay available on lower
-        tiers, so the check is geometry-conditional rather than a blanket viewset
-        gate. Frontend-only hiding does not satisfy CLAUDE.md rule #6."""
-        if not self.request.data.get("BoundaryGeoJSON"):
-            return
-        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
-            return
-        from apps.billing.mixins import FeatureGatedException
-        from apps.billing.services import get_upgrade_message, is_feature_enabled
-
-        entity_id = getattr(self.request, "entity_id", None)
-        if not (entity_id and is_feature_enabled(entity_id=entity_id, feature_key="land_parcel_gis")):
-            raise FeatureGatedException(
-                feature_key="land_parcel_gis",
-                message=get_upgrade_message(feature_key="land_parcel_gis"),
-            )
-
-    def create(self, request, *args, **kwargs):
-        self._check_gis_gate()
-        return super().create(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        self._check_gis_gate()
-        return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=["get", "post"], url_path="ecosystems")
     def ecosystems(self, request, pk=None):

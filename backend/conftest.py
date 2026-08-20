@@ -105,24 +105,24 @@ def entity_id():
     return 1
 
 
-# ── Feature-gate helper ───────────────────────────────────────────────────────
+# ── Feature gates ─────────────────────────────────────────────────────────────
 
 @pytest.fixture
 def enable_feature(db):
-    """Grant a plan feature to an entity via an active subscription.
+    """Grant a gated feature to an entity via an active test subscription.
 
-    Returns a helper ``grant(entity, feature_key)`` that provisions (idempotently)
-    a shared test plan, enables ``feature_key`` on it, and subscribes ``entity``.
-    Used by tests that exercise a FeatureGateMixin-gated view so the default,
-    subscription-less test entity is not denied with HTTP 402.
+    Server-side feature gates (FeatureGateMixin) deny any entity without an
+    active subscription that includes the feature, so tests exercising a gated
+    endpoint must grant the feature first.  Calling more than once accumulates
+    features onto the same shared plan, so an entity can hold several at once.
     """
     def _grant(entity, feature_key):
         from apps.billing.models import EntitySubscriptions, PlanFeatures, Plans
 
         plan, _ = Plans.objects.get_or_create(
-            PlanKey="test_all_features",
+            PlanKey="test_feature_plan",
             defaults={
-                "PlanName": "Test (all features)",
+                "PlanName": "Test Feature Plan",
                 "PriceMonthlyGBP": 0,
                 "PriceAnnualGBP": 0,
                 "MaxEntities": 0,
@@ -134,7 +134,7 @@ def enable_feature(db):
         PlanFeatures.objects.get_or_create(
             PlanId=plan,
             FeatureKey=feature_key,
-            defaults={"IsEnabled": True, "UpgradeMessage": f"{feature_key} requires a higher plan."},
+            defaults={"IsEnabled": True, "UpgradeMessage": "Upgrade to use this feature."},
         )
         EntitySubscriptions.objects.get_or_create(
             EntityId=entity,

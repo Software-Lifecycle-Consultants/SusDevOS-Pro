@@ -16,12 +16,9 @@ from .serializers import (
 
 
 class EcosystemViewSet(FeatureGateMixin, EntityScopeInitialMixin, ModelViewSet):
-    """Ecosystem uses IntegerField for EntityId — uses a custom queryset filter.
-
-    Ecosystem tracking is a Starter+ feature (spec/pricing.md), so it is gated
-    server-side (CLAUDE.md rule #6). FeatureGateMixin is first in the MRO so its
-    initial() runs after EntityScopeInitialMixin has resolved request.entity_id.
-    """
+    """Ecosystem uses IntegerField for EntityId — uses a custom queryset filter."""
+    # Ecosystem tracking is a Starter+ feature (CLAUDE.md rule #6: feature
+    # gates are server-enforced, never frontend-only).
     required_feature = "ecosystem_basic"
     permission_classes = [IsAuthenticated]
     queryset = Ecosystem.objects.all()
@@ -46,8 +43,8 @@ class EcosystemViewSet(FeatureGateMixin, EntityScopeInitialMixin, ModelViewSet):
 
 
 class SpeciesViewSet(FeatureGateMixin, EntityScopeInitialMixin, ModelViewSet):
-    """Species tracking is part of the Starter+ ecosystem module — gated
-    server-side (CLAUDE.md rule #6)."""
+    # Species/biodiversity tracking is part of ecosystem tracking — Starter+
+    # (CLAUDE.md rule #6: feature gates are server-enforced, not frontend-only).
     required_feature = "ecosystem_basic"
     permission_classes = [IsAuthenticated]
     queryset = Species.objects.all()
