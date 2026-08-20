@@ -88,6 +88,22 @@ class TestUsersViewSetAuthorization:
         assert resp.status_code == status.HTTP_403_FORBIDDEN
         assert UserPrivilegeOverrides.objects.filter(UserId=staff_user).count() == 0
 
+    def test_staff_cannot_remove_privilege_override(self, entity, staff_user):
+        # A pre-existing Revoke override limiting the staff member: removing it
+        # would be an escalation, so the DELETE action must be admin-only too.
+        module = Modules.objects.create(ModuleName="Reports", ModuleKey="reports")
+        iface = Interfaces.objects.create(
+            ModuleId=module, InterfaceName="Export", InterfaceKey="export_reports",
+        )
+        override = UserPrivilegeOverrides.objects.create(
+            UserId=staff_user, InterfaceId=iface, PermissionType=2, OverrideAction=2,
+        )
+        resp = _client(staff_user, entity).delete(
+            f"/api/users/{staff_user.UserId}/privileges/override/{override.OverrideId}/",
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert UserPrivilegeOverrides.objects.filter(OverrideId=override.OverrideId).exists()
+
     def test_staff_cannot_invite_user(self, entity, staff_user):
         resp = _client(staff_user, entity).post(
             "/api/users/",
@@ -132,6 +148,7 @@ class TestUsersViewSetEntityResolution:
         assert staff_user.user_roles.filter(RoleId__RoleKey="manager", Status=1).exists()
 
     def test_manager_can_invite_user_into_tenant(self, entity, manager_user):
+        _role("staff")  # so the invited user is actually assigned the role
         resp = _client(manager_user, entity).post(
             "/api/users/",
             {
@@ -145,3 +162,4 @@ class TestUsersViewSetEntityResolution:
         # Entity resolution restored → the invitee is attached to the tenant,
         # not created as an orphan with EntityId = None.
         assert created.EntityId_id == entity.EntityId
+        assert created.user_roles.filter(RoleId__RoleKey="staff", Status=1).exists()

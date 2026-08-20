@@ -306,8 +306,9 @@ class UsersViewSet(EntityScopeInitialMixin, ModelViewSet):
     # EntityScopeInitialMixin re-resolves request.entity_id AFTER DRF authentication.
     # TenantQueryMiddleware runs before auth, so for JWT requests it leaves entity_id
     # None; without this mixin get_queryset() below would return none() for every
-    # non-SuperAdmin (empty user list, 404 on detail) and perform_create would attach
-    # EntityId=None (orphan user). Every other tenant-scoped viewset does the same.
+    # non-SuperAdmin (empty user list, 404 on detail) and user creation
+    # (UserCreateSerializer.create) would attach EntityId=None (orphan user). Every
+    # other tenant-scoped viewset does the same.
 
     def get_permissions(self):
         """Authorize user-management actions by role.
