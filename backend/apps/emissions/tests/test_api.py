@@ -407,3 +407,30 @@ class TestScope3FeatureGate:
         eid = created.data["EmissionsId"]
         resp = auth_client.patch(f"{BASE_URL}{eid}/", {"Scope": 3}, format="json")
         assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+
+
+@pytest.mark.django_db
+class TestMarketBasedScope2FeatureGate:
+    """Market-based Scope 2 is Starter+ (scope_2_market_based). Gated only when a
+    contractual market factor (EFMarketBased) is supplied — location-based Scope 2
+    stays on all plans. Server-enforced, not frontend-only (CLAUDE.md rule #6)."""
+
+    def test_market_based_scope2_denied_without_feature(self, auth_client, gwp_dataset, entity):
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId,
+            EFMarketBased="0.05000000"), format="json")
+        assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+        assert resp.data["feature"] == "scope_2_market_based"
+
+    def test_location_based_scope2_allowed_without_feature(self, auth_client, gwp_dataset, entity):
+        """Scope 2 with no market factor is location-based only → available to all."""
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    def test_market_based_scope2_allowed_with_feature(self, auth_client, gwp_dataset, entity, enable_feature):
+        enable_feature(entity, "scope_2_market_based")
+        resp = auth_client.post(BASE_URL, _payload(
+            2, "5000", ELEC_EF, Unit="kWh", gwp_id=gwp_dataset.GwpDatasetId,
+            EFMarketBased="0.05000000"), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED, resp.data

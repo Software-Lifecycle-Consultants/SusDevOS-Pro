@@ -106,6 +106,30 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
                 message=get_upgrade_message(feature_key="scope_3"),
             )
 
+    def _require_market_scope2_feature(self, validated_data):
+        """Market-based Scope 2 is a Starter+ feature (``scope_2_market_based``).
+
+        Location-based Scope 2 is on every plan, so the gate triggers only when a
+        contractual/supplier market factor (``EFMarketBased``) is supplied on a
+        Scope 2 record — mirroring the ``scope_3`` gate. Rule #5 is unaffected:
+        both methods are still computed, and a Free-plan Scope 2 record simply
+        cannot set a distinct market factor (market falls back to location).
+        Server-enforced, never frontend-only (CLAUDE.md rule #6)."""
+        if validated_data.get("Scope") != 2 or validated_data.get("EFMarketBased") is None:
+            return
+        if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
+            return
+        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.services import get_upgrade_message, is_feature_enabled
+        entity_id = getattr(self.request, "entity_id", None)
+        if not entity_id or not is_feature_enabled(
+            entity_id=entity_id, feature_key="scope_2_market_based"
+        ):
+            raise FeatureGatedException(
+                feature_key="scope_2_market_based",
+                message=get_upgrade_message(feature_key="scope_2_market_based"),
+            )
+
     def perform_create(self, serializer):
         # GwpDatasetId defaults to system default if not provided
         if not serializer.validated_data.get("GwpDatasetId"):
@@ -120,6 +144,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
         locked = self._inventory_locked_response(serializer.validated_data.get("InventoryId"))
         if locked:
             return locked
@@ -142,6 +167,7 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self._require_scope3_feature(serializer.validated_data)
+        self._require_market_scope2_feature(serializer.validated_data)
         # Block re-pointing this row INTO a (different) verified inventory. The
         # guards above only see the row's *current* InventoryId; InventoryId is
         # client-writable, so without this a PATCH could attach an unverified
