@@ -28,7 +28,7 @@ severity within each section, not by ID.
 | **Severity** | High — the seeded privilege model is currently decorative |
 | **Diagram** | [UML 02 — privilege resolution](../diagrams/uml/02-domain-tenancy-rbac.md) |
 | **Code** | `backend/apps/shared/permissions.py` · `HasModulePrivilege` |
-| **Linear** | `area:ten` · `type:bug` · `risk:security` |
+| **Linear** | [SUS-5](https://linear.app/susdevos/issue/SUS-5) · `area:ten` · `type:bug` · `risk:security` |
 
 The database seeds **13 modules, 50 interfaces and 56 role-privilege rows**, and
 `_resolve_privilege()` implements the full override-then-role resolution algorithm. But
@@ -79,7 +79,7 @@ missing entity
 | **Severity** | High — blocks a deploy, but only once |
 | **Diagram** | [UML 04](../diagrams/uml/04-domain-nature-mrv.md) · [F1](../diagrams/FINDINGS.md#f1) |
 | **Code** | `backend/apps/ecosystem/migrations/0004_*.py` |
-| **Linear** | `area:nat` · `type:task` · `risk:schema` |
+| **Linear** | [SUS-6](https://linear.app/susdevos/issue/SUS-6) · `area:nat` · `type:task` · `risk:schema` |
 
 `EntityId` on both models became a real `ForeignKey`. The migration adds the constraint to an
 existing column, so any pre-existing row referencing a deleted entity will abort it. The local
@@ -108,7 +108,7 @@ database has zero rows in both tables, so this cannot surface in development.
 | **Status** | ❓ Undecided — product decision |
 | **Diagram** | [BPMN 02](../diagrams/bpmn/02-emissions-lifecycle.md) · [F10](../diagrams/FINDINGS.md#f10) |
 | **Code** | `backend/apps/emissions/views.py` · `EmissionsDataViewSet.get_permissions` |
-| **Linear** | `area:inv` · `type:decision` |
+| **Linear** | [SUS-14](https://linear.app/susdevos/issue/SUS-14) · `area:inv` · `type:decision` |
 
 Verification is now restricted to Manager and above (F10), which closed the worst of the gap —
 Staff can no longer sign off their own work. But a Manager who records a figure can still
@@ -139,7 +139,7 @@ would stop them dead. Segregation of duties is a policy question, not a defect.
 | **Status** | ❓ Undecided — product decision |
 | **Diagram** | [UML 05 — gate enforcement](../diagrams/uml/05-domain-platform.md) |
 | **Code** | `backend/apps/billing/services.py` · `can_add_entity()` |
-| **Linear** | `area:bil` · `type:decision` · `risk:billing` |
+| **Linear** | [SUS-15](https://linear.app/susdevos/issue/SUS-15) · `area:bil` · `type:decision` · `risk:billing` |
 
 `is_feature_enabled()` and `record_api_call()` deny when no entitled subscription resolves.
 `can_add_entity()` returns `True` in the same situation. The asymmetry is pre-existing,
@@ -170,7 +170,7 @@ deliberately left unchanged because it is a commercial decision rather than a bu
 | **Severity** | High — the entire billing state machine is currently inert |
 | **Diagram** | [UML 07 — subscription states](../diagrams/uml/07-state-machines.md) |
 | **Code** | `backend/apps/billing/models.py` · `EntitySubscriptions.Status` |
-| **Linear** | `area:bil` · `type:feature` |
+| **Linear** | [SUS-7](https://linear.app/susdevos/issue/SUS-7) · `area:bil` · `type:feature` |
 
 `EntitySubscriptions` carries `StripeCustomerId`, `StripeSubscriptionId` and
 `StripeLatestInvoiceId`, and the status vocabulary includes `past_due`, `canceled` and
@@ -203,7 +203,7 @@ This makes the F8 grace-period fix forward-looking: correct, tested, and current
 |---|---|
 | **Status** | ⬜ Gap — depends on [SDO-GAP-05](#sdo-gap-05) |
 | **Diagram** | [UML 07](../diagrams/uml/07-state-machines.md) · [F8](../diagrams/FINDINGS.md#f8) |
-| **Linear** | `area:bil` · `type:feature` |
+| **Linear** | [SUS-13](https://linear.app/susdevos/issue/SUS-13) · `area:bil` · `type:feature` |
 
 F8 gives `past_due` entitlements until `CurrentPeriodEnd`. Nothing tells the user that window
 exists or when it closes. The notification vocabulary has no billing type.
@@ -235,7 +235,7 @@ exists or when it closes. The notification vocabulary has no billing type.
 | **Severity** | Low — cosmetic today, misleading in production |
 | **Diagram** | [UML 01 — deployment topology](../diagrams/uml/01-component-architecture.md) |
 | **Code** | `docker-compose.yml` · `backend/Dockerfile` |
-| **Linear** | `area:bil` · `type:task` |
+| **Linear** | [SUS-16](https://linear.app/susdevos/issue/SUS-16) · `area:bil` · `type:task` |
 
 With the compose networking fixed, the worker and beat containers start correctly and register
 all 13 tasks — but still report `unhealthy`, because they inherit a healthcheck written for the
@@ -322,7 +322,7 @@ default. So in practice the fallback path has never run.
 |---|---|
 | **Status** | ⬜ Gap |
 | **Diagram** | [Diagram set README](../diagrams/README.md) |
-| **Linear** | `area:ten` · `type:task` |
+| **Linear** | [SUS-17](https://linear.app/susdevos/issue/SUS-17) · `area:ten` · `type:task` |
 
 `CLAUDE.md` already warns that a `spec/` file describing an out-of-scope feature is stale
 rather than a backlog item. Deriving the diagrams confirmed the drift is wider than the
@@ -423,7 +423,7 @@ and [SDO-GAP-01](#sdo-gap-01) would make it hotter.
 | **Severity** | Medium — a synced dataset with no consumer |
 | **Diagram** | [UML 03 — currency](../diagrams/uml/03-domain-ghg.md) · [UML 08](../diagrams/uml/08-async-topology.md) |
 | **Code** | `backend/apps/emissions/services.py` · `backend/apps/emissions/models.py:252-253` |
-| **Linear** | `area:ghg` · `type:bug` |
+| **Linear** | [SUS-8](https://linear.app/susdevos/issue/SUS-8) · `area:ghg` · `type:bug` |
 
 `tasks.integrations.sync_ecb_fx_rates` populates `ExchangeRates` every day at 17:00, and
 `EmissionsData` declares `SpendAmountUSD` and `ExchangeRateToUSD`. But **`compute_emissions()`
@@ -461,7 +461,7 @@ normalisation. Two records in different currencies are silently incomparable.
 | **Severity** | Medium |
 | **Diagram** | [UML 03 — inventory and records](../diagrams/uml/03-domain-ghg.md) |
 | **Code** | `backend/apps/emissions/models.py` · `EmissionsDetails` |
-| **Linear** | `area:ghg` · `type:bug` |
+| **Linear** | [SUS-9](https://linear.app/susdevos/issue/SUS-9) · `area:ghg` · `type:bug` |
 
 `EmissionsDetails` declares `EmissionsAmount` and `EmissionsAmountTonnes`, but the model has
 **no `save()` override** and no service computes them — unlike `EmissionsData`, whose `save()`
@@ -497,7 +497,7 @@ without their CO₂e contribution.
 | **Status** | ⬜ Gap |
 | **Diagram** | [BPMN 01](../diagrams/bpmn/01-tenant-onboarding.md) |
 | **Code** | `backend/apps/shared/urls_integrations.py:9` · `backend/apps/users/views.py` `SignupView` |
-| **Linear** | `area:ten` · `type:feature` |
+| **Linear** | [SUS-12](https://linear.app/susdevos/issue/SUS-12) · `area:ten` · `type:feature` |
 
 `CompaniesHouseLookupView` requires `IsAuthenticated`. `SignupView` is `AllowAny` and
 `register_new_entity()` never calls it. So the integration exists but cannot be used at the one

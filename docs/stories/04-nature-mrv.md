@@ -229,7 +229,7 @@ that didn't happen.
 | **Diagram** | [BPMN 06 §L4](../diagrams/bpmn/06-nature-tracking.md) — describes the intended flag |
 | **Code** | none — `Species.IUCNStatus` stores the code but nothing reads it to flag CR/EN/VU |
 | **Tests** | none |
-| **Linear** | `area:nat` · `type:feature` |
+| **Linear** | [SUS-11](https://linear.app/susdevos/issue/SUS-11) · `area:nat` · `type:feature` |
 
 **Acceptance criteria (target behaviour — nothing below exists today)**
 

@@ -136,6 +136,14 @@ Stories are written to map onto Linear issues without rewriting.
 Suggested labels: `area:ten|ghg|inv|nat|rep|bil`, `type:spec|feature|bug|decision`,
 `risk:schema|security|billing` where it applies.
 
-> **Not yet connected.** No Linear workspace is wired to this repo. Connecting it requires
-> authorising the Linear connector; until then this package *is* the backlog, and
-> [07-backlog-gaps.md](07-backlog-gaps.md) is the queue.
+> **Connected.** Workspace [susdevos](https://linear.app/susdevos), team `Susdevos`.
+> The 13 actionable items — 11 gaps and 2 decisions — are imported as **SUS-5 … SUS-17**, each
+> linking back to its story here, and each story carrying its Linear ID in the metadata block.
+>
+> The 83 ✅ Built and 🟡 Partial stories were deliberately **not** imported. They are a
+> specification, not work: they belong in the repo beside the code they describe, where they are
+> version-controlled and reviewed in the same pull request. Importing them would fill the
+> backlog with issues nobody will action.
+>
+> When a story becomes work — new behaviour, or a Partial that needs its test — create the
+> Linear issue then and add its ID to the story metadata row.

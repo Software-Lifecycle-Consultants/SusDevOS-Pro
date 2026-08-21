@@ -58,7 +58,7 @@ reason when excluded
 | **Diagram** | [BPMN 03 §Scope 3 relevance assessment](../diagrams/bpmn/03-inventory-verification.md) · [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
 | **Code** | `backend/apps/emissions/models.py` · `Scope3RelevanceAssessments` (model + admin registration only) |
 | **Tests** | none |
-| **Linear** | `area:inv` · `type:feature` |
+| **Linear** | [SUS-10](https://linear.app/susdevos/issue/SUS-10) · `area:inv` · `type:feature` |
 
 **Acceptance criteria (target behaviour — not yet buildable against a real endpoint)**
 
