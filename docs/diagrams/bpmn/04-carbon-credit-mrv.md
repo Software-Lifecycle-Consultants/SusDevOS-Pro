@@ -3,6 +3,9 @@
 How an offset claim is captured and then independently validated against the Verra or
 Gold Standard registry. This is the MRV assurance loop.
 
+
+**Related user stories** — [Nature & MRV — SDO-NAT-11…14](../../stories/04-nature-mrv.md)
+
 ## Offset capture and validation
 
 ```mermaid

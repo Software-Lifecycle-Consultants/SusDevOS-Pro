@@ -3,6 +3,9 @@
 How the running system is composed. Everything inside **SusDevOS Platform** is code in this
 repo; everything in **External Services** is a third party reached over HTTPS.
 
+
+**Related user stories** — [Billing & platform — SDO-BIL-12, 13](../../stories/06-billing-platform.md)
+
 ```mermaid
 flowchart TB
     subgraph Client["Client tier"]

@@ -2,6 +2,9 @@
 
 From activity data capture to a locked, verified record — including the correction path.
 
+
+**Related user stories** — [GHG accounting — SDO-GHG-01…05](../../stories/02-ghg-accounting.md) · [Inventory & assurance — SDO-INV-06…09](../../stories/03-inventory-assurance.md)
+
 ## Main process
 
 ```mermaid

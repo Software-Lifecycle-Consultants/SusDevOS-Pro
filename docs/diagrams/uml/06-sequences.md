@@ -2,6 +2,9 @@
 
 The four interaction paths a reviewer most needs to trace end to end.
 
+
+**Related user stories** — [Tenancy & access — SDO-TEN-03…05](../../stories/01-tenancy-access.md) · [GHG accounting — SDO-GHG-02](../../stories/02-ghg-accounting.md) · [Reporting — SDO-REP-02…06](../../stories/05-reporting-notifications.md)
+
 ## 6.1 Login, tenant resolution, and refresh
 
 ```mermaid

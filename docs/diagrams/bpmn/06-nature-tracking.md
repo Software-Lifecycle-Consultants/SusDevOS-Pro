@@ -3,6 +3,9 @@
 The LULUCF / TNFD side of the platform: recording biomass carbon lost to tree removal and
 gained through restoration planting.
 
+
+**Related user stories** — [Nature & MRV — SDO-NAT-01…10](../../stories/04-nature-mrv.md)
+
 ## Tree removal — carbon stock loss
 
 ```mermaid
@@ -38,7 +41,7 @@ flowchart TB
         R -.-> S[Record affected species<br/>not removed but impacted]
         S --> T[("TreeRemovalAffectedSpecies<br/>ecological impact, no carbon figure")]
         T --> U{"Threatened species<br/>IUCN CR/EN/VU?"}
-        U -->|"Yes"| V([⚠️ Flagged for<br/>biodiversity reporting])
+        U -->|"Yes"| V([⬜ Not built - no code<br/>inspects IUCNStatus])
         U -->|"No"| W([Standard record])
     end
 
@@ -46,6 +49,11 @@ flowchart TB
     style G fill:#fff3e0,stroke:#e65100,color:#000
     style V fill:#ffebee,stroke:#b71c1c,color:#000
 ```
+
+> **⬜ Threatened-species flagging is not built.** `Species.IUCNStatus` is populated from the
+> IUCN Red List, but nothing in the codebase reads it to flag CR/EN/VU species for biodiversity
+> reporting — the diagram step above is the intended behaviour, not the current one. Tracked as
+> [SDO-NAT-07](../../stories/04-nature-mrv.md).
 
 The **removed vs affected** split is the TNFD-relevant distinction: removed species carry the
 carbon computation, affected species record ecological impact without a carbon figure.

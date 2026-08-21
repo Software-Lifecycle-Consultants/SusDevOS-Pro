@@ -3,6 +3,9 @@
 Every lifecycle in the system that is driven by a status column, and the transitions
 that are legal between states.
 
+
+**Related user stories** — [Inventory & assurance — SDO-INV-06…10](../../stories/03-inventory-assurance.md) · [Reporting — SDO-REP-03](../../stories/05-reporting-notifications.md) · [Billing — SDO-BIL-06, 07](../../stories/06-billing-platform.md)
+
 ## 7.1 GHG inventory verification
 
 `GHGInventories.VerificationStatus` — the immutability rule that governs the whole

@@ -3,6 +3,9 @@
 The only user-triggered asynchronous process in the platform. Everything else in the
 request path is synchronous.
 
+
+**Related user stories** — [Reporting & notifications — SDO-REP-01…08](../../stories/05-reporting-notifications.md)
+
 ## Process
 
 ```mermaid

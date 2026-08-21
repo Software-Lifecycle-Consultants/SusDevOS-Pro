@@ -3,6 +3,9 @@
 Cross-cutting infrastructure: projects, billing, reports, notifications, audit,
 and the shared resource pool every module attaches to.
 
+
+**Related user stories** — [Billing & platform — SDO-BIL-01…13](../../stories/06-billing-platform.md) · [Reporting — SDO-REP-01…11](../../stories/05-reporting-notifications.md)
+
 ## Development projects
 
 ```mermaid
@@ -12,9 +15,12 @@ classDiagram
     class DevelopmentProjects {
         +ProjectId: PK
         +EntityId: FK PROTECT
-        +ProjectName
-        +ConsolidationApproach 1..3
+        +ProjectName / ProjectReference
+        +ProjectType
+        +Country / Location
         +StartDate / EndDate
+        +TotalAreaHectares
+        +EstimatedValueGBP
         +Status
     }
 
@@ -29,7 +35,10 @@ classDiagram
     class DevelopmentProjectPartners {
         +ProjectId: FK CASCADE
         +EntityId: FK CASCADE
-        +PartnerRole
+        +PartnerSharePercent
+        +PartnerConsolidationApproach
+        +IsDoubleCountingRisk
+        +DoubleCountingNotes
     }
 
     class RelatedProjects {
@@ -84,14 +93,18 @@ classDiagram
 
     class Plans {
         +PlanId: PK
-        +PlanName
-        +PriceMonthly / PriceAnnual
-        +Status
+        +PlanKey / PlanName
+        +PriceMonthlyGBP / PriceAnnualGBP
+        +MaxUsersPerEntity / MaxEntities
+        +MaxApiCallsPerDay / MaxReportingYears
+        +SupportTier / IsPublic / SortOrder
     }
     class PlanFeatures {
         +PlanId: FK CASCADE
         +FeatureKey - gate lookup key
-        +FeatureValue / Limit
+        +IsEnabled
+        +LimitValue
+        +UpgradeMessage
     }
     class EntitySubscriptions {
         +EntityId: OneToOne CASCADE
@@ -102,9 +115,11 @@ classDiagram
     }
     class UsageTracking {
         +EntityId: FK CASCADE
-        +MetricKey
-        +Count
-        +PeriodDate
+        +ApiCallsToday / ApiCallsMonth
+        +ActiveUsersCount
+        +TotalEmissionsRecords
+        +ReportingYearsCount
+        +PeriodStart / PeriodEnd
     }
     class Entities
 
@@ -219,8 +234,10 @@ classDiagram
     }
 
     class Locations {
-        +Latitude / Longitude
-        +Address / Country
+        +Title
+        +GPSCoordinates
+        +City / Country
+        +Remarks
     }
     class Tags
     class Contacts {
@@ -229,17 +246,19 @@ classDiagram
     class Documents
     class Images
     class EntityApiKeys {
-        +HashedKey
+        +HashedApiKey / KeyPrefix
+        +TargetEntityId
         +ExpiryDate
     }
     class AuditLog {
-        +AuditId: PK
+        +LogId: PK
         +EntityId: FK
         +ChangedBy: FK Users
         +ChangedByUsername - denormalised
         +Action / TableName / RecordId
         +Description
-        +IPAddress / UserAgent
+        +OldValues / NewValues
+        +IpAddress / UserAgent
         +RetentionTier - 1:30d, 2:1y, 3:7y
         +ChangedOn
     }

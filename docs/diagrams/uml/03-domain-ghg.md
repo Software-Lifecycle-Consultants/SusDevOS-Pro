@@ -3,6 +3,9 @@
 The emissions core: reference data (units, factors, GWP), the inventory container,
 the emissions records themselves, and the target/offset satellites.
 
+
+**Related user stories** — [GHG accounting — SDO-GHG-01…13](../../stories/02-ghg-accounting.md) · [Inventory & assurance — SDO-INV-01…13](../../stories/03-inventory-assurance.md)
+
 ## Reference data — units, factors, GWP
 
 ```mermaid
@@ -11,8 +14,9 @@ classDiagram
 
     class GwpDatasets {
         +GwpDatasetId: PK
-        +DatasetName «e.g. IPCC AR6 GWP100»
-        +Status
+        +Name «e.g. IPCC AR6» / Version
+        +Horizon «100»
+        +PublishedYear / IsDefault
     }
     class GwpValues {
         +GwpValueId: PK
@@ -22,13 +26,17 @@ classDiagram
     }
     class Units {
         +UnitId: PK
-        +UnitCode
+        +UnitName / UnitSymbol
+        +PhysicalDimension
+        +CanonicalUnit / IsCanonical
         +ConversionFactor «to canonical unit»
     }
     class EmissionFactorSets {
         +SetId: PK
         +SetName «DEFRA, Climatiq, ...»
-        +Region / Year
+        +Publisher / Version
+        +GeographicScope
+        +ApplicableYear / IsActive
     }
     class EmissionFactors {
         +FactorId: PK
@@ -64,8 +72,10 @@ classDiagram
     class Scope3RelevanceAssessments {
         +InventoryId: FK CASCADE
         +EntityId: FK PROTECT
-        +Category «1..15»
-        +IsRelevant / Justification
+        +AssessmentId: PK
+        +CategoryNumber «1..15»
+        +IsRelevant
+        +ExclusionReason / Notes
     }
 
     class EmissionsData {
@@ -150,8 +160,9 @@ classDiagram
         +TargetId: FK CASCADE
         +EntityId: FK PROTECT
         +MilestoneYear
-        +TargetValue
-        +ActualValue «filled by nightly task»
+        +TargetEmissionsTonnes
+        +ActualEmissionsTonnes «filled nightly»
+        +IsAchieved / Notes
     }
     Targets "1" --> "*" TargetMilestones
 ```
@@ -160,7 +171,7 @@ Targets are **generic** reduction targets. Per `CLAUDE.md` there is deliberately
 validation, registry sync, or SBTi-specific tiering — `ValidationStatus` is an internal
 review flag, not an external submission state.
 
-`tasks.emissions.link_milestone_actuals` (nightly, 01:30) populates `ActualValue` from
+`tasks.emissions.link_milestone_actuals` (nightly, 01:30) populates `ActualEmissionsTonnes` from
 recorded emissions.
 
 ## Currency
@@ -169,9 +180,9 @@ recorded emissions.
 classDiagram
     class ExchangeRates {
         +RateId: PK
-        +BaseCurrency / QuoteCurrency
+        +FromCurrency / ToCurrency
         +Rate: Decimal
-        +RateDate
+        +RateDate / Source
     }
 ```
 
