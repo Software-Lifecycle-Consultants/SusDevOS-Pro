@@ -167,7 +167,9 @@ class RolePrivileges(BaseAuditMixin):
 
 
 class UserRoles(BaseAuditMixin):
-    """Assigns a user to a role. A user has one active role at a time (v1.0)."""
+    """Assigns a user to a role. A user may hold multiple active roles; privilege
+    resolution takes the union of all of them. assign_role currently retires the
+    previous role before creating a new one, so single-role remains the norm."""
 
     UserRoleId = models.AutoField(primary_key=True)
     UserId = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_roles")

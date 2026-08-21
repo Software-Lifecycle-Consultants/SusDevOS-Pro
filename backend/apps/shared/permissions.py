@@ -85,13 +85,18 @@ def _resolve_privilege(user, interface_key: str, permission_type: int) -> bool:
         # If any active override is Revoke → deny; if Grant → allow
         return override.OverrideAction == 1
 
-    # 2. Role-based privileges
-    user_role = UserRoles.objects.filter(UserId=user, Status=1).select_related("RoleId").first()
-    if not user_role:
+    # 2. Role-based privileges — union across every active role.
+    #    IsEntityAdmin / IsManagerOrAbove already scan all active roles; this
+    #    keeps _resolve_privilege consistent with them instead of depending on
+    #    an arbitrary .first() over an unordered queryset.
+    role_ids = list(
+        UserRoles.objects.filter(UserId=user, Status=1).values_list("RoleId", flat=True)
+    )
+    if not role_ids:
         return False
 
     return RolePrivileges.objects.filter(
-        RoleId=user_role.RoleId,
+        RoleId__in=role_ids,
         ModuleId=interface.ModuleId,
         InterfaceId__in=[interface, None],  # None = module-level wildcard
         PermissionType__in=[permission_type, 5],
