@@ -4,10 +4,16 @@ Workers: default queue (general), integrations queue, reports queue.
 Beat: DatabaseScheduler (schedule stored in DB, editable via admin).
 """
 
+import logging
 import os
+
+from django.core.exceptions import ImproperlyConfigured
 
 from celery import Celery
 from celery.schedules import crontab
+from celery.signals import beat_init
+
+logger = logging.getLogger(__name__)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
@@ -56,6 +62,11 @@ app.conf.beat_schedule = {
         "schedule": crontab(hour=3, minute=30),
         "options": {"expires": 3600},
     },
+    # tasks.integrations.sync_oer_fx_rates is intentionally NOT scheduled here.
+    # It's a manual fallback for when the ECB source is unavailable and requires
+    # OPEN_EXCHANGE_RATES_API_KEY, which defaults to "" (settings/base.py:260).
+    # sync_ecb_fx_rates() already triggers it on ECB failure via .delay(); it stays
+    # off beat_schedule so it isn't run daily against an unset API key.
 
     # GHG maintenance
     "recompute-stale-inventory-totals": {
@@ -85,6 +96,11 @@ app.conf.beat_schedule = {
         "schedule": crontab(hour=5, minute=30),
         "options": {"expires": 3600},
     },
+    "prune-old-notifications": {
+        "task": "tasks.auth.prune_old_notifications",
+        "schedule": crontab(hour=5, minute=45),
+        "options": {"expires": 3600},
+    },
     "reset-api-call-counters": {
         "task": "tasks.billing.reset_daily_api_counters",
         "schedule": crontab(hour=0, minute=0),   # midnight UTC
@@ -101,3 +117,45 @@ app.conf.task_routes = {
     "tasks.auth.*":         {"queue": "default"},
     "tasks.billing.*":      {"queue": "default"},
 }
+
+
+def check_beat_schedule_registered():
+    """Return the beat_schedule task names that are not in the task registry.
+
+    ``app.conf.imports`` above is a *declaration*, not an import: Celery only
+    loads those modules when a worker or beat process boots. So the registry is
+    empty until ``import_default_modules()`` runs, and this must force it before
+    comparing — otherwise every scheduled task looks unregistered.
+    """
+    app.loader.import_default_modules()
+    return sorted(
+        entry["task"]
+        for entry in app.conf.beat_schedule.values()
+        if entry["task"] not in app.tasks
+    )
+
+
+@beat_init.connect
+def _validate_beat_schedule(sender=None, **kwargs):
+    """Fail beat startup when beat_schedule names a task no worker can run.
+
+    Tasks live in the top-level ``tasks/`` package, which autodiscover_tasks()
+    does not scan — they are imported explicitly via ``app.conf.imports``.
+    Forgetting that import leaves beat publishing a task every worker rejects as
+    NotRegistered, with nothing obviously wrong in the schedule itself.
+
+    Hooked to ``beat_init`` rather than ``on_after_finalize`` deliberately: this
+    is beat's problem, and finalize fires in every process that merely imports
+    the Celery app (the API included), where raising would take down a container
+    that has nothing to do with scheduling.
+    """
+    missing = check_beat_schedule_registered()
+    if missing:
+        raise ImproperlyConfigured(
+            f"beat_schedule references unregistered tasks: {missing}. "
+            f"Add the owning module to app.conf.imports in config/celery.py."
+        )
+    logger.info(
+        "beat_schedule validated: %d scheduled tasks all registered.",
+        len(app.conf.beat_schedule),
+    )
