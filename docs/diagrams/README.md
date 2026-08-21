@@ -10,6 +10,14 @@ VS Code Markdown preview, and in the published Artifact version. No tooling requ
 
 ---
 
+## Companion: user stories
+
+[`docs/stories/`](../stories/README.md) is the behavioural specification — 96 stories covering
+what the system does, each linked to the diagram that shows its mechanism, plus a backlog of
+known gaps. Every diagram here carries a **Related user stories** line back to them.
+
+Diagrams answer *how it works*; stories answer *what it must do*.
+
 ## Contents
 
 ### Review findings
@@ -106,6 +114,19 @@ The product is scoped to **nature / MRV + TNFD**. Per `CLAUDE.md`, these are del
 **not** built and therefore appear in no diagram: SBTi target validation, CDP export,
 NDC tagging, RE100 renewable-commitment tracking. Generic GHG capabilities that happen to
 support external frameworks (market-based Scope 2, for instance) are in scope and are modelled.
+
+## Accuracy checks
+
+Two machine checks back this set, both re-run after every edit:
+
+- **Mermaid** — all 54 diagram definitions are parsed with the Mermaid compiler; a diagram that
+  would render as an error box fails the check.
+- **Field names** — every attribute asserted in a `classDiagram` is cross-checked against the
+  live Django model fields. This caught 38 invented or misnamed attributes on the first run;
+  the set is now at 283 claims, 0 suspect.
+
+Behavioural claims are not machine-checkable and were the source of the remaining corrections
+(see the correction notes in BPMN 01, 03 and 06).
 
 ## Regenerating
 

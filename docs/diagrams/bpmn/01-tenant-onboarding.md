@@ -5,6 +5,9 @@ From a prospect arriving on the marketing site to a fully provisioned user who c
 **Lanes** map to the four seeded roles: `SuperAdmin` (1), `Admin` (2), `Manager` (3),
 `Staff` (4), plus the automated **System** lane.
 
+
+**Related user stories** — [Tenancy & access — SDO-TEN-01, 02, 07](../../stories/01-tenancy-access.md) · [Billing — SDO-BIL-02](../../stories/06-billing-platform.md)
+
 ## Process
 
 ```mermaid
@@ -14,13 +17,9 @@ flowchart TB
         B --> C[Submits /register or /demo]
     end
 
-    subgraph L2["⚙️ System"]
-        C -.-> D[/"Companies House lookup<br/>POST /integrations/companies-house/lookup/"/]
-        D --> E{"Company<br/>found?"}
-        E -->|"Yes"| F[/"Pre-fill EntityName,<br/>EntityType, registered address"/]
-        E -->|"No"| G[Manual entry fallback]
-        F --> H
-        G --> H[/"EntityCreateSerializer"/]
+    subgraph L2["⚙️ System — SignupView, AllowAny"]
+        C -.-> G[Entity details entered by hand<br/>no external lookup on this path]
+        G --> H[/"register_new_entity()"/]
         H --> I[("INSERT Entities")]
         I --> J[/"Attach free plan<br/>INSERT EntitySubscriptions"/]
         J --> K[("INSERT Users<br/>role = Admin")]
@@ -42,10 +41,18 @@ flowchart TB
         S -->|"No"| U([No action])
     end
 
-    style D fill:#fff3e0,stroke:#e65100,color:#000
     style H fill:#fff3e0,stroke:#e65100,color:#000
     style J fill:#e8f5e9,stroke:#1b5e20,color:#000
 ```
+
+> **Correction (2026-08-21).** An earlier version of this diagram showed the Companies House
+> lookup pre-filling entity details during self-service registration. **That flow does not
+> exist.** `SignupView` is `AllowAny` and `register_new_entity()` never calls Companies House;
+> `CompaniesHouseLookupView` (`apps/shared/urls_integrations.py:9`) requires `IsAuthenticated`,
+> so an anonymous prospect cannot reach it. The lookup is available to an already-authenticated
+> user maintaining entity details, not to a prospect signing up. The original was inferred from
+> `spec/api_integrations.md` rather than read from the code — the drift that
+> [SDO-GAP-10](../../stories/07-backlog-gaps.md#sdo-gap-10) is about.
 
 **Ordering constraint.** `seed_plans` must have run before any entity is created —
 `EntityCreateSerializer` looks up the free plan to attach a subscription, and entity creation

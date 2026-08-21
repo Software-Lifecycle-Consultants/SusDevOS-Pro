@@ -2,6 +2,9 @@
 
 Celery queues, the beat schedule, and where each task reaches outside the platform.
 
+
+**Related user stories** — [Billing & platform — SDO-BIL-13](../../stories/06-billing-platform.md) · [Backlog — SDO-GAP-09](../../stories/07-backlog-gaps.md)
+
 ## Queue routing
 
 ```mermaid
@@ -102,7 +105,7 @@ gantt
 |------|----------|-------|---------|
 | `tasks.billing.reset_daily_api_counters` | 00:00 daily | default | Reset `UsageTracking` per-day counters |
 | `tasks.emissions.recompute_stale_inventory_totals` | 01:00 daily | default | Re-aggregate inventory scope totals |
-| `tasks.emissions.link_milestone_actuals` | 01:30 daily | default | Fill `TargetMilestones.ActualValue` |
+| `tasks.emissions.link_milestone_actuals` | 01:30 daily | default | Fill `TargetMilestones.ActualEmissionsTonnes` |
 | `tasks.integrations.sync_climatiq_emission_factors` | 02:00 Sundays | integrations | Refresh emission factor library |
 | `tasks.integrations.sync_verra_registry` | 03:00 daily | integrations | Validate VCS credit serials |
 | `tasks.integrations.sync_gold_standard_registry` | 03:30 daily | integrations | Validate Gold Standard serials |

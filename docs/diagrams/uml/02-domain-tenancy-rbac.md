@@ -2,6 +2,9 @@
 
 The multi-tenancy root (`Entities`) and the privilege system that governs every request.
 
+
+**Related user stories** — [Tenancy & access — SDO-TEN-01…16](../../stories/01-tenancy-access.md)
+
 ## Tenancy
 
 ```mermaid
@@ -27,7 +30,8 @@ classDiagram
     class EntityMembers {
         +UserId: FK CASCADE
         +EntityId: FK CASCADE
-        +Note: grants multi-entity access
+        +CreatedBy / CreatedAt
+        %% grants multi-entity access
     }
 
     class Users {
@@ -193,8 +197,9 @@ classDiagram
         +UsedAt
     }
     class EntityApiKeys {
-        +KeyId: PK
-        +HashedKey
+        +ApiKeyId: PK
+        +HashedApiKey / KeyPrefix
+        +TargetEntityId
         +ExpiryDate
     }
 

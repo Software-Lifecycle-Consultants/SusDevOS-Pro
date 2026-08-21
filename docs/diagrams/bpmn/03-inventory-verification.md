@@ -3,6 +3,9 @@
 The annual reporting cycle: open an inventory, assess Scope 3 relevance, accumulate records,
 close, verify, and lock.
 
+
+**Related user stories** — [Inventory & assurance — SDO-INV-01…11](../../stories/03-inventory-assurance.md)
+
 ## Annual inventory process
 
 ```mermaid
@@ -15,7 +18,7 @@ flowchart TB
     end
 
     subgraph L2["⚙️ System"]
-        E --> F[("INSERT Scope3RelevanceAssessments<br/>one row per category")]
+        E --> F[("INSERT Scope3RelevanceAssessments<br/>⬜ Django admin only - no REST API")]
         F --> G[("GHGInventories<br/>VerificationStatus = 1 Unverified")]
     end
 
@@ -70,6 +73,13 @@ the **view**, not the serializer.
 GHG Protocol requires reporters to justify which of the 15 Scope 3 categories are material.
 `Scope3RelevanceAssessments` is that record.
 
+> **⬜ Not exposed through the API.** The model exists and is registered in Django admin, but
+> there is **no serializer and no viewset** — `grep` finds it only in `emissions/admin.py`.
+> The assessment therefore cannot be performed by a sustainability manager in the product; it
+> is an admin-console activity today. An earlier version of this diagram implied a user-facing
+> flow. Tracked as
+> [SDO-INV-02](../../stories/03-inventory-assurance.md).
+
 ```mermaid
 flowchart LR
     subgraph A1["👤 Manager"]
@@ -79,8 +89,8 @@ flowchart LR
     end
 
     subgraph A2["⚙️ System"]
-        C --> E[("Scope3RelevanceAssessments<br/>IsRelevant = true")]
-        D --> F[("Scope3RelevanceAssessments<br/>IsRelevant = false<br/>+ Justification text")]
+        C --> E[("Scope3RelevanceAssessments<br/>IsRelevant = true - admin only")]
+        D --> F[("Scope3RelevanceAssessments<br/>IsRelevant = false<br/>+ ExclusionReason - admin only")]
         E --> G[/"Category expected in<br/>emissions data"/]
         F --> H[/"Exclusion documented<br/>for the assurance file"/]
     end

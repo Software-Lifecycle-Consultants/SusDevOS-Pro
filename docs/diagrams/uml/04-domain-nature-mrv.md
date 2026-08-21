@@ -4,6 +4,9 @@ Land, ecosystems, species, and the two carbon-flux processes: **tree removals**
 (stock loss) and **restorations** (sequestration). This is the IPCC LULUCF /
 TNFD side of the platform.
 
+
+**Related user stories** — [Nature & MRV — SDO-NAT-01…15](../../stories/04-nature-mrv.md)
+
 ## Land & ecosystem
 
 ```mermaid
@@ -15,7 +18,9 @@ classDiagram
         +EntityId: FK PROTECT
         +ParcelName
         +AreaHectares
-        +Geometry «PostGIS»
+        +BoundaryGeoJSON: JSONField - not PostGIS
+        +LandUseType / Tenure
+        +ParcelReference / PlanningReference
     }
 
     class Ecosystem {
@@ -28,9 +33,13 @@ classDiagram
         +SpeciesId: PK
         +EntityId: FK PROTECT, db_column EntityId
         +ScientificName / CommonName
-        +IUCNStatus «LC..EX»
+        +IUCNStatus «LC..EX» / IUCNSyncedAt
+        +GBIFKey / Kingdom / Family
         +IPCCForestType
-        +biomass parameters
+        +BasicWoodDensity
+        +BiomassExpansionFactor
+        +RootToShootRatio / CarbonFraction
+        +AnnualSequestrationRateTonnesCO2ePerHa
     }
 
     class LandParcelEcosystems { <<junction>> }
@@ -88,25 +97,31 @@ classDiagram
         +TreeRemovalId: PK
         +EntityId: FK PROTECT
         +ProjectId: FK nullable
-        +RemovalDate
-        +TotalCO2eLostTonnes «computed»
+        +RemovalDate / RemovalReference
+        +TotalTreesRemoved
+        +TotalBiomassCarbon 🔒
+        +HasMitigationPlan / MitigationNotes
     }
 
     class TreeRemovalRemovedSpecies {
         +TreeRemovalId: FK CASCADE
         +SpeciesId: FK CASCADE
-        +TreeCount / DBH / Height
-        +BiomassCalcMethod
-        +AboveGroundBiomass 🔒
-        +BelowGroundBiomass 🔒
-        +CarbonStockTonnes 🔒
-        +CO2eTonnes 🔒
+        +Count / VolumeM3
+        +BiomassCalculationMethod
+        +AboveGroundBiomassTonnes 🔒
+        +BelowGroundBiomassTonnes 🔒
+        +TotalBiomassTonnes 🔒
+        +CarbonStockTonnesC 🔒
+        +CO2EquivalentTonnes 🔒
+        +DeadOrganicMatterTonnesCO2e
+        +SoilCarbonTonnesCO2e
+        +TotalCarbonStockLossTonnesCO2e 🔒
     }
 
     class TreeRemovalAffectedSpecies {
         +TreeRemovalId: FK CASCADE
         +SpeciesId: FK CASCADE
-        +ImpactNotes
+        +Notes
     }
 
     class Species
@@ -144,19 +159,24 @@ classDiagram
     class Restorations {
         +RestorationId: PK
         +EntityId: FK PROTECT
-        +RestorationDate
-        +TotalCO2eSequesteredTonnes «computed»
+        +RestorationName / RestorationReference
+        +StartDate / CompletionDate
+        +TotalAreaHectares / TotalTreesPlanted
+        +EstimatedCarbonSequestrationTonnes 🔒
     }
 
     class RestorationSpecies {
         +RestorationId: FK CASCADE
         +SpeciesId: FK CASCADE
-        +TreeCount / SurvivalRate
+        +Count / SurvivalEstimate
+        +AreaHectares
         +YearsEstablished 🔒
-        +BiomassCalcMethod
-        +CarbonStockTonnes 🔒
-        +CO2eTonnes 🔒
+        +AnnualSequestrationRateTonnesCO2ePerHa
+        +CumulativeSequestrationTonnesCO2e 🔒
+        +SequestrationDataSource
         +PermanenceRisk
+        +LeakageDiscountPercent
+        +AdditionalityAssessment
     }
 
     class Species
@@ -207,8 +227,8 @@ flowchart LR
         S5 --> S6["recompute_restoration_total()"]
     end
 
-    R7 --> TOT[("TreeRemovals.<br/>TotalCO2eLostTonnes")]
-    S6 --> TOT2[("Restorations.<br/>TotalCO2eSequesteredTonnes")]
+    R7 --> TOT[("TreeRemovals.<br/>TotalBiomassCarbon")]
+    S6 --> TOT2[("Restorations.<br/>EstimatedCarbonSequestrationTonnes")]
 
     style R2 fill:#fff3e0,stroke:#e65100,color:#000
     style S2 fill:#fff3e0,stroke:#e65100,color:#000
