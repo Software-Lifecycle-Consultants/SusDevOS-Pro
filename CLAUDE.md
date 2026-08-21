@@ -58,7 +58,7 @@ All design decisions are documented in `spec/`. Read the relevant spec before im
 
 **Calculations:** All GHG calculations are server-side only. `EmissionsData.save()` override triggers calculation. Client-submitted `EmissionsAmount` values are overwritten. See `spec/ghg_calculation_spec.md` §13.
 
-**Feature gates:** `FeatureGateMixin` on views checks `PlanFeatures` table. Returns `{"code": "feature_gated", "feature": "...", "upgrade_url": "/pricing"}` which the frontend renders as an upgrade modal.
+**Feature gates:** `FeatureGateMixin` on views checks `PlanFeatures` table. Returns HTTP 402 Payment Required with `{"code": "feature_gated", "feature": "...", "detail": "...", "upgrade_url": "/pricing"}` which the frontend renders as an upgrade modal.
 
 **Migrations:** Numbered 0010–0028 in `backend/migrations/`. Each app's own migrations live in `apps/{app}/migrations/`. The numbered series in `backend/migrations/` are design-phase reference migrations — actual Django migrations belong in each app.
 

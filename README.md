@@ -23,7 +23,7 @@ SusDevOS is a multi-tenant SaaS platform that helps sustainability managers, ESG
 | **Celery tasks** | ECB FX daily sync · Climatiq/DEFRA EF sync · Verra VCS daily validation · nightly inventory total recomputation · audit log retention purge · report file purge |
 | **Admin** | All 12 apps registered with search, filters, inlines, and `raw_id_fields`. |
 | **OpenAPI** | drf-spectacular → `GET /api/schema/` (229 KB) · Swagger UI at `/api/schema/swagger-ui/` |
-| **Tests** | 85 pytest tests: 37 model tests + 48 API tests covering auth flows, tenant scoping, GHG formula correctness, and verification immutability. |
+| **Tests** | 219 pytest tests covering auth flows, tenant scoping, GHG formula correctness, verification immutability, RBAC privilege resolution, billing entitlement, and Celery task scheduling. |
 
 ### Frontend — Next.js 14
 
@@ -126,7 +126,7 @@ npm run dev   # http://localhost:3000
 docker compose run --rm api python -m pytest -q
 ```
 
-Expected: **85 passed**.
+Expected: **219 passed**.
 
 ---
 
