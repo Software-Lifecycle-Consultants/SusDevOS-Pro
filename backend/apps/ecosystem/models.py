@@ -24,7 +24,12 @@ IPCC_FOREST_TYPE_CHOICES = [
 
 class Ecosystem(BaseAuditMixin):
     EcosystemId = models.AutoField(primary_key=True)
-    EntityId = models.IntegerField(help_text="FK to entities.Entities")
+    EntityId = models.ForeignKey(
+        "entities.Entities",
+        on_delete=models.PROTECT,
+        related_name="ecosystems",
+        db_column="EntityId",
+    )
     EcosystemName = models.CharField(max_length=200)
     EcosystemType = models.CharField(max_length=100, blank=True, null=True)
     Description = models.TextField(blank=True, null=True)
@@ -49,7 +54,12 @@ class EcosystemTags(models.Model):
 
 class Species(BaseAuditMixin):
     SpeciesId = models.AutoField(primary_key=True)
-    EntityId = models.IntegerField(help_text="FK to entities.Entities")
+    EntityId = models.ForeignKey(
+        "entities.Entities",
+        on_delete=models.PROTECT,
+        related_name="species_records",
+        db_column="EntityId",
+    )
     CommonName = models.CharField(max_length=200)
     ScientificName = models.CharField(max_length=200, null=True, blank=True)
     Family = models.CharField(max_length=100, null=True, blank=True)
