@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 
 def _species(entity, **kwargs):
     from apps.ecosystem.models import Species
-    defaults = dict(EntityId=entity.EntityId, CommonName="Test Tree")
+    defaults = dict(EntityId_id=entity.EntityId, CommonName="Test Tree")
     defaults.update(kwargs)
     return Species.objects.create(**defaults)
 

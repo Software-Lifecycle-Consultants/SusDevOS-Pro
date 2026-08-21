@@ -20,6 +20,7 @@ from rest_framework.test import APIClient
 import pytest
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.shared.permissions import _resolve_privilege
 from apps.users.models import (
     Interfaces,
     Modules,
@@ -28,7 +29,11 @@ from apps.users.models import (
     UserRoles,
     Users,
 )
-from apps.users.tests.factories import UsersFactory
+from apps.users.tests.factories import (
+    RolePrivilegesFactory,
+    UserRolesFactory,
+    UsersFactory,
+)
 
 
 def _client(user, entity):
@@ -163,3 +168,40 @@ class TestUsersViewSetEntityResolution:
         # not created as an orphan with EntityId = None.
         assert created.EntityId_id == entity.EntityId
         assert created.user_roles.filter(RoleId__RoleKey="staff", Status=1).exists()
+
+
+@pytest.mark.django_db
+class TestResolvePrivilegeMultiRole:
+    """_resolve_privilege must union privileges across every active role (F2).
+
+    UserRoles has no unique_together and no Meta.ordering, so a user with two
+    active roles previously had their privileges resolved off an arbitrary
+    .first() row instead of the union of both roles.
+    """
+
+    def test_two_active_roles_union_their_privileges(self, entity):
+        module = Modules.objects.create(ModuleName="Emissions", ModuleKey="emissions_multi")
+        iface_a = Interfaces.objects.create(
+            ModuleId=module, InterfaceName="View A", InterfaceKey="view_a_multi",
+        )
+        iface_b = Interfaces.objects.create(
+            ModuleId=module, InterfaceName="View B", InterfaceKey="view_b_multi",
+        )
+
+        role_manager = _role("manager")
+        role_staff = _role("staff")
+        RolePrivilegesFactory(
+            RoleId=role_manager, ModuleId=module, InterfaceId=iface_a, PermissionType=2,
+        )
+        RolePrivilegesFactory(
+            RoleId=role_staff, ModuleId=module, InterfaceId=iface_b, PermissionType=2,
+        )
+
+        user = UsersFactory(EntityId=entity, email="multirole@testcorp.com", username="multirole")
+        UserRolesFactory(UserId=user, RoleId=role_manager)
+        UserRolesFactory(UserId=user, RoleId=role_staff)
+
+        # Before the fix, exactly one of these would fail depending on which
+        # UserRoles row .first() happened to return.
+        assert _resolve_privilege(user, "view_a_multi", 2) is True
+        assert _resolve_privilege(user, "view_b_multi", 2) is True

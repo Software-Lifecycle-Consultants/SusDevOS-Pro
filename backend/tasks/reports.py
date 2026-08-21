@@ -58,11 +58,20 @@ def generate_report(self, report_job_id: int):
     except Exception as exc:
         logger.exception("Report %s failed: %s", report_job_id, exc)
         try:
+            # Failed is an honest description of the job's state right now,
+            # whether or not a retry follows, so this write happens on every
+            # attempt. The user-facing notification is different: firing it
+            # on an attempt that still has retries left would tell the user
+            # the report failed even though a later attempt may succeed a
+            # minute later, producing a false failure notice (and possibly
+            # prompting a duplicate re-request of a report still in flight).
+            # So it is deferred until there are no retries left.
             job.JobStatus = 4  # Failed
             job.ErrorMessage = str(exc)[:500]
             job.CompletedAt = now()
             job.save(update_fields=["JobStatus", "ErrorMessage", "CompletedAt"])
-            _notify_failed(job, str(exc))
+            if self.request.retries >= self.max_retries:
+                _notify_failed(job, str(exc))
         except Exception:
             pass
         raise self.retry(exc=exc)

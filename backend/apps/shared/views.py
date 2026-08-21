@@ -6,8 +6,10 @@ Usage:
         queryset = Foo.objects.all()
         serializer_class = FooSerializer
 
-For models where EntityId is an IntegerField (ecosystem.Ecosystem, ecosystem.Species):
-    override get_queryset and use filter(EntityId=entity_id) directly.
+For views that cannot use the full TenantViewSetMixin — e.g. a bespoke
+get_queryset that doesn't fit the mixin's filter(Status__lt=4)/EntityId
+pattern — mix in EntityScopeInitialMixin directly so request.entity_id is
+still re-resolved after DRF authentication.
 """
 
 
@@ -57,11 +59,10 @@ class EntityScopeInitialMixin:
     """Re-resolve ``request.entity_id`` after DRF authentication.
 
     Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
-    but cannot use the full :class:`TenantViewSetMixin` — e.g. viewsets whose
-    model stores ``EntityId`` as a plain IntegerField (ecosystem.Ecosystem,
-    ecosystem.Species) and views with a bespoke ``get_queryset``.  Without this,
-    ``request.entity_id`` is None for JWT requests and tenant scoping silently
-    fails (empty reads, NOT-NULL violations on create)."""
+    but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
+    bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
+    Without this, ``request.entity_id`` is None for JWT requests and tenant
+    scoping silently fails (empty reads, NOT-NULL violations on create)."""
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)  # runs DRF auth + perms

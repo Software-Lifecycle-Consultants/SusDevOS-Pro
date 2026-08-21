@@ -1,3 +1,19 @@
+# Inside the compose network, reach infra by service name, not localhost.
+# (.env uses localhost for the host-based dev workflow.) Shared by the API and
+# every Celery service — without it they dial localhost inside their own
+# container and never reach Postgres or Redis.
+x-compose-network-env: &compose-network-env
+  DJANGO_SETTINGS_MODULE: config.settings.local
+  DB_HOST:               db
+  DB_USER:               susdevos
+  DB_PASSWORD:           susdevos
+  DB_NAME:               susdevos
+  REDIS_URL:             redis://redis:6379/0
+  CELERY_BROKER_URL:     redis://redis:6379/1
+  CELERY_RESULT_BACKEND: redis://redis:6379/2
+  CACHE_LOCATION:        redis://redis:6379/3
+  AWS_S3_ENDPOINT_URL:   http://minio:9000
+
 services:
 
   # ── PostgreSQL + PostGIS ────────────────────────────────────────────────────
@@ -70,18 +86,7 @@ services:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.local
-      # Inside the compose network, reach infra by service name, not localhost.
-      # (.env uses localhost for the host-based dev workflow in CLAUDE.md.)
-      DB_HOST:               db
-      DB_USER:               susdevos
-      DB_PASSWORD:           susdevos
-      DB_NAME:               susdevos
-      REDIS_URL:             redis://redis:6379/0
-      CELERY_BROKER_URL:     redis://redis:6379/1
-      CELERY_RESULT_BACKEND: redis://redis:6379/2
-      CACHE_LOCATION:        redis://redis:6379/3
-      AWS_S3_ENDPOINT_URL:   http://minio:9000
+      <<: *compose-network-env
 
   # ── Celery worker (default queue) ─────────────────────────────────────────
   celery_worker:
@@ -100,6 +105,8 @@ services:
     depends_on:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
+    environment:
+      <<: *compose-network-env
 
   # ── Celery worker (integrations queue) ───────────────────────────────────
   celery_integrations:
@@ -118,6 +125,8 @@ services:
     depends_on:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
+    environment:
+      <<: *compose-network-env
 
   # ── Celery worker (reports queue) ─────────────────────────────────────────
   celery_reports:
@@ -137,6 +146,8 @@ services:
     depends_on:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
+    environment:
+      <<: *compose-network-env
 
   # ── Celery beat (scheduler) ───────────────────────────────────────────────
   celery_beat:
@@ -154,6 +165,8 @@ services:
     depends_on:
       db:    { condition: service_healthy }
       redis: { condition: service_healthy }
+    environment:
+      <<: *compose-network-env
 
 volumes:
   postgres_data:

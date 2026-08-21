@@ -1,13 +1,14 @@
 """
 Tenant-scope resolution for the ecosystem viewsets.
 
-Ecosystem/Species use IntegerField EntityId and a bespoke get_queryset, so they
-cannot use the full TenantViewSetMixin.  They must still re-resolve
-request.entity_id after DRF (JWT) authentication — TenantQueryMiddleware runs
-before authentication and leaves request.entity_id None for token requests.
+Ecosystem/Species now use TenantViewSetMixin (EntityId is a real FK to
+entities.Entities). The mixin re-resolves request.entity_id after DRF (JWT)
+authentication — TenantQueryMiddleware runs before authentication and leaves
+request.entity_id None for token requests.
 
-Regression test: without EntityScopeInitialMixin, a JWT create writes
-EntityId=None (a NOT-NULL violation → HTTP 500) and reads return an empty set.
+Regression test: without EntityScopeInitialMixin (the base TenantViewSetMixin
+relies on), a JWT create writes EntityId=None (a NOT-NULL violation → HTTP 500)
+and reads return an empty set.
 """
 from rest_framework import status
 
@@ -81,3 +82,23 @@ def test_ecosystem_create_denied_without_feature(auth_client, entity):
 def test_ecosystem_list_denied_without_feature(auth_client, entity):
     resp = auth_client.get(ECO_URL)
     assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+
+
+# ── Audit logging (TenantViewSetMixin behaviour gain) ───────────────────────
+
+
+def test_ecosystem_create_writes_audit_log(auth_client, entity, enable_feature):
+    """Adopting TenantViewSetMixin means create now writes an AuditLog row —
+    EcosystemViewSet/SpeciesViewSet previously had no audit coverage at all."""
+    from apps.shared.models import AuditLog
+
+    enable_feature(entity, "ecosystem_basic")
+    resp = auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
+    assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+    entry = AuditLog.objects.filter(
+        TableName="ecosystem", RecordId=resp.data["EcosystemId"], Action="Create",
+    ).first()
+    assert entry is not None
+    assert entry.EntityId_id == entity.EntityId
+    assert entry.Description == f"Create Ecosystem #{resp.data['EcosystemId']}"

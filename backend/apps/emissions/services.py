@@ -11,6 +11,8 @@ from decimal import Decimal
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils import timezone
 
+from rest_framework.exceptions import PermissionDenied, ValidationError
+
 logger = logging.getLogger(__name__)
 
 # ── GHG Calculation ───────────────────────────────────────────────────────────
@@ -145,9 +147,15 @@ def _get_gwp_factor(instance) -> Decimal:
 def verify_record(instance, verified_by, notes: str = "") -> None:
     """
     Advance VerificationStatus to VERIFIED (3).
-    Records verifier identity and timestamp. Caller must check current status
-    before calling — this function does not guard against double-verification.
+    Records verifier identity and timestamp. Guards against double-verification
+    itself — raises ValidationError if the record is already verified — so any
+    call site (management command, bulk-verify endpoint, retried task), not
+    just the view, is protected from silently overwriting VerifiedBy/VerifiedAt/
+    VerificationNotes with a second verifier's identity.
     """
+    if instance.VerificationStatus >= 3:
+        raise ValidationError({"code": "already_verified", "detail": "Already verified."})
+
     instance.VerificationStatus = 3
     instance.VerifiedBy         = verified_by
     instance.VerifiedAt         = timezone.now()
@@ -170,8 +178,13 @@ def unlock_record(instance, reason: str, unlocked_by, entity_id: int) -> None:
     """
     Reset VerificationStatus to 1 (Submitted/Under review) after it reached
     VERIFIED. Writes a mandatory 7-year retention audit log entry.
-    Only callable by SuperAdmin — the view enforces that guard.
+    Enforces the SuperAdmin-only guard itself (in addition to the view), and
+    does so before any mutation or audit-log write so a rejected unlock leaves
+    no trace of a state change.
     """
+    if not getattr(unlocked_by, "IsSuperAdmin", False):
+        raise PermissionDenied("Only SuperAdmin can unlock verified records.")
+
     from apps.shared.models import AuditLog
 
     instance.VerificationStatus = 1

@@ -1,0 +1,2960 @@
+<title>SusDevOS Architecture Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root {
+  --ground:      #F7F8F6;
+  --surface:     #FFFFFF;
+  --surface-alt: #EEF1EE;
+  --ink:         #16211C;
+  --ink-soft:    #4A5952;
+  --ink-faint:   #78877F;
+  --rule:        #DCE3DD;
+  --rule-strong: #C3CDC5;
+  --accent:      #1F6B4A;
+  --accent-soft: #E4EFE8;
+  --flag:        #8A5E10;
+  --flag-soft:   #F6EEDC;
+  --alert:       #A33A2E;
+  --alert-soft:  #F8E7E4;
+
+  --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --f-body:    'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --f-mono:    'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+
+  --rail: 268px;
+  --measure: 68ch;
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0F1512;
+    --surface:     #161D19;
+    --surface-alt: #1D2621;
+    --ink:         #E5EBE6;
+    --ink-soft:    #A9B6AE;
+    --ink-faint:   #78877F;
+    --rule:        #263029;
+    --rule-strong: #37453B;
+    --accent:      #5FB88C;
+    --accent-soft: #17281F;
+    --flag:        #D2A552;
+    --flag-soft:   #2A2213;
+    --alert:       #E0796A;
+    --alert-soft:  #2E1A17;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #0F1512;
+  --surface:     #161D19;
+  --surface-alt: #1D2621;
+  --ink:         #E5EBE6;
+  --ink-soft:    #A9B6AE;
+  --ink-faint:   #78877F;
+  --rule:        #263029;
+  --rule-strong: #37453B;
+  --accent:      #5FB88C;
+  --accent-soft: #17281F;
+  --flag:        #D2A552;
+  --flag-soft:   #2A2213;
+  --alert:       #E0796A;
+  --alert-soft:  #2E1A17;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.layout { display: flex; align-items: flex-start; }
+
+/* ── Rail ──────────────────────────────────────────────── */
+.rail {
+  width: var(--rail);
+  flex: 0 0 var(--rail);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--rule);
+  background: var(--surface);
+  padding: 28px 0 40px;
+}
+
+.rail-brand { padding: 0 24px 20px; border-bottom: 1px solid var(--rule); }
+
+.rail-brand h1 {
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0 0 4px;
+  line-height: 1.25;
+}
+
+.rail-brand p {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-faint);
+}
+
+.rail nav ul { list-style: none; margin: 0; padding: 18px 12px 0; }
+
+.nav-group {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  padding: 18px 12px 8px;
+}
+.nav-group:first-child { padding-top: 2px; }
+
+.rail nav a {
+  display: flex;
+  gap: 11px;
+  align-items: baseline;
+  padding: 6px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: background .12s ease, color .12s ease;
+}
+.rail nav a:hover { background: var(--surface-alt); color: var(--ink); }
+.rail nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rail nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav-num {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+.rail nav a.active .nav-num { color: var(--accent); }
+
+/* ── Main ──────────────────────────────────────────────── */
+.main { flex: 1 1 auto; min-width: 0; padding: 0 clamp(24px, 5vw, 72px) 120px; }
+
+.masthead { padding: 72px 0 44px; border-bottom: 2px solid var(--ink); max-width: var(--measure); }
+
+.masthead .eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+
+.masthead h1 {
+  font-family: var(--f-display);
+  font-size: clamp(38px, 5.2vw, 60px);
+  font-weight: 700;
+  letter-spacing: -0.033em;
+  line-height: 1.03;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+
+.masthead .lede { font-size: 19px; color: var(--ink-soft); margin: 0; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 40px 0 0;
+  max-width: 900px;
+}
+.stat { background: var(--surface); padding: 16px 18px; }
+.stat b {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stat span {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.provenance {
+  margin: 34px 0 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  max-width: var(--measure);
+  font-size: 15.5px;
+}
+.provenance p { margin: 0; }
+.provenance p + p { margin-top: 8px; }
+
+/* ── Sections ──────────────────────────────────────────── */
+.doc { padding: 64px 0 0; scroll-margin-top: 24px; }
+.doc-head { border-bottom: 1px solid var(--rule); padding-bottom: 18px; margin-bottom: 30px; }
+
+.eyebrow { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+
+.badge {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+.badge-uml    { background: var(--accent-soft); color: var(--accent); }
+.badge-bpmn   { background: var(--flag-soft); color: var(--flag); }
+.badge-review { background: var(--alert-soft); color: var(--alert); }
+
+/* Explicit finding anchors must clear the top of the viewport when jumped to. */
+.doc a[id] { display: block; position: relative; top: -12px; visibility: hidden; }
+.doc h2[id], .doc a[id] { scroll-margin-top: 24px; }
+
+.doc-num {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+
+.doc-head h2 {
+  font-family: var(--f-display);
+  font-size: clamp(27px, 3.3vw, 37px);
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  line-height: 1.13;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+
+.doc-file { margin: 0; }
+.doc-file code {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  background: none;
+  padding: 0;
+}
+
+/* ── Prose ─────────────────────────────────────────────── */
+.doc h3 {
+  font-family: var(--f-display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin: 48px 0 14px;
+  max-width: var(--measure);
+  text-wrap: balance;
+}
+
+.doc h4 {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-faint);
+  margin: 34px 0 12px;
+}
+
+.doc p, .doc ul, .doc ol { max-width: var(--measure); }
+.doc p { margin: 0 0 17px; }
+.doc ul, .doc ol { margin: 0 0 17px; padding-left: 22px; }
+.doc li { margin-bottom: 7px; }
+.doc li::marker { color: var(--ink-faint); }
+
+.doc strong { font-weight: 600; }
+
+.doc a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+.doc code {
+  font-family: var(--f-mono);
+  font-size: 0.845em;
+  background: var(--surface-alt);
+  padding: 1.5px 5px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
+.doc blockquote {
+  margin: 26px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--flag);
+  background: var(--flag-soft);
+  max-width: var(--measure);
+  font-size: 16px;
+}
+.doc blockquote p { margin: 0; }
+.doc blockquote p + p { margin-top: 9px; }
+.doc blockquote strong { color: var(--flag); }
+
+.doc hr { display: none; }
+
+.doc em { color: var(--ink-soft); }
+
+/* Trailing source line */
+.doc > p:last-child em { font-family: var(--f-mono); font-size: 11.5px; font-style: normal; color: var(--ink-faint); }
+.doc > p:last-child { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); max-width: none; }
+.doc > p:last-child code { font-size: 11px; background: none; padding: 0; }
+
+/* ── Diagram plates ────────────────────────────────────── */
+.plate {
+  margin: 26px 0 30px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  border-radius: 4px;
+}
+.plate-scroll { overflow-x: auto; padding: 26px 22px; }
+.plate pre.mermaid {
+  margin: 0;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  min-width: min-content;
+}
+
+/* ── Code ──────────────────────────────────────────────── */
+.codewrap { margin: 22px 0 26px; }
+pre.code {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--surface-alt);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 18px;
+  font-family: var(--f-mono);
+  font-size: 12.8px;
+  line-height: 1.6;
+}
+pre.code code { background: none; padding: 0; font-size: inherit; }
+
+/* ── Tables ────────────────────────────────────────────── */
+.tablewrap { overflow-x: auto; margin: 24px 0 28px; border: 1px solid var(--rule); border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; background: var(--surface); }
+th, td { text-align: left; padding: 10px 15px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-faint);
+  background: var(--surface-alt);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td code { font-size: 12px; }
+td:first-child { font-variant-numeric: tabular-nums; }
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .layout { display: block; }
+  .rail {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 18px;
+  }
+  .rail nav ul { display: flex; flex-wrap: wrap; gap: 3px; padding: 14px 12px 0; }
+  .nav-group { width: 100%; padding: 12px 12px 4px; }
+  .main { padding: 0 22px 80px; }
+  .masthead { padding: 42px 0 32px; }
+  body { font-size: 16.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+html { scroll-behavior: smooth; }
+</style>
+
+<div class="layout">
+  <aside class="rail">
+    <div class="rail-brand">
+      <h1>Architecture Atlas</h1>
+      <p>SusDevOS · technical review</p>
+    </div>
+    <nav aria-label="Diagram index">
+      <ul><li class="nav-group">Review</li><li><a href="#findings" data-target="findings"><span class="nav-num">F</span><span class="nav-label">Findings F1–F9</span></a></li><li class="nav-group">UML — structure &amp; behaviour</li><li><a href="#component" data-target="component"><span class="nav-num">01</span><span class="nav-label">Component & deployment</span></a></li><li><a href="#tenancy" data-target="tenancy"><span class="nav-num">02</span><span class="nav-label">Tenancy & RBAC</span></a></li><li><a href="#ghg" data-target="ghg"><span class="nav-num">03</span><span class="nav-label">GHG accounting</span></a></li><li><a href="#nature" data-target="nature"><span class="nav-num">04</span><span class="nav-label">Nature & MRV</span></a></li><li><a href="#platform" data-target="platform"><span class="nav-num">05</span><span class="nav-label">Platform services</span></a></li><li><a href="#sequences" data-target="sequences"><span class="nav-num">06</span><span class="nav-label">Sequences</span></a></li><li><a href="#states" data-target="states"><span class="nav-num">07</span><span class="nav-label">State machines</span></a></li><li><a href="#async" data-target="async"><span class="nav-num">08</span><span class="nav-label">Async topology</span></a></li><li class="nav-group">BPMN — process models</li><li><a href="#onboarding" data-target="onboarding"><span class="nav-num">01</span><span class="nav-label">Tenant onboarding</span></a></li><li><a href="#emissions" data-target="emissions"><span class="nav-num">02</span><span class="nav-label">Emissions lifecycle</span></a></li><li><a href="#inventory" data-target="inventory"><span class="nav-num">03</span><span class="nav-label">Inventory verification</span></a></li><li><a href="#mrv" data-target="mrv"><span class="nav-num">04</span><span class="nav-label">Carbon credit MRV</span></a></li><li><a href="#reports" data-target="reports"><span class="nav-num">05</span><span class="nav-label">Report generation</span></a></li><li><a href="#nature-proc" data-target="nature-proc"><span class="nav-num">06</span><span class="nav-label">Nature tracking</span></a></li></ul>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="masthead">
+      <p class="eyebrow">Derived from source · 2026-08-21</p>
+      <h1>What we have actually built</h1>
+      <p class="lede">Fourteen UML and BPMN diagrams covering the SusDevOS platform end to end — the domain model, the request pipeline, the calculation rules, and every process a user drives.</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><b>12</b><span>Django apps</span></div>
+      <div class="stat"><b>~70</b><span>Models</span></div>
+      <div class="stat"><b>14</b><span>Documents</span></div>
+      <div class="stat"><b>54</b><span>Diagrams</span></div>
+      <div class="stat"><b>13</b><span>RBAC modules</span></div>
+      <div class="stat"><b>10</b><span>Findings fixed</span></div>
+    </div>
+
+    <div class="provenance">
+      <p><strong>Provenance.</strong> Every diagram was derived by reading <code>backend/apps/</code>, <code>backend/tasks/</code>, <code>backend/config/</code> and <code>frontend/src/</code> — not from the <code>spec/</code> documents. Where code and spec disagree, these diagrams follow the code and flag the divergence.</p>
+      <p>All 54 Mermaid definitions were parsed with the Mermaid compiler before publishing; every one renders. Ten findings surfaced along the way — they open this page as <a href="#findings">F1–F10</a>, and each is tagged <strong>✅ Fn</strong> at the exact node or transition it affected.</p>
+      <p><strong>All ten are now fixed and verified against a running stack</strong> — 219 tests passing (up from a 199 baseline), the migration applied, and Celery worker and beat booting clean. Each finding keeps its original description so the diagrams still explain why the code looks the way it does.</p>
+    </div>
+
+    <section id="findings" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-review">REVIEW</span> <span class="doc-num">F</span></p>
+    <h2>Review Findings Register</h2>
+    <p class="doc-file"><code>docs/diagrams/FINDINGS.md</code></p>
+  </header>
+  <p>Observations surfaced while deriving the <a href="README.md">architecture diagram set</a> from source,
+tagged <code>F1</code>–<code>F10</code> so a reviewer can move between this register and the diagrams.</p>
+<blockquote>
+<p><strong>Status: all resolved (2026-08-21).</strong> Every finding below has been fixed and verified
+against a running stack — <code>219 passed</code>, up from a <code>199</code> baseline. Each entry keeps its
+original description as a record of <em>why</em> the change was made, followed by a <strong>Resolution</strong>
+note stating what was actually done. Two findings changed shape once investigated, and one
+was rejected on inspection rather than &quot;fixed&quot;; those are called out explicitly.</p>
+</blockquote>
+<h2>Register</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Category</th><th>Finding</th><th>Resolution</th></tr></thead><tbody><tr><td><strong>F1</strong></td><td>Tenant isolation</td><td><code>Ecosystem</code> / <code>Species</code> scope by convention, not by FK</td><td>✅ Real <code>ForeignKey</code> + <code>TenantViewSetMixin</code></td></tr><tr><td><strong>F2</strong></td><td>Authorization</td><td>Only the first active role is consulted</td><td>✅ Union across all active roles</td></tr><tr><td><strong>F3</strong></td><td>Data integrity</td><td><code>verify_record()</code> has no double-verification guard</td><td>✅ Guard moved into the service</td></tr><tr><td><strong>F4</strong></td><td>UX / async</td><td><code>report_failed</code> is sent before the retry is attempted</td><td>✅ Deferred to the terminal attempt</td></tr><tr><td><strong>F5</strong></td><td>Doc drift</td><td>Feature gate returns <strong>402</strong>, not documented</td><td>✅ <code>CLAUDE.md</code> corrected</td></tr><tr><td><strong>F6</strong></td><td>Operational</td><td>Tasks in <code>tasks/</code> need an explicit import to register</td><td>✅ <code>beat_init</code> validator + CI test</td></tr><tr><td><strong>F7</strong></td><td>Operational</td><td>Two tasks absent from <code>beat_schedule</code></td><td>✅ One scheduled, one confirmed intentional</td></tr><tr><td><strong>F8</strong></td><td>Billing</td><td><code>past_due</code> loses gated features immediately</td><td>✅ Grace until <code>CurrentPeriodEnd</code></td></tr><tr><td><strong>F9</strong></td><td>Authorization</td><td>Unlock guard lives in the view, not the service</td><td>✅ Guard moved into the service</td></tr><tr><td><strong>F10</strong></td><td>Authorization</td><td><code>verify</code> was open to any authenticated user <em>(found during the fix)</em></td><td>✅ Restricted to Manager+</td></tr></tbody></table></div><h3>What changed once investigated</h3>
+<ul>
+<li><strong>F1 was far cheaper than feared.</strong> Adding <code>db_column=&quot;EntityId&quot;</code> to the new <code>ForeignKey</code>
+keeps the existing column, so the migration is two <code>AlterField</code>s that add an FK constraint
+and an index — no rename, no data migration, no table rewrite. Verified with <code>sqlmigrate</code>.</li>
+<li><strong>F2 was less severe than originally written.</strong> <code>assign_role</code> already retires the previous
+role before creating a new one, and <code>IsEntityAdmin</code>/<code>IsManagerOrAbove</code> already scanned all
+active roles. Only <code>_resolve_privilege</code> was single-role, so this was a latent inconsistency
+rather than a live bug.</li>
+<li><strong>F8 had no producer.</strong> Nothing in the repo ever <em>sets</em> <code>past_due</code> — there is no Stripe
+webhook and no dunning logic. The fix is forward-looking policy, not a live outage.</li>
+<li><strong>F6&#39;s first fix was wrong and the new test caught it.</strong> See F6 below.</li>
+</ul>
+<hr>
+<p><a id="f1"></a></p>
+<h2>F1 · Ecosystem and Species scope by convention, not by foreign key</h2>
+<p><strong>Category:</strong> Tenant isolation · <strong>Confidence:</strong> High — directly readable in the model</p>
+<p><code>Ecosystem.EntityId</code> and <code>Species.EntityId</code> are declared as plain <code>IntegerField</code>s carrying a
+<code>help_text=&quot;FK to entities.Entities&quot;</code>, rather than as actual <code>ForeignKey</code> relations:</p>
+<div class="codewrap"><pre class="code"><code>EntityId = models.IntegerField(help_text="FK to entities.Entities")</code></pre></div><p>Because there is no relation, <code>TenantViewSetMixin.get_queryset()</code> — which filters
+<code>.filter(EntityId=entity_id)</code> on a related field — cannot be used. Those viewsets therefore
+mix in only <code>EntityScopeInitialMixin</code> and enforce scoping in their own <code>get_queryset()</code>.</p>
+<p><strong>Failure scenario.</strong> A new endpoint added to <code>apps/ecosystem/</code> that defines its own
+<code>get_queryset()</code> without an <code>EntityId</code> filter returns every tenant&#39;s species and ecosystems.
+Nothing in the ORM or the mixin prevents it, and no exception is raised — the leak is silent.</p>
+<p><strong>Mitigation already present.</strong> <code>apps/ecosystem/tests/test_tenant_scope.py</code> and
+<code>apps/land/tests/test_ecosystem_link_isolation.py</code> are regression tests for exactly this.</p>
+<p><strong>To confirm:</strong> whether the <code>IntegerField</code> choice was deliberate (avoiding a circular app
+dependency, perhaps) or historical. If historical, converting to a real <code>ForeignKey</code> would
+let both apps use <code>TenantViewSetMixin</code> and make the isolation structural.</p>
+<p><strong>Resolution (2026-08-21).</strong> Both fields are now real foreign keys:
+<code>models.ForeignKey(&quot;entities.Entities&quot;, on_delete=models.PROTECT, db_column=&quot;EntityId&quot;)</code>,
+with <code>related_name</code> <code>ecosystems</code> and <code>species_records</code>. <code>db_column</code> keeps the existing column
+name, so migration <code>ecosystem/0004</code> emits only <code>CREATE INDEX</code> + <code>ADD CONSTRAINT FOREIGN KEY</code> —
+confirmed by reading <code>sqlmigrate</code> output before applying, then applied cleanly to the running
+database.</p>
+<p>Both viewsets now use <code>TenantViewSetMixin</code> instead of hand-rolled filtering, so isolation is
+structural rather than conventional. That also closed a gap nobody had flagged: these two
+viewsets previously wrote <strong>no audit-log entries at all</strong> and never set <code>UpdatedBy</code>. A new test
+asserts an <code>AuditLog</code> row is written on create.</p>
+<p>⚠️ <strong>Before deploying:</strong> the new FK constraint will fail to apply if any existing
+<code>ecosystem</code>/<code>species</code> row references a missing entity. Check for orphans first — the local
+database has zero rows, so this cannot surface in dev.</p>
+<hr>
+<p><a id="f2"></a></p>
+<h2>F2 · Only the first active role is consulted</h2>
+<p><strong>Category:</strong> Authorization · <strong>Confidence:</strong> High — directly readable</p>
+<div class="codewrap"><pre class="code"><code>user_role = UserRoles.objects.filter(UserId=user, Status=1).select_related("RoleId").first()
+if not user_role:
+    return False</code></pre></div><p><code>UserRoles</code> is a many-to-many table — the schema permits a user to hold several active roles
+— but resolution reads exactly one, with <strong>no <code>order_by</code></strong>. Privileges are therefore not the
+union of the user&#39;s roles, and which role wins is whatever the database returns first.</p>
+<p><strong>Failure scenario.</strong> A user is granted both <code>Manager</code> and a narrow custom role. If the
+custom role is returned first, their Manager privileges silently vanish. Because there is no
+<code>order_by</code>, the effective role can change between queries after a table rewrite (<code>VACUUM FULL</code>, a restore, a bulk update) with no data change at all — the same user gets different
+permissions on different days.</p>
+<p><strong>To confirm:</strong> whether multiple concurrent active roles are intended to be possible. If they
+are not, a uniqueness constraint on <code>(UserId, Status=1)</code> would make the invariant explicit
+and turn a silent mis-resolution into a database error. If they are, resolution needs to
+union across roles.</p>
+<p><strong>Resolution (2026-08-21).</strong> <code>_resolve_privilege</code> now unions across every active role
+(<code>RoleId__in=role_ids</code>), matching what <code>IsEntityAdmin</code>/<code>IsManagerOrAbove</code> already did. The
+user-override branch is untouched — its <code>order_by(&quot;-OverrideAction&quot;)</code> is load-bearing.</p>
+<p>No <code>UniqueConstraint</code> was added, deliberately: the union makes multi-role well-defined, and
+such a migration could fail against pre-existing duplicate rows. <code>assign_role</code> is now wrapped
+in <code>transaction.atomic()</code> so its retire-then-create pair cannot interleave. A regression test
+gives one user two active roles and asserts both roles&#39; privileges resolve — before the fix
+exactly one of those assertions would have failed, depending on which row <code>.first()</code> returned.</p>
+<hr>
+<p><a id="f3"></a></p>
+<h2>F3 · <code>verify_record()</code> has no double-verification guard</h2>
+<p><strong>Category:</strong> Data integrity · <strong>Confidence:</strong> High — stated in the function&#39;s own docstring</p>
+<blockquote>
+<p>*&quot;Advance VerificationStatus to VERIFIED (3). Records verifier identity and timestamp.
+<strong>Caller must check current status before calling — this function does not guard against
+double-verification.</strong>&quot;*</p>
+</blockquote>
+<p>The guard is implemented in <code>EmissionsDataViewSet</code>, not in the service.</p>
+<p><strong>Failure scenario.</strong> Any second call — a retried request, a management command, a future
+bulk-verify endpoint, a Celery task — overwrites <code>VerifiedBy</code>, <code>VerifiedAt</code> and
+<code>VerificationNotes</code> with the second caller&#39;s identity. The original verifier&#39;s attestation is
+lost, with no audit record of the change, which is precisely the field an assurance provider
+would rely on.</p>
+<p><strong>To confirm:</strong> whether the guard belongs in the service instead, so every call site inherits
+it. The docstring suggests the author considered this and chose the caller-checks contract
+deliberately.</p>
+<p><strong>Resolution (2026-08-21).</strong> <code>verify_record()</code> now raises
+<code>ValidationError({&quot;code&quot;: &quot;already_verified&quot;})</code> when <code>VerificationStatus &gt;= 3</code>, so every call
+site inherits the guard rather than only the viewset. The view&#39;s own check is retained
+deliberately — it returns the exact response body existing tests assert on, so the API is
+unchanged. A new test calls the service directly twice and asserts <code>VerifiedBy</code>/<code>VerifiedAt</code>
+survive the second call.</p>
+<hr>
+<p><a id="f4"></a></p>
+<h2>F4 · <code>report_failed</code> is sent before the retry is attempted</h2>
+<p><strong>Category:</strong> UX / async · <strong>Confidence:</strong> High — ordering is explicit in the task body</p>
+<div class="codewrap"><pre class="code"><code>job.JobStatus = 4          # Failed
+job.save(...)
+_notify_failed(job, str(exc))
+...
+raise self.retry(exc=exc)  # up to 2 retries, 60s apart</code></pre></div><p>The job is marked <code>Failed</code> and the user notified, and only then is the retry raised.</p>
+<p><strong>Failure scenario.</strong> A transient S3 timeout on attempt 1 sends the user a
+&quot;Report generation failed&quot; notification. Attempt 2 succeeds 60 seconds later and sends
+&quot;Report ready&quot;. The user has received a failure notice for a report that worked — and, if
+they act on the first message, may re-request a report that was already being generated.</p>
+<p><strong>To confirm:</strong> whether this is intended. Deferring <code>_notify_failed()</code> until
+<code>self.request.retries &gt;= self.max_retries</code> would notify only on terminal failure. Note the
+status write itself is arguably correct as-is — <code>JobStatus = 4</code> between attempts is an honest
+description of the job&#39;s state; it is the <em>notification</em> that is premature.</p>
+<p><strong>Resolution (2026-08-21).</strong> <code>_notify_failed()</code> now fires only when
+<code>self.request.retries &gt;= self.max_retries</code>. The <code>JobStatus = 4</code> write still happens on every
+attempt — &quot;Failed&quot; is an honest description of the job&#39;s state between attempts; it was only
+the <em>notification</em> that was premature. Three tests cover retries-remaining, terminal attempt,
+and the happy path.</p>
+<hr>
+<p><a id="f5"></a></p>
+<h2>F5 · The feature gate returns 402, which <code>CLAUDE.md</code> does not state</h2>
+<p><strong>Category:</strong> Documentation drift · <strong>Confidence:</strong> High</p>
+<p><code>CLAUDE.md</code> documents the gate response body:</p>
+<blockquote>
+<p><code>{&quot;code&quot;: &quot;feature_gated&quot;, &quot;feature&quot;: &quot;...&quot;, &quot;upgrade_url&quot;: &quot;/pricing&quot;}</code></p>
+</blockquote>
+<p>but not its status code. The implementation raises <code>FeatureGatedException</code> carrying
+<code>status_code = status.HTTP_402_PAYMENT_REQUIRED</code>, converted to a response by the handler in
+<code>apps/shared/exceptions.py</code>.</p>
+<p><strong>Failure scenario.</strong> A reviewer, or a frontend developer writing an interceptor, assumes the
+platform&#39;s conventional 403 and writes a handler that never fires. The upgrade modal silently
+fails to appear, and the user sees a generic error.</p>
+<p><strong>To confirm:</strong> nothing about the code — 402 Payment Required is the right choice for a
+billing gate. This is a one-line documentation fix in <code>CLAUDE.md</code>.</p>
+<p><strong>Resolution (2026-08-21).</strong> <code>CLAUDE.md</code> now states the gate returns <strong>HTTP 402 Payment
+Required</strong> and includes the <code>detail</code> key the handler actually returns — the original example
+omitted it, a second inaccuracy in the same line.</p>
+<hr>
+<p><a id="f6"></a></p>
+<h2>F6 · Tasks in <code>tasks/</code> require an explicit import to be registered</h2>
+<p><strong>Category:</strong> Operational · <strong>Confidence:</strong> High — the constraint is commented in the source</p>
+<p>The Celery task modules live in a top-level <code>tasks/</code> package rather than inside Django apps,
+so <code>app.autodiscover_tasks()</code> does not find them. <code>config/celery.py</code> compensates by importing
+all eight modules explicitly.</p>
+<p><strong>Failure scenario.</strong> A developer adds <code>tasks/foo.py</code>, registers it in <code>beat_schedule</code>, and
+deploys. Beat dutifully publishes the task to the queue; no worker has it registered, so every
+firing raises <code>NotRegistered</code> on the worker side. The schedule looks correct in Django admin
+and nothing appears wrong until someone notices the job never runs.</p>
+<p><strong>To confirm:</strong> whether a startup assertion — comparing <code>beat_schedule</code> task names against
+<code>app.tasks</code> — would be worth adding. It would convert a silent runtime failure into a
+loud boot failure.</p>
+<p><strong>Resolution (2026-08-21) — and the first attempt was wrong.</strong> The validator was initially
+hooked to <code>on_after_finalize</code>. Its own new test failed immediately, revealing that
+<code>app.conf.imports</code> is a <em>declaration</em>, not an import: Celery loads those modules only when a
+worker or beat process boots. At finalize the registry is still empty, so the validator
+reported <strong>all 11</strong> scheduled tasks as unregistered — and because finalize fires in every
+process that merely imports the Celery app, it would have taken down the API container too.</p>
+<p>The working version hooks <code>beat_init</code> (this is beat&#39;s problem, not every process&#39;s) and calls
+<code>app.loader.import_default_modules()</code> before comparing. Verified end to end: beat boots clean
+and the receiver reports &quot;beat_schedule validated: 11 scheduled tasks all registered&quot;. The
+shared helper <code>check_beat_schedule_registered()</code> is what the CI test calls, so the test and the
+runtime guard cannot drift apart.</p>
+<hr>
+<p><a id="f7"></a></p>
+<h2>F7 · Two tasks are registered but absent from <code>beat_schedule</code></h2>
+<p><strong>Category:</strong> Operational · <strong>Confidence:</strong> Medium — depends on the DB scheduler&#39;s contents</p>
+<p><code>tasks.auth.prune_old_notifications</code> and <code>tasks.integrations.sync_oer_fx_rates</code> are defined
+and imported, but neither appears in <code>app.conf.beat_schedule</code>.</p>
+<p>Both readings are plausible and the code does not distinguish them:</p>
+<ul>
+<li><strong>Intended.</strong> The primary schedule is <code>django_celery_beat</code>&#39;s <code>DatabaseScheduler</code>, and these
+two are scheduled there, or invoked manually. <code>sync_oer_fx_rates</code> in particular looks like a
+deliberate fallback for when the ECB source is unavailable.</li>
+<li><strong>Unintended.</strong> They were meant to be scheduled and the entry was missed — in which case
+notifications accumulate without pruning indefinitely.</li>
+</ul>
+<p><strong>Partially checked (2026-08-21).</strong> The local database holds <strong>zero</strong> <code>PeriodicTask</code> rows.
+That is not evidence either way — <code>celery_beat</code> has never been started in this environment, so
+an empty table is expected. It does pin down the mechanism, though: <code>DatabaseScheduler</code> seeds
+<code>PeriodicTask</code> from <code>app.conf.beat_schedule</code> at beat startup, which means a task absent from
+<code>beat_schedule</code> receives <strong>no row at all</strong> and never runs unless someone adds it by hand in
+Django admin. The &quot;scheduled in the DB instead&quot; reading therefore only holds if that manual
+step was actually performed — it does not happen automatically.</p>
+<p><strong>To confirm:</strong> inspect <code>PeriodicTask</code> rows in the deployed environment, where beat has
+actually run.</p>
+<p><strong>Resolution (2026-08-21) — settled with evidence, not inspection.</strong> Split by task:</p>
+<ul>
+<li><code>prune_old_notifications</code> <strong>was</strong> an oversight. It is now scheduled (05:45 daily), and beat
+has synced it into the database — confirmed by querying <code>PeriodicTask</code> after startup.</li>
+<li><code>sync_oer_fx_rates</code> is <strong>correctly</strong> unscheduled. <code>sync_ecb_fx_rates</code> already dispatches it
+via <code>.delay()</code> when the ECB source fails, and it already no-ops with a clear log line when
+<code>OPEN_EXCHANGE_RATES_API_KEY</code> is unset (it defaults to <code>&quot;&quot;</code>). A comment in
+<code>config/celery.py</code> and a test now record that this omission is intentional.</li>
+</ul>
+<p>The mechanism hypothesised earlier is confirmed: <code>DatabaseScheduler</code> seeds <code>PeriodicTask</code>
+<em>from</em> <code>beat_schedule</code> at beat startup, so a task absent from the schedule gets no row at all.
+<code>prune_old_notifications</code> genuinely never ran.</p>
+<hr>
+<p><a id="f8"></a></p>
+<h2>F8 · <code>past_due</code> loses gated features immediately</h2>
+<p><strong>Category:</strong> Billing · <strong>Confidence:</strong> High — verified by reading the query</p>
+<div class="codewrap"><pre class="code"><code>sub = EntitySubscriptions.objects.select_related("PlanId").get(
+    ...
+    Status__in = ["active", "trialing"],
+)</code></pre></div><p><code>is_feature_enabled()</code> resolves a subscription only in <code>active</code> or <code>trialing</code> state. A
+subscription in <code>past_due</code> matches nothing, the lookup fails, and <strong>every</strong> gated feature is
+denied — there is no grace period.</p>
+<p><strong>Failure scenario.</strong> A customer&#39;s card expires. On the first failed charge the subscription
+moves to <code>past_due</code>, and their next request to any gated endpoint returns 402 with an upgrade
+prompt — despite being a paying customer mid-dunning. Scope 3 entry, land parcels, offsets and
+report export all stop at once. The likely support outcome is a churn conversation rather than
+a card update.</p>
+<p><strong>To confirm:</strong> this is a product decision, not a bug. Most SaaS billing allows a dunning grace
+window. If a grace period is wanted, adding <code>&quot;past_due&quot;</code> to the <code>Status__in</code> list is the whole
+change — though it should probably be time-boxed against <code>CurrentPeriodEnd</code> rather than open-ended.</p>
+<p><strong>Resolution (2026-08-21).</strong> A single <code>get_entitled_subscription()</code> helper replaces the
+status filter that was duplicated across <code>is_feature_enabled()</code> and <code>get_active_plan()</code>. A
+<code>past_due</code> subscription keeps its entitlements while <code>now() &lt;= CurrentPeriodEnd</code> — it paid for
+the period it is in — and loses them once that passes.</p>
+<p><code>can_add_entity()</code>&#39;s fail-<strong>open</strong> behaviour was left exactly as-is, with a comment naming the
+asymmetry against the two fail-closed callers; changing it is a separate product decision. A
+new <code>apps/billing/tests/</code> package covers the full status matrix, including the two boundary
+cases (<code>past_due</code> with a NULL period end, and <code>canceled</code> with a future one).</p>
+<hr>
+<p><a id="f9"></a></p>
+<h2>F9 · The unlock guard lives in the view, not the service</h2>
+<p><strong>Category:</strong> Authorization · <strong>Confidence:</strong> High — stated in the function&#39;s own docstring</p>
+<blockquote>
+<p><em>&quot;Only callable by SuperAdmin — <strong>the view enforces that guard</strong>.&quot;</em></p>
+</blockquote>
+<p><code>unlock_record()</code> performs the privileged state change — resetting a verified emissions record
+to editable — and writes the mandatory 7-year audit entry, but performs no authorization check
+of its own.</p>
+<p><strong>Failure scenario.</strong> Any future call site that is not the viewset — a management command, an
+admin action, a bulk-correction task — unlocks verified records with no SuperAdmin check. The
+audit row is still written, so the action is traceable, but it was never authorized.</p>
+<p><strong>Note.</strong> This is the same structural pattern as <strong>F3</strong>: the emissions service layer
+consistently places authorization and precondition checks in the view rather than the service.
+That is a defensible, coherent choice — the finding is that it is <em>load-bearing</em> and undocumented
+outside the docstrings, so a new call site is one easy mistake away from bypassing it.</p>
+<p><strong>Resolution (2026-08-21).</strong> <code>unlock_record()</code> now raises <code>PermissionDenied</code> when
+<code>unlocked_by</code> is not a SuperAdmin — it already received the acting user, so it always had the
+context to check. The guard runs before any mutation or audit write, so a rejected unlock
+leaves no trace. The view&#39;s inline check is retained for its specific response body. A test
+asserts the rejection writes no <code>Action=&quot;Unlock_Verified&quot;</code> audit row.</p>
+<hr>
+<p><a id="f10"></a></p>
+<h2>F10 · The <code>verify</code> action was open to any authenticated user</h2>
+<p><strong>Category:</strong> Authorization · <strong>Found:</strong> during the F3/F9 work, not in the original review</p>
+<p><code>EmissionsDataViewSet</code> sets <code>permission_classes = [IsAuthenticated]</code> at class level and the
+<code>verify</code> action did not override it. Any authenticated member of the tenant could verify an
+emissions record — <strong>including the person who created it</strong>. In an MRV/assurance product that
+defeats segregation of duties: verification is the control that makes a record defensible to an
+assurance provider, and self-verification makes it worthless.</p>
+<p><strong>Resolution (2026-08-21).</strong> A <code>get_permissions()</code> override now restricts <code>verify</code> to
+<code>IsManagerOrAbove</code> and <code>unlock</code> to <code>IsSuperAdmin</code>, reusing the existing permission classes
+rather than adding new ones. A test asserts a <code>staff</code>-role user gets 403 while the manager path
+still returns 204.</p>
+<p><strong>Not done:</strong> blocking a manager from verifying their <em>own</em> record. That is a stricter policy
+that could break legitimate workflows where one person both records and verifies, and it is a
+product decision rather than a defect.</p>
+<hr>
+<h2>Reading these together</h2>
+<p>F3, F9 and F10 were one architectural pattern seen three times: <code>apps/emissions</code> treated its
+service functions as trusted primitives and pushed every guard up into the view. That is a
+defensible choice, but it was load-bearing and undocumented outside docstrings, leaving each
+new call site one easy mistake away from bypassing it. All three guards now sit in the layer
+that owns the invariant, with the view checks kept so the API&#39;s responses are unchanged.</p>
+<p>F6 and F7 were both consequences of the top-level <code>tasks/</code> package layout, and F6 is the one
+worth remembering: the first fix was wrong in a way that would have broken the API container,
+and only writing the test caught it.</p>
+<hr>
+<p><em>Findings derived from <code>backend/apps/</code>, <code>backend/tasks/</code>, <code>backend/config/</code> on branch
+<code>fix/deploy-hardening</code>. All resolved 2026-08-21 and verified against a running stack:
+219 tests passing, migration applied, Celery worker and beat booting clean.</em></p>
+
+</section><section id="component" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">01</span></p>
+    <h2>Component & Deployment Architecture</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/01-component-architecture.md</code></p>
+  </header>
+  <p>How the running system is composed. Everything inside <strong>SusDevOS Platform</strong> is code in this
+repo; everything in <strong>External Services</strong> is a third party reached over HTTPS.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph Client["Client tier"]
+        BROWSER["Browser&lt;br/&gt;Next.js 14 App Router"]
+    end
+
+    subgraph Frontend["Frontend — frontend/ (Node 20)"]
+        PAGES["App Router pages&lt;br/&gt;(app) · (marketing) · (public)"]
+        QUERY["TanStack Query hooks&lt;br/&gt;src/hooks/"]
+        ORVAL["Generated API client&lt;br/&gt;src/lib/api (orval)"]
+        ZUSTAND["Auth store&lt;br/&gt;src/store/auth.ts"]
+        PAGES --&gt; QUERY --&gt; ORVAL
+        PAGES --&gt; ZUSTAND
+    end
+
+    subgraph Backend["Backend — backend/ (Django 5.1 + DRF)"]
+        MW["TenantQueryMiddleware&lt;br/&gt;sets request.entity_id"]
+        AUTH["RevokedTokenJWTAuthentication&lt;br/&gt;checks RevokedTokens by Jti"]
+        PERM["Permission layer&lt;br/&gt;HasModulePrivilege · IsSuperAdmin"]
+        GATE["FeatureGateMixin&lt;br/&gt;402 feature_gated"]
+        VIEWS["ViewSets&lt;br/&gt;TenantViewSetMixin"]
+        SVC["Service layer&lt;br/&gt;apps/*/services.py"]
+        MODELS["Models&lt;br/&gt;~70 tables"]
+        SPEC["drf-spectacular&lt;br/&gt;/api/schema/"]
+
+        MW --&gt; AUTH --&gt; PERM --&gt; GATE --&gt; VIEWS --&gt; SVC --&gt; MODELS
+        VIEWS -.-&gt; SPEC
+    end
+
+    subgraph Workers["Celery workers"]
+        WDEF["default queue&lt;br/&gt;-c 4"]
+        WINT["integrations queue&lt;br/&gt;-c 2"]
+        WREP["reports queue&lt;br/&gt;-c 2, max-tasks-per-child=10"]
+        BEAT["celery beat&lt;br/&gt;DatabaseScheduler"]
+    end
+
+    subgraph Data["Data tier"]
+        PG[("PostgreSQL 16&lt;br/&gt;+ PostGIS 3.4")]
+        REDIS[("Redis 7&lt;br/&gt;db0 cache · db1 broker&lt;br/&gt;db2 results · db3 django-cache")]
+        S3[("S3 / MinIO&lt;br/&gt;node-id/entity-id/...")]
+    end
+
+    subgraph External["External services"]
+        CLIMATIQ["Climatiq&lt;br/&gt;emission factors"]
+        VERRA["Verra VCS registry"]
+        GS["Gold Standard registry"]
+        ECB["ECB / OER&lt;br/&gt;FX rates"]
+        GBIF["GBIF + IUCN&lt;br/&gt;species data"]
+        CH["Companies House"]
+        SMTP["SMTP / SES"]
+    end
+
+    BROWSER --&gt; PAGES
+    ORVAL --&gt;|"JWT bearer&lt;br/&gt;+ X-Entity-ID"| MW
+    ORVAL --&gt;|"refresh_token cookie&lt;br/&gt;HttpOnly, /api/auth/refresh"| AUTH
+
+    MODELS --&gt; PG
+    VIEWS --&gt; REDIS
+    VIEWS --&gt;|"enqueue"| REDIS
+    REDIS --&gt; WDEF &amp; WINT &amp; WREP
+    BEAT --&gt;|"schedules"| REDIS
+
+    WREP --&gt; S3
+    WREP --&gt; PG
+    WDEF --&gt; PG
+    WINT --&gt; PG
+
+    WINT --&gt; CLIMATIQ &amp; VERRA &amp; GS &amp; ECB
+    VIEWS --&gt; GBIF &amp; CH
+    WDEF --&gt; SMTP
+
+    classDef ext fill:#fff3e0,stroke:#e65100,color:#000
+    classDef data fill:#e8f5e9,stroke:#1b5e20,color:#000
+    class CLIMATIQ,VERRA,GS,ECB,GBIF,CH,SMTP ext
+    class PG,REDIS,S3 data</pre></div></figure><h2>Request pipeline order — and why it matters</h2>
+<p><code>TenantQueryMiddleware</code> is <strong>Django</strong> middleware, so it runs <em>before</em> DRF authenticates the
+request. On a JWT request <code>request.user</code> is still anonymous at middleware time, so the
+middleware cannot resolve the entity. Every tenant-scoped view therefore re-resolves it:</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A["Django middleware&lt;br/&gt;TenantQueryMiddleware"] --&gt;|"user still&lt;br/&gt;AnonymousUser"| B["entity_id = None"]
+    B --&gt; C["DRF dispatch"]
+    C --&gt; D["initial()&lt;br/&gt;auth + permissions run"]
+    D --&gt; E["EntityScopeInitialMixin&lt;br/&gt;resolve_request_entity_id()"]
+    E --&gt; F["entity_id now correct"]
+    F --&gt; G["get_queryset()&lt;br/&gt;.filter(EntityId=entity_id)"]
+
+    style E fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>Omitting <code>EntityScopeInitialMixin</code> on a tenant-scoped view does not raise — it silently
+yields <code>entity_id is None</code>, which produces empty reads and NOT-NULL violations on create.</p>
+<h2>Deployment topology (local)</h2>
+<div class="tablewrap"><table><thead><tr><th>Service</th><th>Image / runtime</th><th>Host port</th><th>Notes</th></tr></thead><tbody><tr><td><code>db</code></td><td><code>postgis/postgis:16-3.4</code></td><td><em>none</em></td><td>Internal only — reachable as <code>db:5432</code></td></tr><tr><td><code>redis</code></td><td><code>redis:7-alpine</code></td><td>6379</td><td>4 logical DBs</td></tr><tr><td><code>minio</code></td><td><code>minio/minio:latest</code></td><td>9000 / 9001</td><td>S3 API / console</td></tr><tr><td><code>api</code></td><td><code>backend/Dockerfile</code></td><td>8000</td><td><code>runserver</code>, <code>config.settings.local</code></td></tr><tr><td><code>celery_worker</code></td><td><code>backend/Dockerfile</code></td><td>—</td><td><code>default</code> queue</td></tr><tr><td><code>celery_integrations</code></td><td><code>backend/Dockerfile</code></td><td>—</td><td><code>integrations</code> queue</td></tr><tr><td><code>celery_reports</code></td><td><code>backend/Dockerfile</code></td><td>—</td><td><code>reports</code> queue</td></tr><tr><td><code>celery_beat</code></td><td><code>backend/Dockerfile</code></td><td>—</td><td><code>django_celery_beat</code> DatabaseScheduler</td></tr><tr><td>frontend</td><td>Node 20 on host</td><td>3000</td><td>Not containerised for dev</td></tr></tbody></table></div><p><code>db</code> deliberately publishes no host port — 5432/5433 are occupied by other local databases.
+Backend processes must run inside the compose network to reach it.</p>
+<hr>
+<p><em>Source: <code>docker-compose.yml</code>, <code>backend/config/settings/</code>, <code>backend/config/celery.py</code>,
+<code>backend/apps/entities/middleware.py</code>, <code>backend/apps/shared/views.py</code>,
+<code>backend/apps/users/authentication.py</code>, <code>frontend/src/</code></em></p>
+
+</section><section id="tenancy" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">02</span></p>
+    <h2>Tenancy & RBAC Domain Model</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/02-domain-tenancy-rbac.md</code></p>
+  </header>
+  <p>The multi-tenancy root (<code>Entities</code>) and the privilege system that governs every request.</p>
+<h2>Tenancy</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class Entities {
+        +EntityId: AutoField PK
+        +EntityName: Char
+        +EntityType: SmallInt «1..8»
+        +ConsolidationApproach: SmallInt «1..3»
+        +ParentEntityId: FK self, PROTECT
+        +Status: SmallInt
+    }
+
+    class RelatedEntities {
+        &lt;&lt;junction&gt;&gt;
+        +ParentEntityId: FK
+        +ChildEntityId: FK
+        +RelationshipType
+    }
+
+    class EntityMembers {
+        +UserId: FK CASCADE
+        +EntityId: FK CASCADE
+        +Note: grants multi-entity access
+    }
+
+    class Users {
+        +UserId: PK
+        +EntityId: FK PROTECT «primary/home entity»
+        +username / email
+        +IsSuperAdmin: bool
+        +Designation
+    }
+
+    class EntityLocations { &lt;&lt;junction&gt;&gt; }
+    class EntityContacts { &lt;&lt;junction&gt;&gt; }
+    class EntityDocuments { &lt;&lt;junction&gt;&gt; }
+    class EntityTags { &lt;&lt;junction&gt;&gt; }
+    class EntityApiKeysIntermediary { &lt;&lt;junction&gt;&gt; }
+
+    Entities "1" --&gt; "*" Entities : ParentEntityId (self-hierarchy)
+    Entities "1" --&gt; "*" RelatedEntities : peer graph
+    Entities "1" --&gt; "*" Users : home entity
+    Entities "1" --&gt; "*" EntityMembers
+    Users "1" --&gt; "*" EntityMembers : additional entities
+    Entities "1" --&gt; "*" EntityLocations
+    Entities "1" --&gt; "*" EntityContacts
+    Entities "1" --&gt; "*" EntityDocuments
+    Entities "1" --&gt; "*" EntityTags
+    Entities "1" --&gt; "*" EntityApiKeysIntermediary</pre></div></figure><p>A user has exactly one <strong>home</strong> entity (<code>Users.EntityId</code>) and zero or more <strong>additional</strong>
+entities via <code>EntityMembers</code>. That is what makes an ESG consultant serving several clients
+possible without duplicating the user.</p>
+<h2>RBAC — Modules → Interfaces → RolePrivileges</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction LR
+
+    class Modules {
+        +ModuleId: PK
+        +ModuleKey
+        +ModuleName
+        +Status
+    }
+
+    class Interfaces {
+        +InterfaceId: PK
+        +ModuleId: FK CASCADE
+        +InterfaceKey «unique lookup key»
+        +Status
+    }
+
+    class Roles {
+        +RoleId: PK
+        +RoleName
+        +Status
+    }
+
+    class RolePrivileges {
+        +RoleId: FK CASCADE
+        +ModuleId: FK CASCADE
+        +InterfaceId: FK nullable «null = module wildcard»
+        +PermissionType: SmallInt «5 = All»
+        +Status
+    }
+
+    class UserRoles {
+        +UserId: FK CASCADE
+        +RoleId: FK CASCADE
+        +Status
+    }
+
+    class UserPrivilegeOverrides {
+        +UserId: FK CASCADE
+        +InterfaceId: FK CASCADE
+        +PermissionType «5 = All»
+        +OverrideAction: 1=Grant, 2=Revoke
+        +Status
+    }
+
+    class DataAccessPrivileges {
+        +UserId: FK CASCADE
+        +TargetEntityId: FK
+        +ModuleId: FK CASCADE
+    }
+
+    class Users
+
+    Modules "1" --&gt; "*" Interfaces
+    Roles "1" --&gt; "*" RolePrivileges
+    Modules "1" --&gt; "*" RolePrivileges
+    Interfaces "1" --&gt; "*" RolePrivileges
+    Users "1" --&gt; "*" UserRoles
+    Roles "1" --&gt; "*" UserRoles
+    Users "1" --&gt; "*" UserPrivilegeOverrides
+    Interfaces "1" --&gt; "*" UserPrivilegeOverrides
+    Users "1" --&gt; "*" DataAccessPrivileges
+    Modules "1" --&gt; "*" DataAccessPrivileges</pre></div></figure><h3>Privilege resolution algorithm</h3>
+<p>Implemented in <code>_resolve_privilege()</code>. The order is significant — overrides short-circuit
+roles entirely, and a Revoke beats a Grant at the same level.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TD
+    START(["_resolve_privilege(user, interface_key, permission_type)"]) --&gt; LOOKUP["Look up Interfaces&lt;br/&gt;by InterfaceKey, Status=1"]
+    LOOKUP --&gt;|"not found"| DENY1["return False"]
+    LOOKUP --&gt; OVR["Query UserPrivilegeOverrides&lt;br/&gt;PermissionType in (requested, 5=All)&lt;br/&gt;order_by −OverrideAction"]
+    OVR --&gt;|"override exists"| ORACT{"OverrideAction&lt;br/&gt;== 1 (Grant)?"}
+    ORACT --&gt;|"Yes"| ALLOW1["return True"]
+    ORACT --&gt;|"No (2=Revoke)"| DENY2["return False"]
+    OVR --&gt;|"no override"| ROLE["✅ F2 — union of all active UserRoles&lt;br/&gt;RoleId__in across every active role"]
+    ROLE --&gt;|"none"| DENY3["return False"]
+    ROLE --&gt; RP["RolePrivileges match?&lt;br/&gt;RoleId + ModuleId&lt;br/&gt;+ InterfaceId in (interface, NULL)&lt;br/&gt;+ PermissionType in (requested, 5)"]
+    RP --&gt;|"exists"| ALLOW2["return True"]
+    RP --&gt;|"none"| DENY4["return False"]
+
+    style ALLOW1 fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style ALLOW2 fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style DENY1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style DENY2 fill:#ffebee,stroke:#b71c1c,color:#000
+    style DENY3 fill:#ffebee,stroke:#b71c1c,color:#000
+    style DENY4 fill:#ffebee,stroke:#b71c1c,color:#000
+    style ROLE fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><strong><code>ORDER BY -OverrideAction</code> is load-bearing.</strong> <code>2</code> (Revoke) sorts before <code>1</code> (Grant), so a
+Revoke wins when both exist. The <code>.first()</code> depends on that ordering — this is correct, but
+it is not obvious, and removing the ordering would silently invert the precedence.</p>
+<blockquote>
+<p><strong>✅ F2 · Authorization — union across active roles — fixed 2026-08-21.</strong>
+<code>apps/shared/permissions.py:89</code> used to read <code>UserRoles.objects.filter(...).first()</code> with
+<strong>no <code>order_by</code></strong>. <code>UserRoles</code> is a many-to-many table, so a user could hold several active
+roles, but privileges were not the union of them — one arbitrary role won, and a user granted
+both <code>Manager</code> and a narrow custom role could silently lose their Manager privileges, with the
+effective role able to change after a table rewrite with no data change at all.
+<strong>Now:</strong> <code>_resolve_privilege</code> unions across every active role (<code>RoleId__in=role_ids</code>),
+matching what <code>IsEntityAdmin</code>/<code>IsManagerOrAbove</code> already did. No <code>UniqueConstraint</code> was added
+— deliberately, since the union makes multi-role well-defined and such a migration could fail
+against pre-existing duplicate rows. <code>assign_role</code> now runs inside <code>transaction.atomic()</code> so
+its retire-then-create pair cannot interleave.
+See <a href="#f2">F2 in the findings register</a>.</p>
+</blockquote>
+<p><code>build_privilege_map()</code> returns a flat <code>{interface_key: bool}</code> for <code>GET /auth/me</code>, which
+populates the frontend Zustand store. SuperAdmin bypasses the whole algorithm.</p>
+<h2>Token &amp; credential models</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class Users
+    class RevokedTokens {
+        +Jti: UUID «server-side revocation»
+        +UserId: FK
+        +ExpiresAt
+    }
+    class PasswordResetTokens {
+        +UserId: FK CASCADE
+        +Token
+        +ExpiresAt
+        +UsedAt
+    }
+    class EntityApiKeys {
+        +KeyId: PK
+        +HashedKey
+        +ExpiryDate
+    }
+
+    Users "1" --&gt; "*" RevokedTokens
+    Users "1" --&gt; "*" PasswordResetTokens</pre></div></figure><p>Access tokens are 15-minute JWTs held in memory; the 7-day refresh token is an HttpOnly
+cookie scoped to <code>Path=/api/auth/refresh</code>. Logout writes the <code>Jti</code> into <code>RevokedTokens</code>,
+which <code>RevokedTokenJWTAuthentication</code> checks on every request — so revocation is immediate
+rather than waiting for expiry.</p>
+<hr>
+<p><em>Source: <code>backend/apps/entities/models.py</code>, <code>backend/apps/users/models.py</code>,
+<code>backend/apps/shared/permissions.py</code>, <code>backend/apps/users/authentication.py</code></em></p>
+
+</section><section id="ghg" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">03</span></p>
+    <h2>GHG Accounting Domain Model</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/03-domain-ghg.md</code></p>
+  </header>
+  <p>The emissions core: reference data (units, factors, GWP), the inventory container,
+the emissions records themselves, and the target/offset satellites.</p>
+<h2>Reference data — units, factors, GWP</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction LR
+
+    class GwpDatasets {
+        +GwpDatasetId: PK
+        +DatasetName «e.g. IPCC AR6 GWP100»
+        +Status
+    }
+    class GwpValues {
+        +GwpValueId: PK
+        +GwpDatasetId: FK PROTECT
+        +Gas / Subtype
+        +GwpFactor: Decimal
+    }
+    class Units {
+        +UnitId: PK
+        +UnitCode
+        +ConversionFactor «to canonical unit»
+    }
+    class EmissionFactorSets {
+        +SetId: PK
+        +SetName «DEFRA, Climatiq, ...»
+        +Region / Year
+    }
+    class EmissionFactors {
+        +FactorId: PK
+        +SetId: FK PROTECT
+        +InputUnitId: FK PROTECT nullable
+        +FactorValue: Decimal
+    }
+
+    GwpDatasets "1" --&gt; "*" GwpValues
+    EmissionFactorSets "1" --&gt; "*" EmissionFactors
+    Units "1" --&gt; "*" EmissionFactors : InputUnitId</pre></div></figure><h2>Inventory and emissions records</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class GHGInventories {
+        +InventoryId: PK
+        +EntityId: FK PROTECT
+        +ReportingYear / PeriodFrom / PeriodTo
+        +BaselineYear
+        +GwpDatasetId: FK PROTECT
+        +ConsolidationApproach «1..3»
+        +VerificationStatus «1..4»
+        +VerifiedBy: FK Users SET_NULL
+        --
+        VerificationStatus &gt;= 3 → immutable
+    }
+
+    class Scope3RelevanceAssessments {
+        +InventoryId: FK CASCADE
+        +EntityId: FK PROTECT
+        +Category «1..15»
+        +IsRelevant / Justification
+    }
+
+    class EmissionsData {
+        +EmissionsId: PK
+        +EntityId: FK PROTECT
+        +ProjectId / PhaseId: FK nullable
+        +InventoryId: FK nullable
+        +Scope: SmallInt «1|2|3»
+        +Scope3Category: SmallInt nullable
+        +QuantityOrCost: Decimal «client input»
+        +InputUnitId: FK PROTECT
+        +QuantityCanonical: Decimal 🔒
+        +EmissionFactorId: FK
+        +EmissionFactor: Decimal
+        +GwpDatasetId: FK PROTECT
+        +EmissionsAmount: Decimal 🔒
+        +EmissionsAmountTonnes: Decimal 🔒
+        +BiogenicCO2FactorKg: Decimal
+        +BiogenicCO2AmountTonnes: Decimal 🔒
+        +EFLocationBased / EFMarketBased
+        +EmissionsAmountLocationBased 🔒
+        +EmissionsAmountMarketBased 🔒
+        +VerificationStatus: SmallInt
+        +VerifiedBy: FK Users
+    }
+
+    class EmissionsDetails {
+        +EmissionsId: FK CASCADE
+        +EntityId: FK PROTECT
+        +GwpDatasetId: FK PROTECT
+        +Gas / GasAmount
+    }
+
+    class EmissionsOffsets {
+        +OffsetId: PK
+        +EmissionsId: FK CASCADE
+        +EntityId: FK PROTECT
+        +OffsetAmountTonnes
+        +CreditSerialNumber
+        +CreditRegistry «verra | gold_standard»
+        +RegistryValidationStatus
+        +RegistryValidatedAt
+        +RegistryProjectName / Type / VintageYear
+        +RegistryRetirementBeneficiary
+    }
+
+    class Entities
+    class DevelopmentProjects
+    class GwpDatasets
+    class Units
+    class EmissionFactors
+
+    Entities "1" --&gt; "*" GHGInventories
+    GHGInventories "1" --&gt; "*" Scope3RelevanceAssessments
+    GHGInventories "1" --&gt; "*" EmissionsData
+    GwpDatasets "1" --&gt; "*" GHGInventories
+    GwpDatasets "1" --&gt; "*" EmissionsData
+    Entities "1" --&gt; "*" EmissionsData
+    DevelopmentProjects "1" --&gt; "*" EmissionsData
+    Units "1" --&gt; "*" EmissionsData : InputUnitId
+    EmissionFactors "1" --&gt; "*" EmissionsData
+    EmissionsData "1" --&gt; "*" EmissionsDetails
+    EmissionsData "1" --&gt; "*" EmissionsOffsets</pre></div></figure><p>🔒 = <strong>server-computed</strong>. Client-submitted values for these fields are overwritten in
+<code>EmissionsData.save()</code> → <code>compute_emissions()</code>. They are never trusted from the request body.</p>
+<h2>Targets</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class Targets {
+        +TargetId: PK
+        +EntityId: FK PROTECT
+        +BaselineYear / TargetYear
+        +ReductionPercent
+        +ValidationStatus: SmallInt
+    }
+    class TargetMilestones {
+        +MilestoneId: PK
+        +TargetId: FK CASCADE
+        +EntityId: FK PROTECT
+        +MilestoneYear
+        +TargetValue
+        +ActualValue «filled by nightly task»
+    }
+    Targets "1" --&gt; "*" TargetMilestones</pre></div></figure><p>Targets are <strong>generic</strong> reduction targets. Per <code>CLAUDE.md</code> there is deliberately no SBTi
+validation, registry sync, or SBTi-specific tiering — <code>ValidationStatus</code> is an internal
+review flag, not an external submission state.</p>
+<p><code>tasks.emissions.link_milestone_actuals</code> (nightly, 01:30) populates <code>ActualValue</code> from
+recorded emissions.</p>
+<h2>Currency</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class ExchangeRates {
+        +RateId: PK
+        +BaseCurrency / QuoteCurrency
+        +Rate: Decimal
+        +RateDate
+    }</pre></div></figure><p>Populated by <code>tasks.integrations.sync_ecb_fx_rates</code> (17:00 daily), with an
+Open Exchange Rates task as an alternative source. Needed because spend-based Scope 3
+factors are denominated per unit of currency.</p>
+<hr>
+<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/services.py</code>,
+<code>backend/tasks/emissions.py</code>, <code>backend/tasks/integrations/fx.py</code></em></p>
+
+</section><section id="nature" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">04</span></p>
+    <h2>Nature & MRV Domain Model</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/04-domain-nature-mrv.md</code></p>
+  </header>
+  <p>Land, ecosystems, species, and the two carbon-flux processes: <strong>tree removals</strong>
+(stock loss) and <strong>restorations</strong> (sequestration). This is the IPCC LULUCF /
+TNFD side of the platform.</p>
+<h2>Land &amp; ecosystem</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class LandParcels {
+        +LandParcelId: PK
+        +EntityId: FK PROTECT
+        +ParcelName
+        +AreaHectares
+        +Geometry «PostGIS»
+    }
+
+    class Ecosystem {
+        +EcosystemId: PK
+        +EntityId: FK PROTECT, db_column EntityId
+        +EcosystemName / Type
+    }
+
+    class Species {
+        +SpeciesId: PK
+        +EntityId: FK PROTECT, db_column EntityId
+        +ScientificName / CommonName
+        +IUCNStatus «LC..EX»
+        +IPCCForestType
+        +biomass parameters
+    }
+
+    class LandParcelEcosystems { &lt;&lt;junction&gt;&gt; }
+    class SpeciesLandParcels { &lt;&lt;junction&gt;&gt; }
+    class EcosystemTags { &lt;&lt;junction&gt;&gt; }
+    class SpeciesTags { &lt;&lt;junction&gt;&gt; }
+    class LandParcelTags { &lt;&lt;junction&gt;&gt; }
+    class LandParcelContacts { &lt;&lt;junction&gt;&gt; }
+    class LandParcelDocuments { &lt;&lt;junction&gt;&gt; }
+    class LandParcelImages { &lt;&lt;junction&gt;&gt; }
+    class LandParcelLocations { &lt;&lt;junction&gt;&gt; }
+    class LandParcelEntities { &lt;&lt;junction&gt;&gt; }
+
+    class Entities
+
+    Entities "1" --&gt; "*" LandParcels
+    LandParcels "1" --&gt; "*" LandParcelEcosystems
+    Ecosystem "1" --&gt; "*" LandParcelEcosystems
+    Species "1" --&gt; "*" SpeciesLandParcels
+    LandParcels "1" --&gt; "*" SpeciesLandParcels
+    Ecosystem "1" --&gt; "*" EcosystemTags
+    Species "1" --&gt; "*" SpeciesTags
+    LandParcels "1" --&gt; "*" LandParcelTags
+    LandParcels "1" --&gt; "*" LandParcelContacts
+    LandParcels "1" --&gt; "*" LandParcelDocuments
+    LandParcels "1" --&gt; "*" LandParcelImages
+    LandParcels "1" --&gt; "*" LandParcelLocations
+    LandParcels "1" --&gt; "*" LandParcelEntities</pre></div></figure><blockquote>
+<p><strong>✅ F1 · Tenant isolation — real foreign key — fixed 2026-08-21.</strong>
+Both fields used to be declared as <code>EntityId = models.IntegerField(help_text=&quot;FK to entities.Entities&quot;)</code> (<code>apps/ecosystem/models.py:27,52</code>) rather than as a real <code>ForeignKey</code>.
+With no relation, <code>TenantViewSetMixin.get_queryset()</code> could not filter them, so those
+viewsets mixed in only <code>EntityScopeInitialMixin</code> and enforced scoping in their own
+<code>get_queryset()</code> — a new endpoint that forgot the filter would have returned <strong>every
+tenant&#39;s</strong> species and ecosystems, silently and with no exception raised.
+<strong>Now:</strong> both fields are <code>models.ForeignKey(&quot;entities.Entities&quot;, on_delete=models.PROTECT, db_column=&quot;EntityId&quot;)</code>. <code>db_column</code> keeps the existing column name, so migration
+<code>ecosystem/0004</code> is <code>AlterField</code> only — confirmed with <code>sqlmigrate</code> before applying, no
+rename or data migration. Both viewsets now use <code>TenantViewSetMixin</code>, making isolation
+structural rather than conventional, which also closed a gap nobody had flagged: neither
+viewset previously wrote any <code>AuditLog</code> entries or set <code>UpdatedBy</code> — they now do. Regression
+tests remain in place (<code>apps/ecosystem/tests/test_tenant_scope.py</code>,
+<code>apps/land/tests/test_ecosystem_link_isolation.py</code>).
+See <a href="#f1">F1 in the findings register</a>.</p>
+</blockquote>
+<h2>Tree removals — carbon stock loss</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class TreeRemovals {
+        +TreeRemovalId: PK
+        +EntityId: FK PROTECT
+        +ProjectId: FK nullable
+        +RemovalDate
+        +TotalCO2eLostTonnes «computed»
+    }
+
+    class TreeRemovalRemovedSpecies {
+        +TreeRemovalId: FK CASCADE
+        +SpeciesId: FK CASCADE
+        +TreeCount / DBH / Height
+        +BiomassCalcMethod
+        +AboveGroundBiomass 🔒
+        +BelowGroundBiomass 🔒
+        +CarbonStockTonnes 🔒
+        +CO2eTonnes 🔒
+    }
+
+    class TreeRemovalAffectedSpecies {
+        +TreeRemovalId: FK CASCADE
+        +SpeciesId: FK CASCADE
+        +ImpactNotes
+    }
+
+    class Species
+    class TreeRemovalEcosystems { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalLandParcels { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalTags { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalContacts { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalDocuments { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalImages { &lt;&lt;junction&gt;&gt; }
+    class TreeRemovalEntities { &lt;&lt;junction&gt;&gt; }
+
+    TreeRemovals "1" --&gt; "*" TreeRemovalRemovedSpecies
+    TreeRemovals "1" --&gt; "*" TreeRemovalAffectedSpecies
+    Species "1" --&gt; "*" TreeRemovalRemovedSpecies
+    Species "1" --&gt; "*" TreeRemovalAffectedSpecies
+    TreeRemovals "1" --&gt; "*" TreeRemovalEcosystems
+    TreeRemovals "1" --&gt; "*" TreeRemovalLandParcels
+    TreeRemovals "1" --&gt; "*" TreeRemovalTags
+    TreeRemovals "1" --&gt; "*" TreeRemovalContacts
+    TreeRemovals "1" --&gt; "*" TreeRemovalDocuments
+    TreeRemovals "1" --&gt; "*" TreeRemovalImages
+    TreeRemovals "1" --&gt; "*" TreeRemovalEntities</pre></div></figure><p>The distinction between <strong>removed</strong> and <strong>affected</strong> species is the TNFD-relevant one:
+removed species carry the biomass/carbon computation, affected species record ecological
+impact without a carbon figure.</p>
+<h2>Restorations — sequestration</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class Restorations {
+        +RestorationId: PK
+        +EntityId: FK PROTECT
+        +RestorationDate
+        +TotalCO2eSequesteredTonnes «computed»
+    }
+
+    class RestorationSpecies {
+        +RestorationId: FK CASCADE
+        +SpeciesId: FK CASCADE
+        +TreeCount / SurvivalRate
+        +YearsEstablished 🔒
+        +BiomassCalcMethod
+        +CarbonStockTonnes 🔒
+        +CO2eTonnes 🔒
+        +PermanenceRisk
+    }
+
+    class Species
+    class RestorationEcosystems { &lt;&lt;junction&gt;&gt; }
+    class RestorationLandParcels { &lt;&lt;junction&gt;&gt; }
+    class RestorationDevelopmentProjects { &lt;&lt;junction&gt;&gt; }
+    class RestorationLocations { &lt;&lt;junction&gt;&gt; }
+    class RestorationTags { &lt;&lt;junction&gt;&gt; }
+    class RestorationContacts { &lt;&lt;junction&gt;&gt; }
+    class RestorationDocuments { &lt;&lt;junction&gt;&gt; }
+    class RestorationImages { &lt;&lt;junction&gt;&gt; }
+    class RestorationEntities { &lt;&lt;junction&gt;&gt; }
+
+    Restorations "1" --&gt; "*" RestorationSpecies
+    Species "1" --&gt; "*" RestorationSpecies
+    Restorations "1" --&gt; "*" RestorationEcosystems
+    Restorations "1" --&gt; "*" RestorationLandParcels
+    Restorations "1" --&gt; "*" RestorationDevelopmentProjects
+    Restorations "1" --&gt; "*" RestorationLocations
+    Restorations "1" --&gt; "*" RestorationTags
+    Restorations "1" --&gt; "*" RestorationContacts
+    Restorations "1" --&gt; "*" RestorationDocuments
+    Restorations "1" --&gt; "*" RestorationImages
+    Restorations "1" --&gt; "*" RestorationEntities</pre></div></figure><h2>Biomass carbon calculation</h2>
+<p>Both sides share the same IPCC LULUCF shape, implemented in
+<code>apps/restorations/services.py</code>:</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph Removal["Tree removal — stock loss"]
+        R1["Species row&lt;br/&gt;TreeCount, DBH, height"] --&gt; R2["compute_removed_species_carbon()"]
+        R2 --&gt; R3["Above-ground biomass&lt;br/&gt;allometric or per-tree default"]
+        R3 --&gt; R4["Below-ground biomass&lt;br/&gt;× root-to-shoot ratio"]
+        R4 --&gt; R5["Carbon stock&lt;br/&gt;× carbon fraction"]
+        R5 --&gt; R6["CO₂e&lt;br/&gt;× 44/12"]
+        R6 --&gt; R7["recompute_tree_removal_total()&lt;br/&gt;_sum_lulucf()"]
+    end
+
+    subgraph Rest["Restoration — sequestration"]
+        S1["Species row&lt;br/&gt;TreeCount, survival rate"] --&gt; S2["compute_restoration_species_sequestration()"]
+        S2 --&gt; S3["_years_established()&lt;br/&gt;from planting date"]
+        S3 --&gt; S4["Annual growth increment&lt;br/&gt;× years × surviving trees"]
+        S4 --&gt; S5["Carbon stock → CO₂e"]
+        S5 --&gt; S6["recompute_restoration_total()"]
+    end
+
+    R7 --&gt; TOT[("TreeRemovals.&lt;br/&gt;TotalCO2eLostTonnes")]
+    S6 --&gt; TOT2[("Restorations.&lt;br/&gt;TotalCO2eSequesteredTonnes")]
+
+    style R2 fill:#fff3e0,stroke:#e65100,color:#000
+    style S2 fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>Species-level parameters resolve through <code>_param(species, attr, forest_default_key)</code>:
+the species&#39; own value when set, otherwise the IPCC default for its <code>IPCCForestType</code>.</p>
+<h2>External species enrichment</h2>
+<p><code>apps/ecosystem/integrations.py</code> reaches <strong>GBIF</strong> (taxonomy / occurrence) and <strong>IUCN</strong>
+(Red List status) to populate <code>Species.IUCNStatus</code> and canonical naming. This is a
+synchronous, user-triggered lookup at species-creation time — not a scheduled sync.</p>
+<hr>
+<p><em>Source: <code>backend/apps/land/models.py</code>, <code>backend/apps/ecosystem/models.py</code>,
+<code>backend/apps/restorations/models.py</code>, <code>backend/apps/restorations/services.py</code>,
+<code>backend/apps/ecosystem/integrations.py</code></em></p>
+
+</section><section id="platform" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">05</span></p>
+    <h2>Platform Services Domain Model</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/05-domain-platform.md</code></p>
+  </header>
+  <p>Cross-cutting infrastructure: projects, billing, reports, notifications, audit,
+and the shared resource pool every module attaches to.</p>
+<h2>Development projects</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class DevelopmentProjects {
+        +ProjectId: PK
+        +EntityId: FK PROTECT
+        +ProjectName
+        +ConsolidationApproach 1..3
+        +StartDate / EndDate
+        +Status
+    }
+
+    class ProjectPhases {
+        +PhaseId: PK
+        +ProjectId: FK CASCADE
+        +EntityId: FK PROTECT
+        +PhaseName
+        +StartDate / EndDate
+    }
+
+    class DevelopmentProjectPartners {
+        +ProjectId: FK CASCADE
+        +EntityId: FK CASCADE
+        +PartnerRole
+    }
+
+    class RelatedProjects {
+        junction
+    }
+    class DevelopmentProjectLandParcels {
+        junction
+    }
+    class DevelopmentProjectTags {
+        junction
+    }
+    class DevelopmentProjectContacts {
+        junction
+    }
+    class DevelopmentProjectDocuments {
+        junction
+    }
+    class DevelopmentProjectImages {
+        junction
+    }
+    class DevelopmentProjectEntities {
+        junction
+    }
+
+    class Entities
+    class LandParcels
+    class EmissionsData
+
+    Entities "1" --&gt; "*" DevelopmentProjects
+    DevelopmentProjects "1" --&gt; "*" ProjectPhases
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectPartners
+    Entities "1" --&gt; "*" DevelopmentProjectPartners : partner_projects
+    DevelopmentProjects "1" --&gt; "*" RelatedProjects
+    LandParcels "1" --&gt; "*" DevelopmentProjectLandParcels
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectLandParcels
+    DevelopmentProjects "1" --&gt; "*" EmissionsData
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectTags
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectContacts
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectDocuments
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectImages
+    DevelopmentProjects "1" --&gt; "*" DevelopmentProjectEntities</pre></div></figure><p>A project can be <strong>shared</strong> across entities via <code>DevelopmentProjectPartners</code> — the partner
+entity gets a role, while the owning entity remains <code>DevelopmentProjects.EntityId</code>.</p>
+<h2>Billing &amp; feature gating</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction LR
+
+    class Plans {
+        +PlanId: PK
+        +PlanName
+        +PriceMonthly / PriceAnnual
+        +Status
+    }
+    class PlanFeatures {
+        +PlanId: FK CASCADE
+        +FeatureKey - gate lookup key
+        +FeatureValue / Limit
+    }
+    class EntitySubscriptions {
+        +EntityId: OneToOne CASCADE
+        +PlanId: FK PROTECT
+        +Status - active/trialing/past_due/cancelled
+        +BillingInterval - monthly/annual
+        +CurrentPeriodStart / End
+    }
+    class UsageTracking {
+        +EntityId: FK CASCADE
+        +MetricKey
+        +Count
+        +PeriodDate
+    }
+    class Entities
+
+    Plans "1" --&gt; "*" PlanFeatures
+    Plans "1" --&gt; "*" EntitySubscriptions
+    Entities "1" --&gt; "1" EntitySubscriptions
+    Entities "1" --&gt; "*" UsageTracking</pre></div></figure><p><code>EntitySubscriptions.EntityId</code> is a <strong>OneToOne</strong> — an entity has at most one subscription.
+<code>PlanId</code> is <code>PROTECT</code>, so a plan that any entity subscribes to cannot be deleted.</p>
+<p>Seeded state: 5 plans, 117 <code>PlanFeatures</code> rows. <code>seed_plans</code> must run <strong>before</strong> any entity
+is created, because <code>EntityCreateSerializer</code> attaches the free plan on creation.</p>
+<h3>Gate enforcement path</h3>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    REQ["Request to a gated view&lt;br/&gt;required_feature = scope_3"] --&gt; INIT["FeatureGateMixin.initial()"]
+    INIT --&gt; SUPER["super().initial()&lt;br/&gt;auth + permissions first"]
+    SUPER --&gt; SA{"IsSuperAdmin?"}
+    SA --&gt;|"Yes"| PASS["SUPERADMIN_BYPASS&lt;br/&gt;proceed"]
+    SA --&gt;|"No"| EID{"request.entity_id&lt;br/&gt;present?"}
+    EID --&gt;|"No"| DENY
+    EID --&gt;|"Yes"| CHK["billing.services.is_feature_enabled&lt;br/&gt;(entity_id, feature_key)"]
+    CHK --&gt;|"True"| PASS
+    CHK --&gt;|"False"| DENY["FeatureGatedException&lt;br/&gt;HTTP 402"]
+    DENY --&gt; RESP["code: feature_gated&lt;br/&gt;+ feature + upgrade_url"]
+    RESP --&gt; UI["Frontend renders&lt;br/&gt;upgrade modal"]
+
+    style DENY fill:#ffebee,stroke:#b71c1c,color:#000
+    style PASS fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><blockquote>
+<p><strong>✅ F5 · Documentation drift — gate status code documented — fixed 2026-08-21.</strong>
+<code>CLAUDE.md</code> documented the gate&#39;s response body (<code>{&quot;code&quot;: &quot;feature_gated&quot;, ...}</code>) but not
+its status code. The code raises <code>FeatureGatedException</code> carrying
+<code>status_code = HTTP_402_PAYMENT_REQUIRED</code> (<code>apps/billing/mixins.py:53</code>), converted to a
+response by the handler in <code>apps/shared/exceptions.py</code>. A frontend developer writing an
+interceptor could reasonably have assumed the platform&#39;s conventional 403, in which case the
+handler never fires and the upgrade modal silently fails to appear.
+<strong>Now:</strong> <code>CLAUDE.md</code> states the gate returns <strong>HTTP 402 Payment Required</strong> and includes the
+<code>detail</code> key the handler actually returns — the original example omitted it, a second
+inaccuracy in the same line. Nothing about the code changed; 402 was already the right choice
+for a billing gate.
+See <a href="#f5">F5 in the findings register</a>.</p>
+</blockquote>
+<blockquote>
+<p><strong>✅ F8 · Billing — grace period until <code>CurrentPeriodEnd</code> — fixed 2026-08-21.</strong>
+<code>is_feature_enabled()</code> used to resolve a subscription only with <code>Status__in = [&quot;active&quot;, &quot;trialing&quot;]</code> (<code>apps/billing/services.py:21</code>). A <code>past_due</code> subscription matched nothing, so a
+customer whose card expired would have hit 402 on Scope 3 entry, land parcels, offsets and
+report export all at once, mid-dunning, while still a paying customer — though nothing in the
+repo actually sets <code>past_due</code> (no Stripe webhook, no dunning logic), so this was
+forward-looking policy rather than a live outage.
+<strong>Now:</strong> a single <code>get_entitled_subscription()</code> helper replaces the status filter that was
+duplicated across <code>is_feature_enabled()</code> and <code>get_active_plan()</code>. A <code>past_due</code> subscription
+keeps its entitlements while <code>now() &lt;= CurrentPeriodEnd</code> — it paid for the period it is in —
+and loses them once that passes. <code>can_add_entity()</code>&#39;s fail-open behaviour was left as-is, with
+a comment naming the asymmetry against the two fail-closed callers; changing that is a
+separate product decision.
+See <a href="#f8">F8 in the findings register</a>.</p>
+</blockquote>
+<h2>Reports</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class ReportJobs {
+        +ReportJobId: PK
+        +EntityId: FK PROTECT
+        +RequestedBy: FK Users
+        +ReportType - emissions_summary, ghg_inventory, phase_progress, tree_log
+        +Format - pdf/csv/json
+        +JobStatus - 1 Queued to 4 Failed
+        +S3Key / FileSizeBytes
+        +StartedAt / CompletedAt
+        +ErrorMessage
+    }</pre></div></figure><h2>Notifications</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class Notifications {
+        +NotificationId: PK
+        +UserId: FK CASCADE
+        +EntityId: FK CASCADE
+        +Type - 10 kinds
+        +Title / Body
+        +RelatedModule / RelatedRecordId
+        +IsRead / ReadAt
+    }</pre></div></figure><p>Types: <code>user_created</code>, <code>emissions_submitted</code>, <code>emissions_verified</code>, <code>emissions_unlocked</code>,
+<code>system_error</code>, <code>access_denied</code>, <code>entity_created</code>, <code>password_reset</code>, <code>report_ready</code>,
+<code>report_failed</code>.</p>
+<h2>Shared resources &amp; audit</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    direction TB
+
+    class BaseAuditMixin {
+        &lt;&lt;abstract&gt;&gt;
+        +Status: SmallInt
+        +ApprovalStatus: SmallInt
+        +CreatedBy / CreatedOn
+        +UpdatedBy / UpdatedOn
+    }
+
+    class Locations {
+        +Latitude / Longitude
+        +Address / Country
+    }
+    class Tags
+    class Contacts {
+        +LocationId: FK
+    }
+    class Documents
+    class Images
+    class EntityApiKeys {
+        +HashedKey
+        +ExpiryDate
+    }
+    class AuditLog {
+        +AuditId: PK
+        +EntityId: FK
+        +ChangedBy: FK Users
+        +ChangedByUsername - denormalised
+        +Action / TableName / RecordId
+        +Description
+        +IPAddress / UserAgent
+        +RetentionTier - 1:30d, 2:1y, 3:7y
+        +ChangedOn
+    }
+    class DocumentTags {
+        junction
+    }
+    class ImageTags {
+        junction
+    }
+
+    BaseAuditMixin &lt;|-- Locations
+    BaseAuditMixin &lt;|-- Tags
+    BaseAuditMixin &lt;|-- Contacts
+    BaseAuditMixin &lt;|-- Documents
+    BaseAuditMixin &lt;|-- Images
+    BaseAuditMixin &lt;|-- EntityApiKeys
+    Documents "1" --&gt; "*" DocumentTags
+    Images "1" --&gt; "*" ImageTags
+    Tags "1" --&gt; "*" DocumentTags
+    Tags "1" --&gt; "*" ImageTags
+    Locations "1" --&gt; "*" Contacts</pre></div></figure><p><code>BaseAuditMixin</code> is inherited by nearly every domain model — that is where the universal
+<code>Status</code> / <code>CreatedBy</code> / <code>UpdatedOn</code> columns come from. <code>TenantViewSetMixin.get_queryset()</code>
+filters <code>Status__lt=4</code>, so status 4 is the soft-delete tombstone.</p>
+<h3>Audit retention tiers</h3>
+<div class="tablewrap"><table><thead><tr><th>Tier</th><th>Retention</th><th>Applies to</th></tr></thead><tbody><tr><td>1</td><td>30 days</td><td>Low-value trace events</td></tr><tr><td>2</td><td>1 year <em>(default)</em></td><td>Login / session events</td></tr><tr><td>3</td><td>7 years</td><td>CRUD and regulatory events — e.g. <code>Unlock_Verified</code></td></tr></tbody></table></div><p><code>tasks.auth.purge_expired_audit_logs</code> (05:30 daily) enforces these, served by the
+<code>idx_audit_retention</code> index on <code>(RetentionTier, ChangedOn)</code>.</p>
+<h2>Blog / CMS</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
+    class Blogs {
+        +BlogId: PK
+        +EntityId: FK PROTECT
+        +AuthorId: FK Users
+        +Title / Slug / Body
+        +BlogStatus - 1 Draft, 2 Published, 3 Archived
+        +PublishedAt
+    }</pre></div></figure><p>Dual-router: authenticated CMS CRUD under <code>/api/blog/</code>, plus an unauthenticated public
+reader at <code>/api/public/blog/{slug}/</code> (<code>apps/blog/urls_public.py</code>) serving the marketing site.</p>
+<hr>
+<p><em>Source: <code>backend/apps/projects/models.py</code>, <code>backend/apps/billing/</code>,
+<code>backend/apps/reports/models.py</code>, <code>backend/apps/notifications/models.py</code>,
+<code>backend/apps/shared/models.py</code>, <code>backend/apps/blog/</code></em></p>
+
+</section><section id="sequences" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">06</span></p>
+    <h2>Request & Calculation Sequences</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/06-sequences.md</code></p>
+  </header>
+  <p>The four interaction paths a reviewer most needs to trace end to end.</p>
+<h2>6.1 Login, tenant resolution, and refresh</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as Next.js frontend
+    participant MW as TenantQueryMiddleware
+    participant DRF as DRF dispatch
+    participant AU as RevokedTokenJWTAuthentication
+    participant V as View
+    participant DB as PostgreSQL
+
+    U-&gt;&gt;FE: submit username + password
+    FE-&gt;&gt;MW: POST /api/auth/login
+    Note over MW: user is AnonymousUser&lt;br/&gt;entity_id = None
+    MW-&gt;&gt;DRF: pass through
+    DRF-&gt;&gt;V: LoginView (AllowAny)
+    V-&gt;&gt;DB: authenticate credentials
+    DB--&gt;&gt;V: Users row
+    V-&gt;&gt;V: issue_tokens(user)
+    V-&gt;&gt;V: set_refresh_cookie(response)
+    V--&gt;&gt;FE: 200 access_token + user + entity_id + role&lt;br/&gt;Set-Cookie refresh_token HttpOnly&lt;br/&gt;Path=/api/auth/refresh Max-Age=604800
+    FE-&gt;&gt;FE: access token to Zustand (memory only)
+
+    rect rgba(120,160,255,0.10)
+        Note over FE,DB: Subsequent authenticated request
+        FE-&gt;&gt;MW: GET /api/emissions/&lt;br/&gt;Authorization Bearer + X-Entity-ID
+        MW-&gt;&gt;MW: request.user not authenticated yet
+        MW-&gt;&gt;MW: request.entity_id = None
+        MW-&gt;&gt;DRF: continue
+        DRF-&gt;&gt;AU: authenticate()
+        AU-&gt;&gt;DB: is Jti in RevokedTokens?
+        DB--&gt;&gt;AU: not revoked
+        AU--&gt;&gt;DRF: (user, token)
+        DRF-&gt;&gt;V: initial() runs perms
+        V-&gt;&gt;V: EntityScopeInitialMixin&lt;br/&gt;resolve_request_entity_id()
+        Note over V: SuperAdmin - any X-Entity-ID&lt;br/&gt;others - must belong via&lt;br/&gt;EntityMembers or home entity
+        V-&gt;&gt;DB: get_queryset().filter(EntityId=entity_id, Status__lt=4)
+        DB--&gt;&gt;V: tenant-scoped rows
+        V--&gt;&gt;FE: 200 results
+    end
+
+    rect rgba(255,180,120,0.12)
+        Note over FE,DB: Access token expires after 15 min
+        FE-&gt;&gt;V: POST /api/auth/refresh (cookie only)
+        V-&gt;&gt;DB: validate refresh, check RevokedTokens
+        V--&gt;&gt;FE: 200 new access_token
+    end
+
+    U-&gt;&gt;FE: logout
+    FE-&gt;&gt;V: POST /api/auth/logout
+    V-&gt;&gt;DB: INSERT RevokedTokens(Jti, ExpiresAt)
+    V-&gt;&gt;V: clear_refresh_cookie()
+    V--&gt;&gt;FE: 205 / 200</pre></div></figure><p>Revocation is server-side and immediate: <code>RevokedTokenJWTAuthentication.get_validated_token()</code>
+rejects any token whose <code>Jti</code> is present in <code>RevokedTokens</code>, rather than waiting for the
+15-minute expiry. <code>tasks.auth.purge_expired_revoked_tokens</code> (05:00 daily) sweeps rows whose
+underlying token has expired anyway.</p>
+<h2>6.2 Emissions record creation and server-side calculation</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as Contributor
+    participant V as EmissionsDataViewSet
+    participant M as EmissionsData.save()
+    participant S as emissions.services
+    participant DB as PostgreSQL
+
+    U-&gt;&gt;V: POST /api/emissions/ with QuantityOrCost,&lt;br/&gt;InputUnitId, EmissionFactor, Scope,&lt;br/&gt;and (ignored) EmissionsAmount
+    V-&gt;&gt;V: FeatureGateMixin - required_feature
+    V-&gt;&gt;V: TenantViewSetMixin.perform_create()&lt;br/&gt;EntityId = request.entity_id&lt;br/&gt;CreatedBy = request.user.UserId
+    Note over V: EntityId from request body is never trusted
+    V-&gt;&gt;M: save()
+    M-&gt;&gt;S: compute_emissions(instance)
+
+    alt QuantityOrCost or EmissionFactor is None
+        S--&gt;&gt;M: return - nothing to compute
+    else inputs present
+        S-&gt;&gt;S: _apply_unit_conversion()
+        Note over S: QuantityCanonical =&lt;br/&gt;QuantityOrCost x Unit.ConversionFactor&lt;br/&gt;(falls back to raw when no factor)
+        S-&gt;&gt;S: _compute_amounts()
+        S-&gt;&gt;DB: _get_gwp_factor() - GwpValues lookup
+        DB--&gt;&gt;S: GWP100 for gas/subtype
+        Note over S: kg CO2e = qty x EF x GWP100&lt;br/&gt;EmissionsAmount = kg&lt;br/&gt;EmissionsAmountTonnes = kg / 1000
+
+        opt BiogenicCO2FactorKg is not None
+            S-&gt;&gt;S: BiogenicCO2AmountTonnes = qty x factor / 1000
+            Note over S: EXCLUDED from EmissionsAmount&lt;br/&gt;(GHG Protocol, critical rule 4)
+        end
+
+        opt Scope == 2
+            S-&gt;&gt;S: _compute_scope2()
+            Note over S: LocationBased = qty x EFLocationBased&lt;br/&gt;MarketBased = qty x EFMarketBased&lt;br/&gt;each falls back to the generic result&lt;br/&gt;primary = market-based when available
+        end
+    end
+
+    S--&gt;&gt;M: instance mutated in place
+    M-&gt;&gt;DB: INSERT with server-computed fields
+    DB--&gt;&gt;V: saved row
+    V-&gt;&gt;V: _audit("Create", instance)
+    V--&gt;&gt;U: 201 with authoritative amounts</pre></div></figure><p>Three behaviours worth confirming in review, all deliberate and commented in
+<code>services.py</code>:</p>
+<ul>
+<li><code>QuantityCanonical</code> is tested with <code>is None</code>, not truthiness — a legitimate canonical
+value of zero must not silently revert to the raw quantity.</li>
+<li>Clearing <code>BiogenicCO2FactorKg</code> on a re-save also clears <code>BiogenicCO2AmountTonnes</code>,
+so a record that stops being biogenic does not keep reporting a stale figure.</li>
+<li>Scope 2 location/market amounts are recomputed unconditionally on every save (<code>else</code>,
+not <code>elif ... is None</code>), which keeps re-saves idempotent instead of retaining a stale
+value from the previous save.</li>
+</ul>
+<h2>6.3 Verification and unlock</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor VER as Verifier
+    actor SA as SuperAdmin
+    participant V as EmissionsDataViewSet
+    participant S as emissions.services
+    participant N as notifications.services
+    participant DB as PostgreSQL
+
+    VER-&gt;&gt;V: POST /api/emissions/{id}/verify/
+    V-&gt;&gt;V: permission check
+    Note over V: verify_record() now guards itself -&lt;br/&gt;raises on double-verification (F3, fixed)
+    V-&gt;&gt;S: verify_record(instance, verified_by, notes)
+    S-&gt;&gt;DB: VerificationStatus = 3&lt;br/&gt;VerifiedBy, VerifiedAt, VerificationNotes
+    S-&gt;&gt;N: notify(CreatedBy, "emissions_verified")
+    N-&gt;&gt;DB: INSERT Notifications
+    S--&gt;&gt;V: done
+    V--&gt;&gt;VER: 200 - record now locked
+
+    rect rgba(255,140,140,0.12)
+        Note over SA,DB: Later - the record must be corrected
+        SA-&gt;&gt;V: POST /api/emissions/{id}/unlock/ with reason
+        V-&gt;&gt;V: SuperAdmin guard now enforced in BOTH&lt;br/&gt;the view and unlock_record() (F9, fixed)
+        V-&gt;&gt;S: unlock_record(instance, reason, unlocked_by, entity_id)
+        S-&gt;&gt;DB: VerificationStatus = 1
+        S-&gt;&gt;DB: INSERT AuditLog&lt;br/&gt;Action=Unlock_Verified, RetentionTier=3 (7 years)
+        S-&gt;&gt;N: notify(CreatedBy, "emissions_unlocked")
+        S--&gt;&gt;V: done
+        V--&gt;&gt;SA: 200 - editable again
+    end</pre></div></figure><p>The unlock path is the compliance-sensitive one: it is SuperAdmin-only, requires a reason,
+and always writes a 7-year-retention audit row.</p>
+<blockquote>
+<p><strong>✅ F9 · Authorization — guard moved into the service — fixed 2026-08-21.</strong>
+<code>unlock_record()</code> (<code>apps/emissions/services.py:169</code>) performed the privileged state change
+and wrote the mandatory audit row, but its own docstring said outright: <em>&quot;Only callable by
+SuperAdmin — the view enforces that guard.&quot;</em> The function itself checked nothing, so any
+future call site that was not the viewset — a management command, an admin action, a
+bulk-correction task — could unlock verified records with no SuperAdmin check.
+<strong>Now:</strong> <code>unlock_record()</code> raises <code>PermissionDenied</code> when <code>unlocked_by</code> is not a SuperAdmin —
+it already received the acting user, so it always had the context to check. The guard runs
+before any mutation or audit write, so a rejected unlock leaves no trace. The view&#39;s inline
+check is retained for its specific response body, so the guard now lives in both places. This
+was the same structural pattern as <strong>F3</strong>, fixed the same way: the check now sits in the
+layer that owns the invariant.
+See <a href="#f9">F9 in the findings register</a>.</p>
+</blockquote>
+<h2>6.4 Asynchronous report generation</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as User
+    participant V as ReportJobsViewSet
+    participant DB as PostgreSQL
+    participant R as Redis (reports queue)
+    participant W as celery_reports worker
+    participant REN as reports.renderers
+    participant S3 as S3 / MinIO
+    participant N as Notifications
+
+    U-&gt;&gt;V: POST /api/reports/ - type, format
+    V-&gt;&gt;V: _require_export_feature(fmt)
+    V-&gt;&gt;DB: INSERT ReportJobs JobStatus=1 Queued
+    V-&gt;&gt;V: _queue_report(job)
+    V-&gt;&gt;R: generate_report.delay(job.ReportJobId)
+    V--&gt;&gt;U: 201 with ReportJobId - returns immediately
+
+    R-&gt;&gt;W: deliver task
+    W-&gt;&gt;DB: JobStatus=2 Processing, StartedAt=now()
+    W-&gt;&gt;REN: build_report_data(job)
+    REN-&gt;&gt;DB: gather rows for the report type
+    DB--&gt;&gt;REN: dataset
+    REN-&gt;&gt;REN: render(data, job.Format)
+    REN--&gt;&gt;W: bytes
+    W-&gt;&gt;S3: PUT node-id/entity-id/reports/uuid.fmt
+    S3--&gt;&gt;W: stored
+
+    alt success
+        W-&gt;&gt;DB: JobStatus=3 Complete, S3Key, FileSizeBytes, CompletedAt
+        W-&gt;&gt;N: _notify_complete(job) - report_ready
+    else exception
+        W-&gt;&gt;DB: JobStatus=4 Failed, ErrorMessage (500 chars), CompletedAt
+        W-&gt;&gt;N: _notify_failed() now fires only on&lt;br/&gt;the terminal attempt (F4, fixed)
+        W-&gt;&gt;R: self.retry() - max_retries=2, 60s delay
+    end
+
+    U-&gt;&gt;V: GET /api/reports/{id}/download/
+    V-&gt;&gt;V: reject unless JobStatus == 3
+    V-&gt;&gt;S3: presigned URL
+    V--&gt;&gt;U: 302 / URL</pre></div></figure><p><code>generate_report</code> carries <code>time_limit=300</code>, <code>max_retries=2</code>, <code>default_retry_delay=60</code>. The
+worker runs with <code>--max-tasks-per-child=10</code> because PDF rendering leaks memory over time.</p>
+<blockquote>
+<p><strong>✅ F4 · UX / async — notification deferred to the terminal attempt — fixed 2026-08-21.</strong>
+In <code>backend/tasks/reports.py:65-68</code> the job used to be marked <code>Failed</code> and <code>_notify_failed()</code>
+fired, and only then was <code>self.retry()</code> raised — so a transient S3 timeout on attempt 1 told
+the user their report failed, and a successful attempt 2 sixty seconds later told them it was
+ready. The user got a failure notice for a report that worked, and could re-request one
+already being generated.
+<strong>Now:</strong> <code>_notify_failed()</code> fires only when <code>self.request.retries &gt;= self.max_retries</code>. The
+<code>JobStatus = 4</code> write still happens on every attempt — &quot;Failed&quot; is an honest description of
+the job&#39;s state between attempts; it was only the <em>notification</em> that was premature. Three
+tests cover retries-remaining, the terminal attempt, and the happy path.
+See <a href="#f4">F4 in the findings register</a>.</p>
+</blockquote>
+<hr>
+<p><em>Source: <code>backend/apps/users/views.py</code>, <code>backend/apps/users/authentication.py</code>,
+<code>backend/apps/entities/middleware.py</code>, <code>backend/apps/shared/views.py</code>,
+<code>backend/apps/emissions/services.py</code>, <code>backend/apps/reports/views.py</code>,
+<code>backend/tasks/reports.py</code></em></p>
+
+</section><section id="states" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">07</span></p>
+    <h2>State Machines</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/07-state-machines.md</code></p>
+  </header>
+  <p>Every lifecycle in the system that is driven by a status column, and the transitions
+that are legal between states.</p>
+<h2>7.1 GHG inventory verification</h2>
+<p><code>GHGInventories.VerificationStatus</code> — the immutability rule that governs the whole
+compliance story.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Unverified
+
+    Unverified: 1 — Unverified
+    Pending: 2 — Pending
+    VerifiedFirst: 3 — Verified, First Party
+    VerifiedThird: 4 — Verified, Third Party
+
+    Unverified --&gt; Pending: submit for review
+    Pending --&gt; Unverified: reject / send back
+    Pending --&gt; VerifiedFirst: internal sign-off
+    Pending --&gt; VerifiedThird: external assurance
+    VerifiedFirst --&gt; VerifiedThird: escalate to third-party
+    VerifiedThird --&gt; Unverified: SuperAdmin unlock
+    VerifiedFirst --&gt; Unverified: SuperAdmin unlock
+
+    note right of VerifiedFirst
+        Status &gt;= 3 is IMMUTABLE.
+        PATCH and DELETE return 403.
+        Enforced in the view, not the serializer.
+    end note</pre></div></figure><p>The <code>&gt;= 3</code> threshold is what makes the check work: both verified states are locked by a
+single comparison, so adding a state 5 would automatically inherit immutability.</p>
+<h2>7.2 Emissions record verification</h2>
+<p><code>EmissionsData.VerificationStatus</code> — same shape, but note the field is a bare
+<code>PositiveSmallIntegerField(default=1)</code> with <strong>no <code>choices</code></strong> declared, unlike its
+inventory counterpart.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Draft
+
+    Draft: 1 — Draft / under review
+    Verified: 3 — Verified, locked
+
+    Draft --&gt; Verified: verify_record()
+    Verified --&gt; Draft: unlock_record() — SuperAdmin only, guard now in the service too (F9)
+    Verified --&gt; Verified: re-verify attempt rejected by verify_record() (F3, fixed)
+
+    note right of Verified
+        verify_record() sets status 3,
+        VerifiedBy, VerifiedAt, notes,
+        then notifies the record author.
+    end note
+
+    note left of Draft
+        unlock_record() always writes an
+        AuditLog row: Action=Unlock_Verified,
+        RetentionTier=3 (7-year retention).
+    end note</pre></div></figure><blockquote>
+<p><strong>✅ F3 · Data integrity — guard moved into the service — fixed 2026-08-21.</strong>
+<code>verify_record()</code> (<code>apps/emissions/services.py:145</code>) used to state in its own docstring that
+it &quot;does not guard against double-verification&quot; — the caller had to check current status
+first, and only <code>EmissionsDataViewSet</code> did. The <code>Verified → Verified</code> self-transition above
+was reachable from any future call site — a retried request, a management command, a
+bulk-verify endpoint — and would silently overwrite <code>VerifiedBy</code>, <code>VerifiedAt</code> and
+<code>VerificationNotes</code> with the second caller&#39;s identity, losing the original verifier&#39;s
+attestation with no audit record.
+<strong>Now:</strong> <code>verify_record()</code> raises <code>ValidationError({&quot;code&quot;: &quot;already_verified&quot;})</code> when
+<code>VerificationStatus &gt;= 3</code>, so every call site inherits the guard, not only the viewset. The
+view&#39;s own check is retained deliberately — it returns the exact response body existing
+tests assert on, so the API is unchanged. A test calls the service directly twice and asserts
+<code>VerifiedBy</code>/<code>VerifiedAt</code> survive the second call.
+See <a href="#f3">F3 in the findings register</a>.</p>
+</blockquote>
+<h2>7.3 Report job</h2>
+<p><code>ReportJobs.JobStatus</code>, driven by <code>tasks.reports.generate_report</code>.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Queued
+
+    Queued: 1 — Queued
+    Processing: 2 — Processing
+    Complete: 3 — Complete
+    Failed: 4 — Failed
+
+    Queued --&gt; Processing: worker picks up task&lt;br/&gt;StartedAt = now()
+    Processing --&gt; Complete: rendered + uploaded&lt;br/&gt;S3Key, FileSizeBytes, CompletedAt
+    Processing --&gt; Failed: exception&lt;br/&gt;ErrorMessage (500 chars)
+    Failed --&gt; Processing: self.retry()&lt;br/&gt;max_retries=2, 60s delay
+    Complete --&gt; [*]: purged after expiry
+    Failed --&gt; [*]: give up after 2 retries
+
+    note right of Complete
+        Only status 3 permits
+        GET /reports/{id}/download/
+    end note
+
+    note left of Failed
+        JobStatus = 4 is written on every
+        attempt. F4, fixed: the report_failed
+        notification now fires only on the
+        terminal attempt, after retries run out.
+    end note</pre></div></figure><p><code>tasks.reports.purge_expired_reports</code> (04:00 daily) deletes expired jobs and their S3
+objects via <code>_delete_s3_objects()</code>.</p>
+<h2>7.4 Carbon credit registry validation</h2>
+<p><code>EmissionsOffsets.RegistryValidationStatus</code> — the MRV assurance state, driven by the
+nightly registry sync tasks.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Unverified
+
+    Unverified: unverified — default on create
+    Pending: pending — awaiting next sync
+    Valid: valid — serial found in registry
+    Invalid: invalid — serial absent
+
+    Unverified --&gt; Pending: CreditSerialNumber +&lt;br/&gt;CreditRegistry supplied
+    Pending --&gt; Valid: serial matched&lt;br/&gt;RegistryValidatedAt set
+    Pending --&gt; Invalid: no match in registry CSV
+    Invalid --&gt; Pending: serial corrected, re-queued
+    Valid --&gt; Pending: re-validated on next sync
+
+    note right of Valid
+        Sync also backfills RegistryProjectName,
+        RegistryProjectType, RegistryVintageYear,
+        RegistryRetirementBeneficiary.
+    end note</pre></div></figure><p>Registries: <code>verra</code> (VCS) and <code>gold_standard</code>, synced at 03:00 and 03:30 daily onto the
+<code>integrations</code> queue. The Verra CSV is ~500 MB and is streamed, not buffered.</p>
+<h2>7.5 Blog post</h2>
+<p><code>Blogs.BlogStatus</code> — gates what the public marketing router will serve.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Draft
+
+    Draft: 1 — Draft
+    Published: 2 — Published
+    Archived: 3 — Archived
+
+    Draft --&gt; Published: publish — sets PublishedAt
+    Published --&gt; Archived: archive
+    Archived --&gt; Published: re-publish
+    Published --&gt; Draft: unpublish
+
+    note right of Published
+        Only status 2 is served by
+        GET /api/public/blog/{slug}/
+        (unauthenticated public router)
+    end note</pre></div></figure><h2>7.6 Soft-delete — the universal status column</h2>
+<p>Every model inheriting <code>BaseAuditMixin</code> carries a <code>Status</code> column that
+<code>TenantViewSetMixin.get_queryset()</code> filters with <code>Status__lt=4</code>.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    Active: 1 — Active
+    Inactive: 2 — Inactive
+    Suspended: 3 — Suspended
+    Deleted: 4 — Soft-deleted
+
+    [*] --&gt; Active
+    Active --&gt; Inactive
+    Inactive --&gt; Active
+    Active --&gt; Suspended
+    Suspended --&gt; Active
+    Active --&gt; Deleted
+    Inactive --&gt; Deleted
+    Suspended --&gt; Deleted
+
+    note right of Deleted
+        Status &gt;= 4 is invisible to every
+        tenant-scoped queryset. Rows are
+        retained, never hard-deleted.
+    end note</pre></div></figure><h2>7.7 Subscription</h2>
+<p><code>EntitySubscriptions.Status</code>.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
+    direction LR
+    [*] --&gt; Trialing
+
+    Trialing: trialing
+    Active: active
+    PastDue: past_due
+    Cancelled: cancelled
+
+    Trialing --&gt; Active: first successful payment
+    Trialing --&gt; Cancelled: trial lapsed
+    Active --&gt; PastDue: payment failed
+    PastDue --&gt; Active: payment recovered
+    PastDue --&gt; Cancelled: dunning exhausted
+    Active --&gt; Cancelled: user cancels
+    Cancelled --&gt; Active: resubscribe
+
+    note left of Active
+        active and trialing always resolve a
+        plan in is_feature_enabled(); past_due
+        resolves too, until CurrentPeriodEnd.
+    end note
+
+    note right of PastDue
+        F8, fixed: get_entitled_subscription()
+        now keeps entitlements for past_due
+        until CurrentPeriodEnd - it paid for
+        the period it is in.
+    end note</pre></div></figure><hr>
+<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/services.py</code>,
+<code>backend/apps/reports/models.py</code>, <code>backend/tasks/reports.py</code>,
+<code>backend/apps/billing/models.py</code>, <code>backend/apps/blog/models.py</code>,
+<code>backend/apps/shared/models.py</code>, <code>backend/apps/shared/views.py</code></em></p>
+
+</section><section id="async" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-uml">UML</span> <span class="doc-num">08</span></p>
+    <h2>Asynchronous Task Topology</h2>
+    <p class="doc-file"><code>docs/diagrams/uml/08-async-topology.md</code></p>
+  </header>
+  <p>Celery queues, the beat schedule, and where each task reaches outside the platform.</p>
+<h2>Queue routing</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph Producers
+        API["Django API&lt;br/&gt;generate_report.delay()"]
+        BEAT["celery beat&lt;br/&gt;DatabaseScheduler"]
+    end
+
+    subgraph Broker["Redis db1 — broker"]
+        Q1(["default"])
+        Q2(["integrations"])
+        Q3(["reports"])
+    end
+
+    subgraph Consumers
+        W1["celery_worker&lt;br/&gt;-Q default -c 4"]
+        W2["celery_integrations&lt;br/&gt;-Q integrations -c 2"]
+        W3["celery_reports&lt;br/&gt;-Q reports -c 2&lt;br/&gt;--max-tasks-per-child=10"]
+    end
+
+    API --&gt; Q3
+    BEAT --&gt; Q1 &amp; Q2 &amp; Q3
+    Q1 --&gt; W1
+    Q2 --&gt; W2
+    Q3 --&gt; W3
+
+    RES[("Redis db2&lt;br/&gt;result backend")]
+    W1 &amp; W2 &amp; W3 --&gt; RES
+
+    style Q2 fill:#fff3e0,stroke:#e65100,color:#000
+    style Q3 fill:#e3f2fd,stroke:#0d47a1,color:#000</pre></div></figure><p>Routing is declared in <code>config/celery.py</code>:</p>
+<div class="codewrap"><pre class="code"><code>app.conf.task_routes = {
+    "tasks.integrations.*": {"queue": "integrations"},
+    "tasks.reports.*":      {"queue": "reports"},
+}</code></pre></div><p>Anything not matching those prefixes lands on <code>default</code>. The <code>integrations</code> queue is isolated
+because its tasks are slow and network-bound; <code>reports</code> is isolated because PDF rendering is
+memory-hungry, hence <code>--max-tasks-per-child=10</code> to recycle workers.</p>
+<blockquote>
+<p><strong>✅ F6 · Operational — startup validator, fixed on the second attempt — fixed 2026-08-21.</strong>
+The task modules live in a top-level <code>tasks/</code> package rather than inside Django apps, so
+<code>app.autodiscover_tasks()</code> does not find them; <code>config/celery.py:22-29</code> imports all eight
+modules explicitly to compensate. Without a check, a developer adding <code>tasks/foo.py</code> and
+registering it in <code>beat_schedule</code> would deploy cleanly — beat publishes the task, no worker
+has it registered, and every firing raises <code>NotRegistered</code> worker-side, with nothing wrong
+visible in Django admin.
+<strong>Now — and the first attempt was wrong.</strong> A validator comparing <code>beat_schedule</code> names
+against <code>app.tasks</code> was initially hooked to <code>on_after_finalize</code>. Its own new test failed
+immediately: <code>on_after_finalize</code> fires in <em>every</em> process that merely imports the Celery app,
+with the registry still empty at that point, so it reported all 11 scheduled tasks as
+unregistered — and would have taken down the API container too. The working version hooks
+<code>beat_init</code> (this is beat&#39;s problem, not every process&#39;s) and calls
+<code>app.loader.import_default_modules()</code> before comparing. Verified end to end: beat boots clean
+and reports &quot;beat_schedule validated: 11 scheduled tasks all registered.&quot; The shared helper
+<code>check_beat_schedule_registered()</code> is what the CI test calls, so the test and the runtime
+guard cannot drift apart.
+See <a href="#f6">F6 in the findings register</a>.</p>
+</blockquote>
+<h2>Beat schedule (UTC)</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">gantt
+    title Nightly task schedule (UTC)
+    dateFormat HH:mm
+    axisFormat %H:%M
+
+    section Billing
+    reset_daily_api_counters      :00:00, 15m
+
+    section Emissions
+    recompute_stale_inventory_totals :01:00, 25m
+    link_milestone_actuals           :01:30, 20m
+
+    section Integrations
+    sync_climatiq_emission_factors (Sun) :02:00, 50m
+    sync_verra_registry                  :03:00, 25m
+    sync_gold_standard_registry          :03:30, 25m
+    sync_ecb_fx_rates                    :17:00, 15m
+
+    section Housekeeping
+    purge_expired_reports         :04:00, 20m
+    purge_expired_revoked_tokens  :05:00, 15m
+    purge_expired_audit_logs      :05:30, 20m
+    prune_old_notifications       :05:45, 15m</pre></div></figure><p><em>Bar widths indicate scheduling separation, not measured runtime.</em></p>
+<div class="tablewrap"><table><thead><tr><th>Task</th><th>Schedule</th><th>Queue</th><th>Purpose</th></tr></thead><tbody><tr><td><code>tasks.billing.reset_daily_api_counters</code></td><td>00:00 daily</td><td>default</td><td>Reset <code>UsageTracking</code> per-day counters</td></tr><tr><td><code>tasks.emissions.recompute_stale_inventory_totals</code></td><td>01:00 daily</td><td>default</td><td>Re-aggregate inventory scope totals</td></tr><tr><td><code>tasks.emissions.link_milestone_actuals</code></td><td>01:30 daily</td><td>default</td><td>Fill <code>TargetMilestones.ActualValue</code></td></tr><tr><td><code>tasks.integrations.sync_climatiq_emission_factors</code></td><td>02:00 Sundays</td><td>integrations</td><td>Refresh emission factor library</td></tr><tr><td><code>tasks.integrations.sync_verra_registry</code></td><td>03:00 daily</td><td>integrations</td><td>Validate VCS credit serials</td></tr><tr><td><code>tasks.integrations.sync_gold_standard_registry</code></td><td>03:30 daily</td><td>integrations</td><td>Validate Gold Standard serials</td></tr><tr><td><code>tasks.reports.purge_expired_reports</code></td><td>04:00 daily</td><td>reports</td><td>Delete expired jobs + S3 objects</td></tr><tr><td><code>tasks.auth.purge_expired_revoked_tokens</code></td><td>05:00 daily</td><td>default</td><td>Sweep <code>RevokedTokens</code> past expiry</td></tr><tr><td><code>tasks.auth.purge_expired_audit_logs</code></td><td>05:30 daily</td><td>default</td><td>Enforce retention tiers 1/2/3</td></tr><tr><td><code>tasks.auth.prune_old_notifications</code></td><td>05:45 daily</td><td>default</td><td>Trim read notifications</td></tr><tr><td><code>tasks.integrations.sync_ecb_fx_rates</code></td><td>17:00 daily</td><td>integrations</td><td>ECB reference rates (published ~16:00 CET)</td></tr><tr><td><code>tasks.integrations.sync_oer_fx_rates</code></td><td>—</td><td>integrations</td><td>Open Exchange Rates alternative</td></tr><tr><td><code>tasks.reports.generate_report</code></td><td>on demand</td><td>reports</td><td>User-triggered report build</td></tr></tbody></table></div><blockquote>
+<p><strong>✅ F7 · Operational — settled with evidence, not inspection — fixed 2026-08-21.</strong>
+<code>tasks.auth.prune_old_notifications</code> and <code>tasks.integrations.sync_oer_fx_rates</code> were defined
+and imported, but neither appeared in <code>app.conf.beat_schedule</code>. <code>DatabaseScheduler</code> seeds
+<code>PeriodicTask</code> from <code>beat_schedule</code> at beat startup, so a task absent from the schedule gets
+no row at all and never runs unless someone adds it by hand in Django admin — which meant the
+two tasks needed checking separately rather than assuming one explanation covered both.
+<strong>Now, split by task:</strong> <code>prune_old_notifications</code> <strong>was</strong> a genuine oversight — it is now
+scheduled at 05:45 daily, and beat has synced it into the database, confirmed by querying
+<code>PeriodicTask</code> after startup. <code>sync_oer_fx_rates</code> is <strong>correctly</strong> unscheduled:
+<code>sync_ecb_fx_rates</code> already dispatches it via <code>.delay()</code> when the ECB source fails, and it
+already no-ops with a clear log line when <code>OPEN_EXCHANGE_RATES_API_KEY</code> is unset (it defaults
+to <code>&quot;&quot;</code>). A comment in <code>config/celery.py</code> and a test now record that this omission is
+intentional — so only one of the two originally-flagged tasks turned out to be missing.
+See <a href="#f7">F7 in the findings register</a>.</p>
+</blockquote>
+<h2>External integration surface</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph Scheduled["Scheduled — integrations queue"]
+        T1["sync_climatiq_emission_factors"]
+        T2["sync_verra_registry"]
+        T3["sync_gold_standard_registry"]
+        T4["sync_ecb_fx_rates"]
+    end
+
+    subgraph Sync["Synchronous — request path"]
+        S1["Species lookup"]
+        S2["Company lookup"]
+    end
+
+    subgraph Ext["External providers"]
+        C["Climatiq API&lt;br/&gt;emission factor aggregator"]
+        V["Verra VCS&lt;br/&gt;~500 MB CSV, streamed"]
+        G["Gold Standard&lt;br/&gt;registry API"]
+        E["ECB reference rates"]
+        GB["GBIF + IUCN Red List"]
+        CH["Companies House"]
+    end
+
+    subgraph Tables["Tables written"]
+        TA[("EmissionFactors&lt;br/&gt;EmissionFactorSets")]
+        TB[("EmissionsOffsets&lt;br/&gt;RegistryValidationStatus")]
+        TC[("ExchangeRates")]
+        TD[("Species&lt;br/&gt;IUCNStatus")]
+        TE[("Entities")]
+    end
+
+    T1 --&gt; C --&gt; TA
+    T2 --&gt; V --&gt; TB
+    T3 --&gt; G --&gt; TB
+    T4 --&gt; E --&gt; TC
+    S1 --&gt; GB --&gt; TD
+    S2 --&gt; CH --&gt; TE
+
+    classDef ext fill:#fff3e0,stroke:#e65100,color:#000
+    class C,V,G,E,GB,CH ext</pre></div></figure><p>The split matters for failure behaviour: scheduled integrations degrade quietly (stale data
+until the next run, with retries), while the two synchronous lookups sit in the user&#39;s
+request path — a provider outage there surfaces as a failed user action.</p>
+<h2>Failure and retry posture</h2>
+<div class="tablewrap"><table><thead><tr><th>Task</th><th>Retry policy</th><th>Failure mode</th></tr></thead><tbody><tr><td><code>generate_report</code></td><td><code>max_retries=2</code>, 60s delay, <code>time_limit=300</code></td><td>Job → status 4 on every attempt; <code>report_failed</code> notification only on the terminal attempt (F4, fixed)</td></tr><tr><td><code>sync_verra_registry</code></td><td>Bound task with retry</td><td>Logs and aborts on <code>requests.RequestException</code>; offsets stay <code>pending</code></td></tr><tr><td><code>sync_ecb_fx_rates</code></td><td>Bound task with retry</td><td>Previous day&#39;s rates remain in <code>ExchangeRates</code></td></tr><tr><td>Purge tasks</td><td>None</td><td>Next night&#39;s run catches up</td></tr></tbody></table></div><hr>
+<p><em>Source: <code>backend/config/celery.py</code>, <code>backend/tasks/</code>, <code>docker-compose.yml</code></em></p>
+
+</section><section id="onboarding" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">01</span></p>
+    <h2>Tenant Onboarding & User Provisioning</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/01-tenant-onboarding.md</code></p>
+  </header>
+  <p>From a prospect arriving on the marketing site to a fully provisioned user who can log in.</p>
+<p><strong>Lanes</strong> map to the four seeded roles: <code>SuperAdmin</code> (1), <code>Admin</code> (2), <code>Manager</code> (3),
+<code>Staff</code> (4), plus the automated <strong>System</strong> lane.</p>
+<h2>Process</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["🧑 Prospect / Public"]
+        A([Arrives on marketing site]) --&gt; B[Browses /pricing, /features]
+        B --&gt; C[Submits /register or /demo]
+    end
+
+    subgraph L2["⚙️ System"]
+        C -.-&gt; D[/"Companies House lookup&lt;br/&gt;POST /integrations/companies-house/lookup/"/]
+        D --&gt; E{"Company&lt;br/&gt;found?"}
+        E --&gt;|"Yes"| F[/"Pre-fill EntityName,&lt;br/&gt;EntityType, registered address"/]
+        E --&gt;|"No"| G[Manual entry fallback]
+        F --&gt; H
+        G --&gt; H[/"EntityCreateSerializer"/]
+        H --&gt; I[("INSERT Entities")]
+        I --&gt; J[/"Attach free plan&lt;br/&gt;INSERT EntitySubscriptions"/]
+        J --&gt; K[("INSERT Users&lt;br/&gt;role = Admin")]
+        K --&gt; L[/"Generate onboard token&lt;br/&gt;PasswordResetTokens"/]
+        L --&gt; M[/"Send onboarding email"/]
+        M --&gt; N[("Notifications:&lt;br/&gt;entity_created, user_created")]
+    end
+
+    subgraph L3["👤 New Entity Admin"]
+        M -.-&gt; O[Opens emailed link&lt;br/&gt;/onboard]
+        O --&gt; P[Sets first password&lt;br/&gt;POST /auth/onboard]
+        P --&gt; Q([Can now log in])
+    end
+
+    subgraph L4["🛡️ SuperAdmin"]
+        N -.-&gt; R[Reviews new entity]
+        R --&gt; S{"Plan change&lt;br/&gt;needed?"}
+        S --&gt;|"Yes"| T[Adjust EntitySubscriptions]
+        S --&gt;|"No"| U([No action])
+    end
+
+    style D fill:#fff3e0,stroke:#e65100,color:#000
+    style H fill:#fff3e0,stroke:#e65100,color:#000
+    style J fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><strong>Ordering constraint.</strong> <code>seed_plans</code> must have run before any entity is created —
+<code>EntityCreateSerializer</code> looks up the free plan to attach a subscription, and entity creation
+fails without it. This is why the seed sequence in the README is ordered
+<code>seed_superadmins → seed_modules → seed_gwp → seed_plans</code> before any tenant exists.</p>
+<h2>Sub-process: inviting additional users</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph M1["👤 Entity Admin"]
+        A1([Needs a new team member]) --&gt; A2[POST /users/&lt;br/&gt;email, role, designation]
+    end
+
+    subgraph M2["⚙️ System"]
+        A2 --&gt; B1{"Caller privileged?&lt;br/&gt;IsEntityAdmin"}
+        B1 --&gt;|"No"| B2([403 — denied])
+        B1 --&gt;|"Yes"| B3{"Seat limit&lt;br/&gt;in PlanFeatures?"}
+        B3 --&gt;|"Exceeded"| B4([402 — feature_gated])
+        B3 --&gt;|"Within limit"| B5[("INSERT Users&lt;br/&gt;EntityId = request.entity_id")]
+        B5 --&gt; B6[("INSERT UserRoles")]
+        B6 --&gt; B7[/"Generate onboard token"/]
+        B7 --&gt; B8[/"Email invite"/]
+        B8 --&gt; B9[("Notification: user_created")]
+    end
+
+    subgraph M3["👤 Invited user"]
+        B8 -.-&gt; C1[Opens /onboard link]
+        C1 --&gt; C2[Sets password]
+        C2 --&gt; C3([Active — privileges&lt;br/&gt;resolved from role])
+    end
+
+    subgraph M4["👤 Entity Admin — optional"]
+        C3 -.-&gt; D1{"Needs an&lt;br/&gt;exception?"}
+        D1 --&gt;|"Yes"| D2[Add UserPrivilegeOverrides&lt;br/&gt;Grant or Revoke]
+        D1 --&gt;|"No"| D3([Role privileges suffice])
+        D2 --&gt; D4[/"Overrides short-circuit&lt;br/&gt;role lookup entirely"/]
+    end
+
+    style B2 fill:#ffebee,stroke:#b71c1c,color:#000
+    style B4 fill:#ffebee,stroke:#b71c1c,color:#000
+    style D4 fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>A user&#39;s <code>EntityId</code> is always taken from <code>request.entity_id</code>, never from the request body —
+so an Admin cannot provision a user into somebody else&#39;s tenant.</p>
+<h2>Sub-process: multi-entity access (ESG consultants)</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph N1["🛡️ SuperAdmin / Admin"]
+        A([Consultant needs access&lt;br/&gt;to a second client]) --&gt; B[Create EntityMembers row&lt;br/&gt;UserId + EntityId]
+    end
+
+    subgraph N2["⚙️ System — every later request"]
+        B -.-&gt; C[Request carries&lt;br/&gt;X-Entity-ID header]
+        C --&gt; D{"IsSuperAdmin?"}
+        D --&gt;|"Yes"| E[/"Any entity permitted"/]
+        D --&gt;|"No"| F{"user_can_access_entity()&lt;br/&gt;home entity or EntityMembers?"}
+        F --&gt;|"Yes"| G[/"request.entity_id set"/]
+        F --&gt;|"No"| H([403 forbidden_entity])
+        E --&gt; I[Queryset scoped to that entity]
+        G --&gt; I
+    end
+
+    style H fill:#ffebee,stroke:#b71c1c,color:#000</pre></div></figure><p>This is the mechanism that lets one consultant serve several client entities without
+duplicate user accounts. Without an <code>X-Entity-ID</code> header the user falls back to their home
+entity (<code>Users.EntityId</code>).</p>
+<hr>
+<p><em>Source: <code>backend/apps/entities/services.py</code>, <code>backend/apps/entities/middleware.py</code>,
+<code>backend/apps/users/views.py</code>, <code>backend/apps/users/serializers.py</code>,
+<code>backend/apps/billing/services.py</code>, <code>backend/apps/shared/permissions.py</code></em></p>
+
+</section><section id="emissions" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">02</span></p>
+    <h2>Emissions Data Lifecycle</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/02-emissions-lifecycle.md</code></p>
+  </header>
+  <p>From activity data capture to a locked, verified record — including the correction path.</p>
+<h2>Main process</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["👤 Staff — data contributor"]
+        A([Activity data available&lt;br/&gt;fuel, electricity, travel, spend]) --&gt; B[Open /emissions — new record]
+        B --&gt; C[Enter Scope, quantity,&lt;br/&gt;input unit, activity description]
+        C --&gt; D{"Scope?"}
+        D --&gt;|"Scope 1"| E[Select emission factor]
+        D --&gt;|"Scope 2"| F[Supply EFLocationBased&lt;br/&gt;AND EFMarketBased]
+        D --&gt;|"Scope 3"| G[Select category 1-15&lt;br/&gt;+ factor]
+        E --&gt; H[Submit POST /api/emissions/]
+        F --&gt; H
+        G --&gt; H
+    end
+
+    subgraph L2["⚙️ System — server-side only"]
+        H --&gt; I{"Feature gate&lt;br/&gt;is_feature_enabled()"}
+        I --&gt;|"Denied"| J([402 feature_gated&lt;br/&gt;upgrade modal])
+        I --&gt;|"Allowed"| K[/"Force EntityId = request.entity_id&lt;br/&gt;CreatedBy = request.user"/]
+        K --&gt; L[/"EmissionsData.save()&lt;br/&gt;compute_emissions()"/]
+        L --&gt; M[/"Unit conversion&lt;br/&gt;QuantityCanonical"/]
+        M --&gt; N[/"GWP lookup&lt;br/&gt;GwpValues by gas"/]
+        N --&gt; O[/"kg CO2e = qty x EF x GWP100"/]
+        O --&gt; P{"Biogenic factor&lt;br/&gt;present?"}
+        P --&gt;|"Yes"| Q[/"BiogenicCO2AmountTonnes&lt;br/&gt;EXCLUDED from total"/]
+        P --&gt;|"No"| R
+        Q --&gt; R{"Scope 2?"}
+        R --&gt;|"Yes"| S[/"Compute BOTH location-based&lt;br/&gt;and market-based amounts"/]
+        R --&gt;|"No"| T
+        S --&gt; T[("INSERT emissions_data")]
+        T --&gt; U[("AuditLog: Create")]
+        U --&gt; V[/"Client-submitted EmissionsAmount&lt;br/&gt;is discarded"/]
+    end
+
+    subgraph L3["👤 Manager — verifier"]
+        V -.-&gt; W[Reviews record on /emissions/id]
+        W --&gt; X{"Data&lt;br/&gt;defensible?"}
+        X --&gt;|"No"| Y[Request correction]
+        X --&gt;|"Yes"| Z[POST /emissions/id/verify/]
+    end
+
+    subgraph L4["⚙️ System — verification"]
+        Z --&gt; AA[/"verify_record()&lt;br/&gt;VerificationStatus = 3"/]
+        AA --&gt; AB[("VerifiedBy, VerifiedAt,&lt;br/&gt;VerificationNotes")]
+        AB --&gt; AC[("Notification:&lt;br/&gt;emissions_verified")]
+        AC --&gt; AD([🔒 Record locked&lt;br/&gt;PATCH/DELETE now 403])
+    end
+
+    Y -.-&gt; C
+
+    style J fill:#ffebee,stroke:#b71c1c,color:#000
+    style V fill:#fff3e0,stroke:#e65100,color:#000
+    style AD fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><strong>The controlling rule:</strong> emissions are never computed on the client. <code>EmissionsAmount</code>,
+<code>EmissionsAmountTonnes</code>, <code>QuantityCanonical</code>, <code>BiogenicCO2AmountTonnes</code>, and both Scope 2
+amounts are populated by <code>compute_emissions()</code> inside <code>EmissionsData.save()</code>. Whatever the
+client sends for those fields is overwritten.</p>
+<h2>Correction path — unlocking a verified record</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph U1["👤 Staff / Manager"]
+        A([Error found in a&lt;br/&gt;verified record]) --&gt; B[Attempt edit]
+        B --&gt; C([403 — record is locked])
+        C --&gt; D[Escalate to SuperAdmin&lt;br/&gt;with justification]
+    end
+
+    subgraph U2["🛡️ SuperAdmin"]
+        D -.-&gt; E{"Correction&lt;br/&gt;justified?"}
+        E --&gt;|"No"| F([Refuse — record stands])
+        E --&gt;|"Yes"| G[POST /emissions/id/unlock/&lt;br/&gt;with mandatory reason]
+    end
+
+    subgraph U3["⚙️ System"]
+        G --&gt; H{"✅ F9 — IsSuperAdmin?&lt;br/&gt;enforced in the VIEW&lt;br/&gt;AND in unlock_record()"}
+        H --&gt;|"No"| I([403 denied])
+        H --&gt;|"Yes"| J[/"unlock_record()&lt;br/&gt;VerificationStatus = 1"/]
+        J --&gt; K[("AuditLog&lt;br/&gt;Action = Unlock_Verified&lt;br/&gt;RetentionTier = 3 → 7 years")]
+        K --&gt; L[("Notification:&lt;br/&gt;emissions_unlocked")]
+        L --&gt; M([Record editable again])
+    end
+
+    M -.-&gt; N[Re-enter the main process&lt;br/&gt;at correction + re-verification]
+
+    style C fill:#ffebee,stroke:#b71c1c,color:#000
+    style I fill:#ffebee,stroke:#b71c1c,color:#000
+    style K fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>The 7-year audit entry is the compliance artefact: every unlock is permanently attributable
+to a named SuperAdmin with a stated reason.</p>
+<blockquote>
+<p><strong>✅ F9 · Authorization — guard moved into the service — fixed 2026-08-21.</strong>
+<code>unlock_record()</code> (<code>apps/emissions/services.py:169</code>) performed the privileged state change
+but checked nothing itself — its own docstring said <em>&quot;Only callable by SuperAdmin — the view
+enforces that guard.&quot;</em> A management command, admin action or bulk-correction task could have
+unlocked verified records with no authorization check; the audit row would still be written,
+so the action stayed traceable, but it was never authorized.
+<strong>Now:</strong> <code>unlock_record()</code> raises <code>PermissionDenied</code> when <code>unlocked_by</code> is not a SuperAdmin,
+before any mutation or audit write, so a rejected unlock leaves no trace. The view&#39;s inline
+check is retained for its specific response body — the guard now lives in both places.
+See <a href="#f9">F9 in the findings register</a>.</p>
+</blockquote>
+<h2>Scope 2 dual-method detail</h2>
+<p>GHG Protocol Scope 2 Guidance requires both methods to be reported. The platform always
+populates both columns, even when only one factor was supplied.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([Scope 2 record saved]) --&gt; B{"EFLocationBased&lt;br/&gt;supplied?"}
+    B --&gt;|"Yes"| C[/"LocationBased =&lt;br/&gt;qty x EFLocationBased"/]
+    B --&gt;|"No"| D[/"LocationBased =&lt;br/&gt;generic fallback result"/]
+    C --&gt; E{"EFMarketBased&lt;br/&gt;supplied?"}
+    D --&gt; E
+    E --&gt;|"Yes"| F[/"MarketBased =&lt;br/&gt;qty x EFMarketBased"/]
+    E --&gt;|"No"| G[/"MarketBased =&lt;br/&gt;LocationBased"/]
+    F --&gt; H[/"Primary EmissionsAmount&lt;br/&gt;= market-based"/]
+    G --&gt; H
+    H --&gt; I([Both columns always populated])
+
+    style I fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>Both branches recompute on <strong>every</strong> save rather than only when the column is null — that
+keeps re-saves idempotent instead of preserving a stale value from a previous save.</p>
+<hr>
+<p><em>Source: <code>backend/apps/emissions/views.py</code>, <code>backend/apps/emissions/services.py</code>,
+<code>backend/apps/emissions/models.py</code>, <code>backend/apps/billing/mixins.py</code></em></p>
+
+</section><section id="inventory" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">03</span></p>
+    <h2>GHG Inventory Close & Verification</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/03-inventory-verification.md</code></p>
+  </header>
+  <p>The annual reporting cycle: open an inventory, assess Scope 3 relevance, accumulate records,
+close, verify, and lock.</p>
+<h2>Annual inventory process</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["👤 Manager — sustainability lead"]
+        A([Reporting year begins]) --&gt; B[POST /ghg-inventories/&lt;br/&gt;ReportingYear, period from/to]
+        B --&gt; C[Choose GwpDatasetId&lt;br/&gt;e.g. IPCC AR6 GWP100]
+        C --&gt; D[Choose ConsolidationApproach&lt;br/&gt;1 Equity / 2 Financial / 3 Operational]
+        D --&gt; E[Assess Scope 3 relevance&lt;br/&gt;categories 1-15]
+    end
+
+    subgraph L2["⚙️ System"]
+        E --&gt; F[("INSERT Scope3RelevanceAssessments&lt;br/&gt;one row per category")]
+        F --&gt; G[("GHGInventories&lt;br/&gt;VerificationStatus = 1 Unverified")]
+    end
+
+    subgraph L3["👤 Staff — throughout the year"]
+        G -.-&gt; H[Record emissions against&lt;br/&gt;InventoryId]
+        H --&gt; I[/"See BPMN 02 —&lt;br/&gt;emissions lifecycle"/]
+        I --&gt; J{"Reporting period&lt;br/&gt;ended?"}
+        J --&gt;|"No"| H
+        J --&gt;|"Yes"| K([Data collection closed])
+    end
+
+    subgraph L4["⚙️ System — nightly"]
+        K -.-&gt; L[/"recompute_stale_inventory_totals&lt;br/&gt;01:00 daily"/]
+        L --&gt; M[/"_compute_inventory_totals()&lt;br/&gt;sum by scope"/]
+        M --&gt; N[("Scope 1 / 2 / 3 totals&lt;br/&gt;written to inventory")]
+    end
+
+    subgraph L5["👤 Manager"]
+        N -.-&gt; O[Review totals vs prior year]
+        O --&gt; P{"Complete and&lt;br/&gt;defensible?"}
+        P --&gt;|"No"| Q[Reopen data collection]
+        P --&gt;|"Yes"| R[Submit for verification&lt;br/&gt;VerificationStatus = 2 Pending]
+    end
+
+    Q -.-&gt; H
+
+    subgraph L6["👤 Verifier — internal or third party"]
+        R -.-&gt; S{"Assurance&lt;br/&gt;type?"}
+        S --&gt;|"Internal"| T[Sign off&lt;br/&gt;VerificationStatus = 3]
+        S --&gt;|"External"| U[Third-party assurance&lt;br/&gt;VerificationStatus = 4]
+        S --&gt;|"Rejected"| V[Send back to Unverified = 1]
+    end
+
+    subgraph L7["⚙️ System — lock"]
+        T --&gt; W[("VerifiedBy, VerifiedAt recorded")]
+        U --&gt; W
+        W --&gt; X([🔒 Status &gt;= 3&lt;br/&gt;PATCH/DELETE return 403])
+    end
+
+    V -.-&gt; O
+
+    style X fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style L fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>The immutability check is a single comparison — <code>VerificationStatus &gt;= 3</code> — so both the
+first-party (3) and third-party (4) states are locked by the same guard. It is enforced in
+the <strong>view</strong>, not the serializer.</p>
+<h2>Scope 3 relevance assessment</h2>
+<p>GHG Protocol requires reporters to justify which of the 15 Scope 3 categories are material.
+<code>Scope3RelevanceAssessments</code> is that record.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph A1["👤 Manager"]
+        A([For each of 15 categories]) --&gt; B{"Relevant to&lt;br/&gt;this entity?"}
+        B --&gt;|"Yes"| C[Mark relevant&lt;br/&gt;+ plan data source]
+        B --&gt;|"No"| D[Mark not relevant&lt;br/&gt;+ MANDATORY justification]
+    end
+
+    subgraph A2["⚙️ System"]
+        C --&gt; E[("Scope3RelevanceAssessments&lt;br/&gt;IsRelevant = true")]
+        D --&gt; F[("Scope3RelevanceAssessments&lt;br/&gt;IsRelevant = false&lt;br/&gt;+ Justification text")]
+        E --&gt; G[/"Category expected in&lt;br/&gt;emissions data"/]
+        F --&gt; H[/"Exclusion documented&lt;br/&gt;for the assurance file"/]
+    end
+
+    subgraph A3["👤 Verifier"]
+        G -.-&gt; I{"Relevant categories&lt;br/&gt;actually populated?"}
+        H -.-&gt; J{"Exclusions&lt;br/&gt;defensible?"}
+        I --&gt;|"Gaps"| K([Query raised])
+        J --&gt;|"Weak"| K
+        I --&gt;|"Complete"| L([Proceed to sign-off])
+        J --&gt;|"Sound"| L
+    end
+
+    style K fill:#ffebee,stroke:#b71c1c,color:#000
+    style L fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>The justification field is what makes an omitted category auditable rather than simply absent.</p>
+<h2>Multi-entity consolidation</h2>
+<p>For a parent entity with subsidiaries, totals are consolidated by the chosen approach.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph C1["👤 Manager — group level"]
+        A([Group inventory needed]) --&gt; B[Request consolidated totals]
+    end
+
+    subgraph C2["⚙️ System"]
+        B --&gt; C[/"compute_consolidated_emissions(&lt;br/&gt;entity, reporting_year, approach)"/]
+        C --&gt; D[/"accessible_entity_ids()&lt;br/&gt;walk ParentEntityId hierarchy"/]
+        D --&gt; E[/"_entity_scope_totals()&lt;br/&gt;per entity, per scope"/]
+        E --&gt; F{"Consolidation&lt;br/&gt;approach"}
+        F --&gt;|"1 Equity Share"| G[/"Weight by ownership %"/]
+        F --&gt;|"2 Financial Control"| H[/"Include 100% where&lt;br/&gt;financial control held"/]
+        F --&gt;|"3 Operational Control"| I[/"Include 100% where&lt;br/&gt;operational control held"/]
+        G --&gt; J[/"_round_scopes()"/]
+        H --&gt; J
+        I --&gt; J
+        J --&gt; K([Consolidated Scope 1/2/3 returned])
+    end
+
+    style K fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><code>ConsolidationApproach</code> is stored on <code>Entities</code>, <code>DevelopmentProjects</code>, <strong>and</strong>
+<code>GHGInventories</code> — the inventory&#39;s own value is the one that governs its reported figures,
+allowing an entity to change approach between reporting years without rewriting history.</p>
+<hr>
+<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/views.py</code>,
+<code>backend/apps/entities/services.py</code>, <code>backend/tasks/emissions.py</code></em></p>
+
+</section><section id="mrv" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">04</span></p>
+    <h2>Carbon Credit MRV & Registry Validation</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/04-carbon-credit-mrv.md</code></p>
+  </header>
+  <p>How an offset claim is captured and then independently validated against the Verra or
+Gold Standard registry. This is the MRV assurance loop.</p>
+<h2>Offset capture and validation</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["👤 Manager / ESG consultant"]
+        A([Credits purchased or retired]) --&gt; B[Open the emissions record&lt;br/&gt;the offset applies to]
+        B --&gt; C[POST /emissions/id/offsets/&lt;br/&gt;title, provider, tonnes]
+        C --&gt; D{"Credit serial&lt;br/&gt;available?"}
+        D --&gt;|"Yes"| E[Enter CreditSerialNumber&lt;br/&gt;+ CreditRegistry]
+        D --&gt;|"No"| F[Leave blank —&lt;br/&gt;unverified claim]
+    end
+
+    subgraph L2["⚙️ System — on save"]
+        E --&gt; G[("EmissionsOffsets&lt;br/&gt;RegistryValidationStatus = pending")]
+        F --&gt; H[("EmissionsOffsets&lt;br/&gt;RegistryValidationStatus = unverified")]
+        G --&gt; I[/"Awaits next registry sync"/]
+        H --&gt; J[/"Never validated —&lt;br/&gt;flagged in reporting"/]
+    end
+
+    subgraph L3["⚙️ Celery — integrations queue, nightly"]
+        I -.-&gt; K{"Which&lt;br/&gt;registry?"}
+        K --&gt;|"verra"| L[/"sync_verra_registry&lt;br/&gt;03:00 daily"/]
+        K --&gt;|"gold_standard"| M[/"sync_gold_standard_registry&lt;br/&gt;03:30 daily"/]
+    end
+
+    subgraph L4["🌍 Verra VCS registry"]
+        L --&gt; N[/"Stream ~500 MB CSV&lt;br/&gt;timeout 120s"/]
+        N --&gt; O{"Download&lt;br/&gt;succeeded?"}
+        O --&gt;|"No"| P([Log + abort —&lt;br/&gt;offsets stay pending])
+        O --&gt;|"Yes"| Q[/"Build set of valid serials&lt;br/&gt;+ retired serial → beneficiary map"/]
+    end
+
+    subgraph L5["⚙️ System — reconcile"]
+        Q --&gt; R{"Offset serial&lt;br/&gt;in registry?"}
+        M --&gt; R
+        R --&gt;|"Match"| S[("RegistryValidationStatus = valid&lt;br/&gt;RegistryValidatedAt = now")]
+        R --&gt;|"No match"| T[("RegistryValidationStatus = invalid")]
+        S --&gt; U[/"Backfill RegistryProjectName,&lt;br/&gt;ProjectType, VintageYear,&lt;br/&gt;RetirementBeneficiary"/]
+    end
+
+    subgraph L6["👤 Manager"]
+        U -.-&gt; V([✅ Offset evidenced])
+        T -.-&gt; W[Investigate — typo,&lt;br/&gt;wrong registry, or bad credit]
+        W --&gt; X[Correct serial → back to pending]
+    end
+
+    X -.-&gt; I
+
+    style P fill:#ffebee,stroke:#b71c1c,color:#000
+    style T fill:#ffebee,stroke:#b71c1c,color:#000
+    style V fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style J fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p><strong>Design property worth noting in review:</strong> validation is <em>asynchronous and external</em>. A
+user can never mark their own credit valid — only a registry match sets <code>valid</code>. That is what
+makes the offset column defensible in an assurance context.</p>
+<h2>Failure semantics</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([Sync task runs]) --&gt; B{"Registry&lt;br/&gt;reachable?"}
+    B --&gt;|"No — RequestException"| C[/"Log error, abort run"/]
+    C --&gt; D([Offsets keep prior status&lt;br/&gt;no false 'invalid'])
+    B --&gt;|"Yes"| E{"Serial found?"}
+    E --&gt;|"Yes"| F([valid])
+    E --&gt;|"No"| G([invalid])
+
+    style D fill:#fff3e0,stroke:#e65100,color:#000
+    style F fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style G fill:#ffebee,stroke:#b71c1c,color:#000</pre></div></figure><p>An unreachable registry deliberately does <strong>not</strong> downgrade offsets to <code>invalid</code> — a network
+outage must not look like a fraudulent credit. Status only moves to <code>invalid</code> on a successful
+download where the serial is genuinely absent.</p>
+<h2>Where offsets sit relative to gross emissions</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph Gross["Gross emissions — never reduced by offsets"]
+        A[("EmissionsData&lt;br/&gt;EmissionsAmountTonnes")]
+    end
+    subgraph Offset["Offset register — reported separately"]
+        B[("EmissionsOffsets&lt;br/&gt;OffsetAmountTonnes")]
+    end
+    subgraph Report["Reporting"]
+        C[/"Gross emissions"/]
+        D[/"Offsets applied"/]
+        E[/"Net position"/]
+    end
+
+    A --&gt; C
+    B --&gt; D
+    C --&gt; E
+    D --&gt; E
+
+    style A fill:#e3f2fd,stroke:#0d47a1,color:#000
+    style B fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>Offsets are a <strong>separate table joined to</strong> the emissions record, not a deduction applied to
+<code>EmissionsAmount</code>. Gross emissions stay gross — GHG Protocol requires offsets to be reported
+separately rather than netted into the inventory total. This mirrors the biogenic CO₂
+treatment in <code>EmissionsData</code>, where the biogenic figure is likewise held apart from the
+GWP total.</p>
+<h2>Scope boundary</h2>
+<p>Per <code>CLAUDE.md</code>, MRV here means <strong>Verra / Gold Standard credit validation</strong> only. There is
+deliberately no SBTi target validation, no CDP questionnaire export, and no NDC tagging —
+if a spec document describes those, the document is stale, not a backlog item.</p>
+<hr>
+<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/tasks/integrations/verra.py</code>,
+<code>backend/tasks/integrations/gold_standard.py</code>, <code>backend/config/celery.py</code></em></p>
+
+</section><section id="reports" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">05</span></p>
+    <h2>Report Generation & Delivery</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/05-report-generation.md</code></p>
+  </header>
+  <p>The only user-triggered asynchronous process in the platform. Everything else in the
+request path is synchronous.</p>
+<h2>Process</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["👤 User"]
+        A([Needs a report]) --&gt; B[Open /reports]
+        B --&gt; C[Choose type:&lt;br/&gt;emissions_summary · ghg_inventory&lt;br/&gt;phase_progress · tree_log]
+        C --&gt; D[Choose format:&lt;br/&gt;PDF · CSV · JSON]
+        D --&gt; E[POST /api/reports/]
+    end
+
+    subgraph L2["⚙️ Django API — synchronous"]
+        E --&gt; F{"_require_export_feature(fmt)&lt;br/&gt;plan allows this format?"}
+        F --&gt;|"No"| G([402 feature_gated])
+        F --&gt;|"Yes"| H[("INSERT ReportJobs&lt;br/&gt;JobStatus = 1 Queued&lt;br/&gt;EntityId, RequestedBy")]
+        H --&gt; I[/"_queue_report(job)&lt;br/&gt;generate_report.delay(id)"/]
+        I --&gt; J([201 with ReportJobId&lt;br/&gt;returns immediately])
+    end
+
+    subgraph L3["📮 Redis — reports queue"]
+        I -.-&gt; K[(Task enqueued)]
+    end
+
+    subgraph L4["⚙️ celery_reports worker"]
+        K --&gt; L[("JobStatus = 2 Processing&lt;br/&gt;StartedAt = now()")]
+        L --&gt; M[/"build_report_data(job)"/]
+        M --&gt; N[/"Query tenant-scoped rows&lt;br/&gt;for the report type"/]
+        N --&gt; O[/"render(data, format)"/]
+        O --&gt; P{"Render&lt;br/&gt;succeeded?"}
+    end
+
+    subgraph L5["🗄️ S3 / MinIO"]
+        P --&gt;|"Yes"| Q[/"PUT node-id/entity-id/&lt;br/&gt;reports/uuid.fmt"/]
+    end
+
+    subgraph L6["⚙️ Completion"]
+        Q --&gt; R[("JobStatus = 3 Complete&lt;br/&gt;S3Key, FileSizeBytes, CompletedAt")]
+        R --&gt; S[("Notification: report_ready")]
+        P --&gt;|"No — exception"| T[("JobStatus = 4 Failed&lt;br/&gt;ErrorMessage, 500 chars")]
+        T --&gt; U[("✅ F4 — Notification: report_failed&lt;br/&gt;sent only on terminal attempt")]
+        U --&gt; V{"Retries&lt;br/&gt;remaining?"}
+        V --&gt;|"Yes — max 2, 60s delay"| K
+        V --&gt;|"No"| W([Terminal failure])
+    end
+
+    subgraph L7["👤 User"]
+        S -.-&gt; X[Sees notification]
+        X --&gt; Y[GET /reports/id/download/]
+        Y --&gt; Z{"JobStatus == 3?"}
+        Z --&gt;|"No"| AA([Rejected])
+        Z --&gt;|"Yes"| AB[/"Pre-signed S3 URL&lt;br/&gt;expiry from env"/]
+        AB --&gt; AC([📄 File downloaded])
+        U -.-&gt; AD[Sees failure + reason]
+    end
+
+    style G fill:#ffebee,stroke:#b71c1c,color:#000
+    style T fill:#ffebee,stroke:#b71c1c,color:#000
+    style W fill:#ffebee,stroke:#b71c1c,color:#000
+    style AC fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style J fill:#e3f2fd,stroke:#0d47a1,color:#000</pre></div></figure><h2>Timing and resource constraints</h2>
+<div class="tablewrap"><table><thead><tr><th>Constraint</th><th>Value</th><th>Reason</th></tr></thead><tbody><tr><td><code>time_limit</code></td><td>300s</td><td>Hard kill — a runaway PDF render must not occupy a worker</td></tr><tr><td><code>max_retries</code></td><td>2</td><td>Transient S3/DB faults recover; deterministic render bugs do not</td></tr><tr><td><code>default_retry_delay</code></td><td>60s</td><td>Space out retries against a recovering dependency</td></tr><tr><td><code>--max-tasks-per-child</code></td><td>10</td><td>Recycle workers — PDF rendering accumulates memory</td></tr><tr><td>Worker concurrency</td><td>2</td><td>Reports are memory-heavy; a narrow queue protects the box</td></tr></tbody></table></div><h2>Retention</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([Report completes]) --&gt; B[(S3 object +&lt;br/&gt;ReportJobs row)]
+    B --&gt; C{"Past retention&lt;br/&gt;window?"}
+    C --&gt;|"No"| D([Downloadable])
+    C --&gt;|"Yes"| E[/"purge_expired_reports&lt;br/&gt;04:00 daily"/]
+    E --&gt; F[/"_delete_s3_objects(keys)"/]
+    F --&gt; G([Object + row removed])
+
+    style E fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><h2>✅ F4 · Failure notification ordering — fixed</h2>
+<blockquote>
+<p>The worker used to mark the job <code>Failed</code> <strong>and send <code>report_failed</code></strong> before calling
+<code>self.retry()</code> (<code>backend/tasks/reports.py:65-68</code>) — so a job that succeeded on its second
+attempt had already told the user it failed, then later told them it was ready, and they
+could re-request a report that was already in flight.
+<strong>Now:</strong> <code>_notify_failed()</code> fires only once <code>self.request.retries &gt;= self.max_retries</code>,
+deferring the notification to the terminal attempt. The <code>JobStatus = 4</code> write still happens
+on every attempt — &quot;Failed&quot; is an honest description of the job&#39;s state between attempts; it
+was only the <em>notification</em> that was premature. Three tests cover retries-remaining, the
+terminal attempt, and the happy path.
+See <a href="#f4">F4 in the findings register</a>.</p>
+</blockquote>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([Attempt 1 raises]) --&gt; B[JobStatus = 4 Failed]
+    B --&gt; C{"Retries&lt;br/&gt;remaining?"}
+    C --&gt;|"Yes - no notification"| D[self.retry]
+    D --&gt; E([Attempt 2 succeeds])
+    E --&gt; F[JobStatus = 3 Complete]
+    F --&gt; G[/"Notify: report_ready"/]
+    G --&gt; H([User receives ONE&lt;br/&gt;accurate notification])
+    C --&gt;|"No - terminal attempt"| I[/"Notify: report_failed"/]
+    I --&gt; J([User notified only&lt;br/&gt;on the final failure])
+
+    style H fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style J fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><h2>Local development note</h2>
+<p><code>_upload_to_storage()</code> branches on settings: S3/MinIO in normal operation, a <code>/tmp</code> write in
+development. A report generated in a local container therefore lands inside that container&#39;s
+filesystem, not in MinIO, unless S3 storage is enabled in the environment.</p>
+<hr>
+<p><em>Source: <code>backend/tasks/reports.py</code>, <code>backend/apps/reports/views.py</code>,
+<code>backend/apps/reports/models.py</code>, <code>backend/apps/reports/renderers.py</code>,
+<code>backend/config/celery.py</code></em></p>
+
+</section><section id="nature-proc" class="doc">
+  <header class="doc-head">
+    <p class="eyebrow"><span class="badge badge-bpmn">BPMN</span> <span class="doc-num">06</span></p>
+    <h2>Nature Tracking: Removals & Restoration</h2>
+    <p class="doc-file"><code>docs/diagrams/bpmn/06-nature-tracking.md</code></p>
+  </header>
+  <p>The LULUCF / TNFD side of the platform: recording biomass carbon lost to tree removal and
+gained through restoration planting.</p>
+<h2>Tree removal — carbon stock loss</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph L1["👤 Manager — project manager"]
+        A([Trees to be removed&lt;br/&gt;for development work]) --&gt; B[Create land parcel&lt;br/&gt;if not already recorded]
+        B --&gt; C[POST /tree-removals/&lt;br/&gt;date, project, parcel]
+        C --&gt; D[For each species removed:&lt;br/&gt;species, tree count, DBH, height]
+    end
+
+    subgraph L2["⚙️ System — species resolution"]
+        D --&gt; E{"Species already&lt;br/&gt;in the catalogue?"}
+        E --&gt;|"No"| F[/"GBIF lookup —&lt;br/&gt;taxonomy + canonical name"/]
+        F --&gt; G[/"IUCN Red List —&lt;br/&gt;conservation status"/]
+        G --&gt; H[("INSERT Species&lt;br/&gt;IUCNStatus, IPCCForestType")]
+        E --&gt;|"Yes"| I[Reuse existing row]
+        H --&gt; I
+    end
+
+    subgraph L3["⚙️ System — IPCC biomass calculation"]
+        I --&gt; J[/"compute_removed_species_carbon()"/]
+        J --&gt; K[/"_param(species, attr, forest_default)&lt;br/&gt;species value, else IPCC default&lt;br/&gt;for its forest type"/]
+        K --&gt; L[/"Above-ground biomass&lt;br/&gt;allometric or per-tree default"/]
+        L --&gt; M[/"Below-ground biomass&lt;br/&gt;x root-to-shoot ratio"/]
+        M --&gt; N[/"Carbon stock&lt;br/&gt;x carbon fraction"/]
+        N --&gt; O[/"CO2e = carbon x 44/12"/]
+        O --&gt; P[("TreeRemovalRemovedSpecies&lt;br/&gt;biomass, carbon, CO2e")]
+        P --&gt; Q[/"recompute_tree_removal_total()&lt;br/&gt;_sum_lulucf()"/]
+        Q --&gt; R[("TreeRemovals.&lt;br/&gt;TotalCO2eLostTonnes")]
+    end
+
+    subgraph L4["👤 Manager — TNFD impact"]
+        R -.-&gt; S[Record affected species&lt;br/&gt;not removed but impacted]
+        S --&gt; T[("TreeRemovalAffectedSpecies&lt;br/&gt;ecological impact, no carbon figure")]
+        T --&gt; U{"Threatened species&lt;br/&gt;IUCN CR/EN/VU?"}
+        U --&gt;|"Yes"| V([⚠️ Flagged for&lt;br/&gt;biodiversity reporting])
+        U --&gt;|"No"| W([Standard record])
+    end
+
+    style F fill:#fff3e0,stroke:#e65100,color:#000
+    style G fill:#fff3e0,stroke:#e65100,color:#000
+    style V fill:#ffebee,stroke:#b71c1c,color:#000</pre></div></figure><p>The <strong>removed vs affected</strong> split is the TNFD-relevant distinction: removed species carry the
+carbon computation, affected species record ecological impact without a carbon figure.</p>
+<h2>Restoration — sequestration</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    subgraph M1["👤 Manager"]
+        A([Restoration planting&lt;br/&gt;undertaken]) --&gt; B[POST /restorations/&lt;br/&gt;date, parcel, ecosystem]
+        B --&gt; C[Link to development project&lt;br/&gt;if compensatory planting]
+        C --&gt; D[For each species planted:&lt;br/&gt;count, survival rate,&lt;br/&gt;permanence risk]
+    end
+
+    subgraph M2["⚙️ System"]
+        D --&gt; E[/"compute_restoration_species_&lt;br/&gt;sequestration()"/]
+        E --&gt; F[/"_years_established()&lt;br/&gt;elapsed since planting"/]
+        F --&gt; G[/"Surviving trees =&lt;br/&gt;count x survival rate"/]
+        G --&gt; H[/"Annual growth increment&lt;br/&gt;x years x surviving trees"/]
+        H --&gt; I[/"Carbon stock → CO2e"/]
+        I --&gt; J[("RestorationSpecies&lt;br/&gt;CarbonStockTonnes, CO2eTonnes")]
+        J --&gt; K[/"recompute_restoration_total()"/]
+        K --&gt; L[("Restorations.&lt;br/&gt;TotalCO2eSequesteredTonnes")]
+    end
+
+    subgraph M3["⚙️ System — time-dependent"]
+        L --&gt; M{"Recomputed on&lt;br/&gt;later access?"}
+        M --&gt; N[/"YearsEstablished grows&lt;br/&gt;with elapsed time"/]
+        N --&gt; O([Sequestration figure&lt;br/&gt;increases year over year])
+    end
+
+    subgraph M4["👤 Manager — permanence"]
+        O -.-&gt; P{"PermanenceRisk&lt;br/&gt;assessed?"}
+        P --&gt;|"High"| Q([Discount applied&lt;br/&gt;in reporting])
+        P --&gt;|"Low"| R([Full credit claimed])
+    end
+
+    style O fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><strong>Important asymmetry.</strong> Removal carbon is a one-off stock loss fixed at the removal date.
+Restoration sequestration is a <em>function of elapsed time</em> — <code>_years_established()</code> recomputes
+from the planting date, so the same restoration row reports a larger figure each year. Any
+reviewer comparing the two must not treat them as symmetric quantities.</p>
+<h2>Combined nature balance</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    subgraph Loss["Carbon lost"]
+        A[("TreeRemovals&lt;br/&gt;TotalCO2eLostTonnes")]
+    end
+    subgraph Gain["Carbon sequestered"]
+        B[("Restorations&lt;br/&gt;TotalCO2eSequesteredTonnes")]
+    end
+    subgraph Report["tree_log report"]
+        C[/"Removals log"/]
+        D[/"Restoration log"/]
+        E[/"Net LULUCF position"/]
+    end
+
+    A --&gt; C --&gt; E
+    B --&gt; D --&gt; E
+    E --&gt; F([PDF / CSV export])
+
+    style A fill:#ffebee,stroke:#b71c1c,color:#000
+    style B fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>The <code>tree_log</code> report type in <code>ReportJobs.REPORT_TYPE_CHOICES</code> is what surfaces this
+combined view.</p>
+<h2>Tenant isolation — now structural</h2>
+<p><code>Ecosystem.EntityId</code> and <code>Species.EntityId</code> are now real <code>ForeignKey</code>s
+(<code>db_column=&quot;EntityId&quot;</code> keeps the existing column), so both viewsets use the full
+<code>TenantViewSetMixin</code> and scoping is enforced structurally rather than by convention.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([Request to /ecosystems/ or /species/]) --&gt; B["TenantViewSetMixin.initial()&lt;br/&gt;resolves request.entity_id"]
+    B --&gt; C[/"get_queryset() filters via the&lt;br/&gt;real EntityId ForeignKey"/]
+    C --&gt; D([Structurally scoped -&lt;br/&gt;no per-view filter to forget])
+
+    style D fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><blockquote>
+<p><strong>✅ F1 · Tenant isolation — real foreign key, structural enforcement — fixed 2026-08-21.</strong>
+<code>EntityId</code> used to be a plain <code>IntegerField</code> (<code>apps/ecosystem/models.py:27,52</code>) rather than a
+<code>ForeignKey</code>, so <code>TenantViewSetMixin</code> could not filter these models and each viewset had to
+filter for itself — a new endpoint that omitted the filter would have returned every
+tenant&#39;s species and ecosystems, silently and with no exception.
+<strong>Now:</strong> both fields are <code>models.ForeignKey(&quot;entities.Entities&quot;, on_delete=models.PROTECT, db_column=&quot;EntityId&quot;)</code>. <code>db_column</code> keeps the existing column, so the migration is
+<code>AlterField</code> only — no rename, no data migration. Both viewsets now use
+<code>TenantViewSetMixin</code>, which also gained them audit logging they previously had none of.
+<code>apps/ecosystem/tests/test_tenant_scope.py</code> and
+<code>apps/land/tests/test_ecosystem_link_isolation.py</code> remain as regression tests.
+See <a href="#f1">F1 in the findings register</a>.</p>
+</blockquote>
+<hr>
+<p><em>Source: <code>backend/apps/restorations/models.py</code>, <code>backend/apps/restorations/services.py</code>,
+<code>backend/apps/ecosystem/models.py</code>, <code>backend/apps/ecosystem/integrations.py</code>,
+<code>backend/apps/ecosystem/views.py</code>, <code>backend/apps/land/models.py</code></em></p>
+
+</section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail nav a'));
+  var map = {};
+  links.forEach(function (a) { map[a.dataset.target] = a; });
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.doc'));
+
+  if (!('IntersectionObserver' in window)) return;
+
+  var visible = {};
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+    var current = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (visible[sections[i].id]) { current = sections[i].id; break; }
+    }
+    if (!current) return;
+    links.forEach(function (a) { a.classList.toggle('active', a.dataset.target === current); });
+  }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+
+  sections.forEach(function (s) { io.observe(s); });
+})();
+</script>

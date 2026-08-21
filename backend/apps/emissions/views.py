@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from apps.billing.mixins import FeatureGateMixin
+from apps.shared.permissions import IsManagerOrAbove, IsSuperAdmin
 from apps.shared.views import TenantViewSetMixin
 
 from .models import (
@@ -48,6 +49,18 @@ VERIFIED = 3  # VerificationStatus >= VERIFIED → immutable
 class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
     queryset = EmissionsData.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """Segregation of duties (MRV/assurance): verifying or unlocking a
+        record must not be reachable by just any authenticated tenant member —
+        including the person who created the record being verified. Only
+        manager-or-above may verify; only SuperAdmin may unlock. All other
+        actions keep the class-level IsAuthenticated behaviour."""
+        if self.action == "verify":
+            return [IsAuthenticated(), IsManagerOrAbove()]
+        if self.action == "unlock":
+            return [IsAuthenticated(), IsSuperAdmin()]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         return EmissionsDataListSerializer if self.action == "list" else EmissionsDataSerializer

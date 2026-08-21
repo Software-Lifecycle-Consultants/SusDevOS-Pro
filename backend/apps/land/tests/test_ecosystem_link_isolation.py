@@ -41,7 +41,7 @@ def two_tenants(db, enable_feature):
     enable_feature(entity_a, "land_parcel_gis")
 
     parcel_a = LandParcels.objects.create(EntityId=entity_a, ParcelName="Alpha parcel")
-    eco_b = Ecosystem.objects.create(EntityId=entity_b.EntityId, EcosystemName="Beta wetland")
+    eco_b = Ecosystem.objects.create(EntityId_id=entity_b.EntityId, EcosystemName="Beta wetland")
 
     return {
         "client_a": _client_for(user_a, entity_a.EntityId),
@@ -72,7 +72,7 @@ def test_can_link_own_ecosystem(two_tenants):
     """Sanity check — linking an ecosystem in the parcel's own entity works."""
     parcel = two_tenants["parcel_a"]
     own_eco = Ecosystem.objects.create(
-        EntityId=parcel.EntityId_id, EcosystemName="Alpha meadow"
+        EntityId_id=parcel.EntityId_id, EcosystemName="Alpha meadow"
     )
     resp = two_tenants["client_a"].post(
         _url(parcel), {"EcosystemId": own_eco.EcosystemId}, format="json"

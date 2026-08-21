@@ -15,6 +15,7 @@ from datetime import UTC, timedelta
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -399,8 +400,9 @@ class UsersViewSet(EntityScopeInitialMixin, ModelViewSet):
         role = Roles.objects.filter(RoleKey=role_key, Status=1).first()
         if not role:
             return Response({"code": "not_found", "detail": "Role not found."}, status=status.HTTP_400_BAD_REQUEST)
-        UserRoles.objects.filter(UserId=target_user, Status=1).update(Status=4)
-        UserRoles.objects.create(UserId=target_user, RoleId=role)
+        with transaction.atomic():
+            UserRoles.objects.filter(UserId=target_user, Status=1).update(Status=4)
+            UserRoles.objects.create(UserId=target_user, RoleId=role)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

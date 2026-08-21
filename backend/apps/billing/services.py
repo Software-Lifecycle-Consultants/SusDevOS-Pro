@@ -5,6 +5,29 @@ Feature gate resolution lives here so it can be called from Celery tasks,
 management commands, and anywhere else that needs a plan check without an
 HTTP request object.
 """
+from django.utils import timezone
+
+ENTITLED_STATUSES = ("active", "trialing")
+
+
+def get_entitled_subscription(*, entity_id: int):
+    """The subscription that currently confers plan entitlements, or None.
+
+    ``past_due`` keeps its entitlements until the end of the period it has
+    already paid for — a failed card should not cut off access mid-period.
+    Once ``CurrentPeriodEnd`` passes, entitlements stop.
+    """
+    from apps.billing.models import EntitySubscriptions
+
+    try:
+        sub = EntitySubscriptions.objects.select_related("PlanId").get(EntityId_id=entity_id)
+    except EntitySubscriptions.DoesNotExist:
+        return None
+    if sub.Status in ENTITLED_STATUSES:
+        return sub
+    if sub.Status == "past_due" and sub.CurrentPeriodEnd and timezone.now() <= sub.CurrentPeriodEnd:
+        return sub
+    return None
 
 
 def is_feature_enabled(*, entity_id: int, feature_key: str) -> bool:
@@ -13,14 +36,10 @@ def is_feature_enabled(*, entity_id: int, feature_key: str) -> bool:
     Returns False for unknown entities, no active subscription, or gated features.
     SuperAdmin bypass is NOT applied here — callers handle that check.
     """
-    from apps.billing.models import EntitySubscriptions, PlanFeatures
+    from apps.billing.models import PlanFeatures
 
-    try:
-        sub = EntitySubscriptions.objects.select_related("PlanId").get(
-            EntityId_id = entity_id,
-            Status__in  = ["active", "trialing"],
-        )
-    except EntitySubscriptions.DoesNotExist:
+    sub = get_entitled_subscription(entity_id=entity_id)
+    if sub is None:
         return False
 
     return PlanFeatures.objects.filter(
@@ -32,19 +51,11 @@ def is_feature_enabled(*, entity_id: int, feature_key: str) -> bool:
 
 def get_active_plan(*, entity_id: int):
     """
-    Return the Plan instance for the entity's active/trialing subscription,
-    or None if no active subscription exists.
+    Return the Plan instance for the entity's active/trialing (or in-grace
+    past_due) subscription, or None if no entitled subscription exists.
     """
-    from apps.billing.models import EntitySubscriptions
-
-    try:
-        sub = EntitySubscriptions.objects.select_related("PlanId").get(
-            EntityId_id = entity_id,
-            Status__in  = ["active", "trialing"],
-        )
-        return sub.PlanId
-    except EntitySubscriptions.DoesNotExist:
-        return None
+    sub = get_entitled_subscription(entity_id=entity_id)
+    return sub.PlanId if sub else None
 
 
 def get_upgrade_message(*, feature_key: str) -> str:
@@ -101,6 +112,12 @@ def can_add_entity(*, entity_id: int) -> bool:
     """
     from apps.entities.models import Entities
 
+    # Routed through get_active_plan() (→ get_entitled_subscription()) for
+    # consistency with is_feature_enabled()/record_api_call(), but this function
+    # fails OPEN when no plan resolves — the opposite of those two, which fail
+    # closed. That asymmetry is intentional and pre-existing (unmetered entity
+    # provisioning is treated differently from feature/usage gating); changing
+    # it is a separate product decision, not part of this fix.
     plan = get_active_plan(entity_id=entity_id)
     if plan is None:
         return True
