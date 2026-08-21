@@ -15,8 +15,11 @@ All formulas verified against GHG Protocol Corporate Standard and IPCC AR6.
 from decimal import Decimal
 
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.test import APIClient
 
 import pytest
+from rest_framework_simplejwt.tokens import RefreshToken
 
 BASE_URL = "/api/emissions/"
 
@@ -44,6 +47,36 @@ def _payload(scope, quantity, ef, gas="CO2", gas_subtype=None, gwp_id=1, **extra
         p["GasSubtype"] = gas_subtype
     p.update(extra)
     return p
+
+
+def _role(key):
+    """Get-or-create a Roles row by RoleKey, for building non-admin test users."""
+    from apps.users.models import Roles
+    role, _ = Roles.objects.get_or_create(RoleKey=key, defaults={"RoleName": key.title()})
+    return role
+
+
+def _client_for(user, entity):
+    """APIClient authenticated as `user` (a real JWT) with X-Entity-ID set —
+    same pattern as conftest.py's auth_client, for users other than admin_user."""
+    client = APIClient()
+    client.credentials(
+        HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(user).access_token}",
+        HTTP_X_ENTITY_ID=str(entity.EntityId),
+    )
+    return client
+
+
+@pytest.fixture
+def staff_user(db, entity):
+    """A tenant user holding only the 'staff' role — below IsManagerOrAbove,
+    so verify/unlock must be closed to it (segregation of duties)."""
+    from apps.users.models import UserRoles
+    from apps.users.tests.factories import UsersFactory
+
+    user = UsersFactory(EntityId=entity, email="staff@testcorp.com", username="teststaff")
+    UserRoles.objects.create(UserId=user, RoleId=_role("staff"))
+    return user
 
 
 @pytest.mark.django_db
@@ -195,6 +228,35 @@ class TestVerificationImmutability:
         second = auth_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "again"}, format="json")
         assert second.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_verify_record_service_rejects_double_verification(
+        self, auth_client, admin_user, gwp_dataset, entity
+    ):
+        """The guard lives in verify_record() itself, not just the view — a
+        second direct call (management command, retried task, ...) must also
+        be rejected, and the original attestation must survive untouched."""
+        from apps.emissions.models import EmissionsData
+        from apps.emissions.services import verify_record
+
+        resp = auth_client.post(BASE_URL, _payload(
+            scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId,
+        ), format="json")
+        eid = resp.data["EmissionsId"]
+        record = EmissionsData.objects.get(pk=eid)
+
+        verify_record(record, verified_by=admin_user, notes="first verification")
+        record.refresh_from_db()
+        original_verified_by = record.VerifiedBy_id
+        original_verified_at = record.VerifiedAt
+        assert original_verified_by is not None
+        assert original_verified_at is not None
+
+        with pytest.raises(ValidationError):
+            verify_record(record, verified_by=admin_user, notes="second verification")
+
+        record.refresh_from_db()
+        assert record.VerifiedBy_id == original_verified_by
+        assert record.VerifiedAt == original_verified_at
+
     def _detail_payload(self, gwp_id):
         return {
             "Description": "Sub-meter A", "QuantityOrCost": "10.0000", "Unit": "litres",
@@ -254,6 +316,34 @@ class TestUnlock:
         non_sa = auth_client.post(f"{BASE_URL}{eid}/unlock/", {"reason": "testing"}, format="json")
         assert non_sa.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_unlock_record_service_denies_non_superadmin(
+        self, auth_client, admin_user, gwp_dataset, entity
+    ):
+        """unlock_record() enforces the SuperAdmin guard itself (not just the
+        view), and does so before any mutation or audit-log write — a rejected
+        unlock must leave VerificationStatus untouched and write no
+        Unlock_Verified audit trail of the attempted state change."""
+        from apps.emissions.models import EmissionsData
+        from apps.emissions.services import unlock_record
+        from apps.shared.models import AuditLog
+
+        resp = auth_client.post(BASE_URL, _payload(
+            scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId,
+        ), format="json")
+        eid = resp.data["EmissionsId"]
+        auth_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "ok"}, format="json")
+        record = EmissionsData.objects.get(pk=eid)
+        assert record.VerificationStatus == 3
+
+        with pytest.raises(PermissionDenied):
+            unlock_record(
+                record, reason="not allowed", unlocked_by=admin_user, entity_id=entity.EntityId,
+            )
+
+        record.refresh_from_db()
+        assert record.VerificationStatus == 3
+        assert not AuditLog.objects.filter(Action="Unlock_Verified", RecordId=eid).exists()
+
     def test_unlock_requires_reason(self, sa_client, auth_client, gwp_dataset, entity):
         resp = auth_client.post(BASE_URL, _payload(
             scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId,
@@ -311,6 +401,38 @@ class TestUnlock:
         log = AuditLog.objects.filter(Action="Unlock_Verified", RecordId=eid).first()
         assert log is not None
         assert log.RetentionTier == 3
+
+
+@pytest.mark.django_db
+class TestVerifyPermission:
+    """POST /emissions/{id}/verify/ is manager-or-above only (segregation of
+    duties): any authenticated tenant member — including the record's own
+    creator — must not be able to self-verify."""
+
+    def test_staff_cannot_verify(self, auth_client, staff_user, gwp_dataset, entity):
+        created = auth_client.post(BASE_URL, _payload(
+            scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId,
+        ), format="json")
+        eid = created.data["EmissionsId"]
+
+        staff_client = _client_for(staff_user, entity)
+        resp = staff_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "not allowed"}, format="json")
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+        record = auth_client.get(f"{BASE_URL}{eid}/")
+        assert record.data["VerificationStatus"] != 3
+
+    def test_manager_or_admin_can_still_verify(self, auth_client, gwp_dataset, entity):
+        """The admin_user fixture (used throughout this suite) holds the
+        'admin' role, which IsManagerOrAbove grants — the existing verify path
+        must keep returning 204 after the get_permissions() override."""
+        created = auth_client.post(BASE_URL, _payload(
+            scope=1, quantity="100.0000", ef=DIESEL_EF, gwp_id=gwp_dataset.GwpDatasetId,
+        ), format="json")
+        eid = created.data["EmissionsId"]
+
+        resp = auth_client.post(f"{BASE_URL}{eid}/verify/", {"notes": "ok"}, format="json")
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.django_db
