@@ -8,6 +8,108 @@
 
 ---
 
+## §0 — Pre-flight
+
+Settle these **before** you SSH in. Everything here is done in a browser, and two of the three
+have propagation delays, so start them first.
+
+### 0.1 — Point DNS away from the Namecheap parking page
+
+The domain currently serves Namecheap's parking page. Those records must be **removed**, not
+just added to — a leftover `URL Redirect` on `@` will hijack the ACME challenge and Let's
+Encrypt will fail to issue.
+
+In Namecheap → Domain List → susdevos.com → **Advanced DNS**:
+
+**Delete these two:**
+
+| Type | Host | Value |
+|------|------|-------|
+| CNAME Record | `www` | `parkingpage.namecheap.com.` |
+| URL Redirect Record | `@` | `http://www.susdevos.com/` |
+
+**Add these two:**
+
+| Type | Host | Value | TTL |
+|------|------|-------|-----|
+| A Record | `@` | `<VPS IP>` | Automatic |
+| A Record | `www` | `<VPS IP>` | Automatic |
+
+Verify from your machine before continuing — both must return the VPS IP and nothing else:
+
+```bash
+dig susdevos.com +short
+dig www.susdevos.com +short
+```
+
+Propagation is usually 5–30 minutes. **Do not start §3 until both resolve**, or cert issuance
+will fail and you will hit Let's Encrypt's rate limit (5 failures per hostname per hour).
+
+### 0.2 — Create the Cloudflare R2 bucket
+
+File uploads and generated reports go to R2. Free to 10 GB with no egress charge.
+
+1. Cloudflare dashboard → **R2** → *Create bucket* → name it `susdevos-files`, location auto.
+2. **R2** → *Manage R2 API Tokens* → *Create API token*:
+   - Permissions: **Object Read & Write**
+   - Scope: **specify bucket** → `susdevos-files` (do not grant account-wide access)
+3. Copy the **Access Key ID** and **Secret Access Key** — the secret is shown once.
+4. From the bucket's *Settings* page, copy the **S3 API endpoint**. It looks like
+   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+
+You now have four values for `backend/.env.prod`: `AWS_ACCESS_KEY_ID`,
+`AWS_SECRET_ACCESS_KEY`, `AWS_S3_ENDPOINT_URL`, and `AWS_STORAGE_BUCKET_NAME=susdevos-files`.
+
+### 0.3 — Transactional email
+
+Invitations, onboarding links and password resets all send email. Without a working sender, a
+new user can never set their password — so this is required for the product to function, even
+though the stack will start without it.
+
+Postmark is what `.env.prod.example` assumes: create a Server, copy its **Server API Token**,
+and use that same token as **both** `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`. Verify the
+sender signature for `noreply@susdevos.com` or Postmark will reject the send.
+
+Any SMTP provider works — adjust `EMAIL_HOST` and `EMAIL_PORT` to match.
+
+### 0.4 — What you need before starting, and what can wait
+
+**Required to launch:**
+
+| Value | Source |
+|-------|--------|
+| `SECRET_KEY`, `JWT_SIGNING_KEY`, `DB_PASSWORD` | Generated on the VPS — see §2 |
+| `SUPERADMIN_1_PASSWORD`, `SUPERADMIN_2_PASSWORD` | Chosen by you; change after first login |
+| R2 credentials ×4 | §0.2 |
+| SMTP credentials | §0.3 |
+
+**Safe to leave blank at launch** — each is guarded and degrades without breaking startup:
+
+| Value | Effect if unset |
+|-------|-----------------|
+| `CLIMATIQ_API_KEY` | Weekly emission-factor sync skips; seeded factors still work |
+| `COMPANIES_HOUSE_API_KEY` | Company lookup returns an error to the caller |
+| `IUCN_API_KEY` | Species enrichment skips the Red List status |
+| `OPEN_EXCHANGE_RATES_API_KEY` | ECB remains the only FX source; the fallback no-ops |
+| `VERRA_CSV_URL` | Verra credit validation skips |
+| `SENTRY_DSN` | No error reporting |
+
+Gold Standard validation needs no key — it queries a public registry — and is a no-op until
+offsets exist.
+
+### 0.5 — Known first-deploy notes
+
+- **The database starts empty**, so the `ecosystem/0004` foreign-key migration cannot hit the
+  orphaned-row problem that would affect an existing database (see SUS-6). A fresh deploy is
+  the safe time to apply it.
+- **Celery beat validates its schedule at startup.** If `beat_schedule` names a task no worker
+  has registered, beat exits with `ImproperlyConfigured` rather than silently publishing tasks
+  nobody runs. Verified passing with all 11 scheduled tasks.
+- **Reports render to R2, not local disk**, because `USE_S3=True`. Confirm the first generated
+  report appears in the bucket.
+
+---
+
 ## §1 — Provision the VPS
 
 1. Order a VPS at contabo.com → Cloud VPS → VPS S or VPS M → Ubuntu 24.04.
@@ -91,6 +193,30 @@ nano backend/.env.prod          # fill in all values
 #  passed to the Next.js image as Docker build args. Local frontend env files
 #  are excluded from the image by frontend/.dockerignore.)
 ```
+
+**Generate the three secrets on the server** — this keeps them off your laptop, out of your
+shell history elsewhere, and out of any chat transcript:
+
+```bash
+cd /opt/susdevos
+
+# Prints three values. Copy each into backend/.env.prod, then clear the terminal.
+python3 - <<'PY'
+import secrets, string
+alphabet = string.ascii_letters + string.digits
+print("SECRET_KEY="      + secrets.token_urlsafe(60))
+print("JWT_SIGNING_KEY=" + secrets.token_urlsafe(60))
+print("DB_PASSWORD="     + "".join(secrets.choice(alphabet) for _ in range(32)))
+PY
+```
+
+`DB_PASSWORD` must be identical in **two** files — `backend/.env.prod` and the top-level
+`/opt/susdevos/.env` created below. Postgres reads it from the top-level file when it
+initialises its data volume on first start; if the two ever disagree, the API cannot
+authenticate and the only fix is to destroy and recreate the volume.
+
+Keep `DB_PASSWORD` alphanumeric. In a Compose `.env` file a `#` begins a comment and a `$`
+begins variable interpolation — either will silently truncate or mangle the password.
 
 **Required backend values before continuing:**
 
