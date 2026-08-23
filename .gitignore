@@ -85,3 +85,6 @@ OPEN_ITEMS.md
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Wrangler local cache (contains account id / oauth state)
+.wrangler/
