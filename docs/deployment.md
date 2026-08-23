@@ -287,10 +287,15 @@ Nginx can't start with the HTTPS config until certs exist. Use the temporary HTT
 cd /opt/susdevos
 
 # Step 1: swap in the HTTP-only init config
+#   The init config lives in nginx/init/, NOT nginx/conf.d/ — conf.d is mounted into
+#   the container and nginx loads every *.conf in it, so a second port-80 server for
+#   susdevos.com there would shadow the real HTTP→HTTPS redirect.
 mv nginx/conf.d/susdevos.conf nginx/conf.d/susdevos.conf.bak
-cp nginx/conf.d/susdevos-init.conf nginx/conf.d/susdevos.conf
+cp nginx/init/susdevos-init.conf nginx/conf.d/susdevos.conf
 
 # Step 2: start Nginx on HTTP only
+#   nginx depends_on api + nextjs, so this also builds and starts them the first
+#   time — expect 5–10 minutes before nginx is actually listening.
 docker compose -f docker-compose.prod.yml up -d nginx
 
 # Verify ACME path is reachable (should return 200)
@@ -311,9 +316,25 @@ mv nginx/conf.d/susdevos.conf.bak nginx/conf.d/susdevos.conf
 
 # Step 5: reload Nginx (now has valid certs)
 docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+
+# Step 6: confirm conf.d holds ONLY the real config plus the shared snippet.
+#   Anything else ending in .conf becomes a live server block.
+ls nginx/conf.d/          # expect: proxy_params.conf  susdevos.conf  susdevos.conf.bak
+docker compose -f docker-compose.prod.yml exec nginx nginx -t
 ```
 
-If Certbot fails: check that port 80 is open, DNS has propagated, and the Nginx container is running.
+`nginx -t` must report `syntax is ok` / `test is successful` with **no** "conflicting server
+name" warnings. A conflict there means a stray `*.conf` is shadowing the real config.
+
+Verify the redirect actually works, rather than assuming:
+
+```bash
+curl -sI http://susdevos.com | head -1     # expect: HTTP/1.1 301 Moved Permanently
+curl -sI https://susdevos.com | head -1    # expect: HTTP/2 200
+```
+
+If Certbot fails: check that port 80 is open, DNS has propagated, and the Nginx container is
+running. DNS is already correct as of 2026-08-23 — both names resolve to `217.76.54.215`.
 
 ---
 
