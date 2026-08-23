@@ -198,14 +198,26 @@ chmod 700 /home/deploy/.ssh && chmod 600 /home/deploy/.ssh/authorized_keys
 wc -l /home/deploy/.ssh/authorized_keys     # expect: 1
 ```
 
-**Now open a SECOND terminal — leave this root session connected — and prove key login works:**
+**Now prove key login works — from a second terminal ON YOUR OWN MACHINE.**
+
+Not another SSH hop from inside the server. Your private key lives on your laptop; the VPS has
+no copy of it, so running this on the server falls back to password auth and fails with
+`Permission denied` even when the key is installed perfectly. That failure tells you nothing.
+
+Leave the root session connected, open a new local terminal, and run:
 
 ```bash
-ssh deploy@217.76.54.215 'whoami && sudo -n true 2>/dev/null && echo "sudo ok" || echo "sudo needs setup"'
+ssh deploy@217.76.54.215 'whoami'
 ```
 
-It must print `deploy`. **Do not continue until it does.** While the first session stays open
+It must print `deploy`. **Do not continue until it does.** While the root session stays open
 you can always fix a mistake; once you harden SSH and close it, a missing key means VNC.
+
+If it asks for a password, the key was not accepted — diagnose with:
+
+```bash
+ssh -v deploy@217.76.54.215 'whoami' 2>&1 | grep -iE "offering|accepted|denied|publickey"
+```
 
 Grant the deploy user sudo if the check above said it needs setup:
 
