@@ -178,16 +178,67 @@ curl -fsSL https://get.docker.com | sh
 useradd -m -s /bin/bash deploy
 usermod -aG docker deploy
 
-# Copy your SSH key to deploy user
+# Install YOUR public key for the deploy user.
+#
+# DANGER: Contabo hands you root + a PASSWORD, so root has no ~/.ssh/authorized_keys.
+# Copying from it (`cp ~/.ssh/authorized_keys ...`) silently produces a deploy user with
+# NO key — and the hardening two steps below then disables password auth and root login.
+# That locks you out of the server entirely, recoverable only through the Contabo VNC
+# console. Paste the key explicitly instead, and verify it before hardening anything.
+#
+# Replace the ssh-ed25519 line with the contents of your own ~/.ssh/id_ed25519.pub.
 mkdir -p /home/deploy/.ssh
-cp ~/.ssh/authorized_keys /home/deploy/.ssh/
+cat > /home/deploy/.ssh/authorized_keys << 'KEY'
+ssh-ed25519 AAAA...your-actual-public-key... you@yourmachine
+KEY
 chown -R deploy:deploy /home/deploy/.ssh
 chmod 700 /home/deploy/.ssh && chmod 600 /home/deploy/.ssh/authorized_keys
 
+# Sanity-check the file really contains one full key line before going further.
+wc -l /home/deploy/.ssh/authorized_keys     # expect: 1
+```
+
+**Now prove key login works — from a second terminal ON YOUR OWN MACHINE.**
+
+Not another SSH hop from inside the server. Your private key lives on your laptop; the VPS has
+no copy of it, so running this on the server falls back to password auth and fails with
+`Permission denied` even when the key is installed perfectly. That failure tells you nothing.
+
+Leave the root session connected, open a new local terminal, and run:
+
+```bash
+ssh deploy@217.76.54.215 'whoami'
+```
+
+It must print `deploy`. **Do not continue until it does.** While the root session stays open
+you can always fix a mistake; once you harden SSH and close it, a missing key means VNC.
+
+If it asks for a password, the key was not accepted — diagnose with:
+
+```bash
+ssh -v deploy@217.76.54.215 'whoami' 2>&1 | grep -iE "offering|accepted|denied|publickey"
+```
+
+Grant the deploy user sudo if the check above said it needs setup:
+
+```bash
+usermod -aG sudo deploy
+```
+
+**Only after key login is confirmed**, harden SSH — back in the root session:
+
+```bash
 # Harden SSH — disable root login and password auth
-sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
-sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/'            /etc/ssh/sshd_config
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# Verify the config parses BEFORE restarting — a syntax error here is also a lockout
+sshd -t && echo "sshd config OK"
+
 systemctl restart ssh
+
+# Confirm from the second terminal that deploy can still get in, BEFORE closing root.
+#   ssh deploy@217.76.54.215 'echo still-in'
 
 # Basic firewall (keep 22 for SSH — change port later if desired)
 ufw allow 22/tcp
