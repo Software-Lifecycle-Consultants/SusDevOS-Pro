@@ -53,7 +53,20 @@ will fail and you will hit Let's Encrypt's rate limit (5 failures per hostname p
 
 File uploads and generated reports go to R2. Free to 10 GB with no egress charge.
 
-Create the bucket with Wrangler (fastest — no dashboard navigation):
+**R2 must be activated on the account first.** It is opt-in, and Wrangler cannot do it —
+attempting to create a bucket before activation fails with:
+
+```
+X [ERROR] A request to the Cloudflare API (/accounts/<ACCOUNT_ID>/r2/buckets) failed.
+  Please enable R2 through the Cloudflare Dashboard. [code: 10042]
+```
+
+Code `10042` is `NotEntitled` — the account has no R2 subscription. Dashboard → **R2 Object
+Storage** → *Enable R2*. Cloudflare requires a **payment method on file even for the free
+tier** (10 GB storage, zero egress); at this application's volume nothing will be charged, but
+the card is mandatory to activate the product.
+
+Once activated, create the bucket with Wrangler:
 
 ```bash
 npx wrangler login                              # opens a browser once
@@ -68,8 +81,14 @@ S3-compatible credentials:
    - Permissions: **Object Read & Write**
    - Scope: **specify bucket** → `susdevos-files` (do not grant account-wide access)
 2. Copy the **Access Key ID** and **Secret Access Key** — the secret is shown once.
-3. From the bucket's *Settings* page, copy the **S3 API endpoint**, of the form
-   `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+3. The **S3 API endpoint** is `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`. For this
+   account that is:
+
+   ```
+   AWS_S3_ENDPOINT_URL=https://ae47f22307c7d002fefcc4d58bc4280b.r2.cloudflarestorage.com
+   ```
+
+   Confirm it on the bucket's *Settings* page rather than trusting this verbatim.
 
 Prefer the dashboard for the whole thing? **R2** → *Create bucket* → name `susdevos-files`,
 location auto — then the token steps above.
