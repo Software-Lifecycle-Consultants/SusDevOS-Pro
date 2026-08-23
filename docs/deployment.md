@@ -32,15 +32,19 @@ In Namecheap → Domain List → susdevos.com → **Advanced DNS**:
 
 | Type | Host | Value | TTL |
 |------|------|-------|-----|
-| A Record | `@` | `<VPS IP>` | Automatic |
-| A Record | `www` | `<VPS IP>` | Automatic |
+| A Record | `@` | `217.76.54.215` | Automatic |
+| A Record | `www` | `217.76.54.215` | Automatic |
 
-Verify from your machine before continuing — both must return the VPS IP and nothing else:
+Verify from your machine before continuing — both must return `217.76.54.215` and nothing else:
 
 ```bash
 dig susdevos.com +short
 dig www.susdevos.com +short
 ```
+
+As of 2026-08-22 the apex still resolves to `192.64.119.96` (Namecheap parking), so this change
+has not been made yet. The VPS itself is reachable — SSH answers on port 22, and 80/443 are
+closed because nothing is serving there yet, which is expected until §4.
 
 Propagation is usually 5–30 minutes. **Do not start §3 until both resolve**, or cert issuance
 will fail and you will hit Let's Encrypt's rate limit (5 failures per hostname per hour).
@@ -49,13 +53,26 @@ will fail and you will hit Let's Encrypt's rate limit (5 failures per hostname p
 
 File uploads and generated reports go to R2. Free to 10 GB with no egress charge.
 
-1. Cloudflare dashboard → **R2** → *Create bucket* → name it `susdevos-files`, location auto.
-2. **R2** → *Manage R2 API Tokens* → *Create API token*:
+Create the bucket with Wrangler (fastest — no dashboard navigation):
+
+```bash
+npx wrangler login                              # opens a browser once
+npx wrangler r2 bucket create susdevos-files
+npx wrangler r2 bucket list                     # confirm it exists
+```
+
+The **API token still has to come from the dashboard** — Wrangler can create buckets but not
+S3-compatible credentials:
+
+1. Cloudflare dashboard → **R2** → *Manage R2 API Tokens* → *Create API token*
    - Permissions: **Object Read & Write**
    - Scope: **specify bucket** → `susdevos-files` (do not grant account-wide access)
-3. Copy the **Access Key ID** and **Secret Access Key** — the secret is shown once.
-4. From the bucket's *Settings* page, copy the **S3 API endpoint**. It looks like
+2. Copy the **Access Key ID** and **Secret Access Key** — the secret is shown once.
+3. From the bucket's *Settings* page, copy the **S3 API endpoint**, of the form
    `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+
+Prefer the dashboard for the whole thing? **R2** → *Create bucket* → name `susdevos-files`,
+location auto — then the token steps above.
 
 You now have four values for `backend/.env.prod`: `AWS_ACCESS_KEY_ID`,
 `AWS_SECRET_ACCESS_KEY`, `AWS_S3_ENDPOINT_URL`, and `AWS_STORAGE_BUCKET_NAME=susdevos-files`.
