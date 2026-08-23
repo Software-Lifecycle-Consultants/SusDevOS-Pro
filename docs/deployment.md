@@ -8,6 +8,144 @@
 
 ---
 
+## §0 — Pre-flight
+
+Settle these **before** you SSH in. Everything here is done in a browser, and two of the three
+have propagation delays, so start them first.
+
+### 0.1 — Point DNS away from the Namecheap parking page
+
+The domain currently serves Namecheap's parking page. Those records must be **removed**, not
+just added to — a leftover `URL Redirect` on `@` will hijack the ACME challenge and Let's
+Encrypt will fail to issue.
+
+In Namecheap → Domain List → susdevos.com → **Advanced DNS**:
+
+**Delete these two:**
+
+| Type | Host | Value |
+|------|------|-------|
+| CNAME Record | `www` | `parkingpage.namecheap.com.` |
+| URL Redirect Record | `@` | `http://www.susdevos.com/` |
+
+**Add these two:**
+
+| Type | Host | Value | TTL |
+|------|------|-------|-----|
+| A Record | `@` | `217.76.54.215` | Automatic |
+| A Record | `www` | `217.76.54.215` | Automatic |
+
+Verify from your machine before continuing — both must return `217.76.54.215` and nothing else:
+
+```bash
+dig susdevos.com +short
+dig www.susdevos.com +short
+```
+
+As of 2026-08-22 the apex still resolves to `192.64.119.96` (Namecheap parking), so this change
+has not been made yet. The VPS itself is reachable — SSH answers on port 22, and 80/443 are
+closed because nothing is serving there yet, which is expected until §4.
+
+Propagation is usually 5–30 minutes. **Do not start §3 until both resolve**, or cert issuance
+will fail and you will hit Let's Encrypt's rate limit (5 failures per hostname per hour).
+
+### 0.2 — Create the Cloudflare R2 bucket
+
+File uploads and generated reports go to R2. Free to 10 GB with no egress charge.
+
+**R2 must be activated on the account first.** It is opt-in, and Wrangler cannot do it —
+attempting to create a bucket before activation fails with:
+
+```
+X [ERROR] A request to the Cloudflare API (/accounts/<ACCOUNT_ID>/r2/buckets) failed.
+  Please enable R2 through the Cloudflare Dashboard. [code: 10042]
+```
+
+Code `10042` is `NotEntitled` — the account has no R2 subscription. Dashboard → **R2 Object
+Storage** → *Enable R2*. Cloudflare requires a **payment method on file even for the free
+tier** (10 GB storage, zero egress); at this application's volume nothing will be charged, but
+the card is mandatory to activate the product.
+
+Once activated, create the bucket with Wrangler:
+
+```bash
+npx wrangler login                              # opens a browser once
+npx wrangler r2 bucket create susdevos-files
+npx wrangler r2 bucket list                     # confirm it exists
+```
+
+The **API token still has to come from the dashboard** — Wrangler can create buckets but not
+S3-compatible credentials:
+
+1. Cloudflare dashboard → **R2** → *Manage R2 API Tokens* → *Create API token*
+   - Permissions: **Object Read & Write**
+   - Scope: **specify bucket** → `susdevos-files` (do not grant account-wide access)
+2. Copy the **Access Key ID** and **Secret Access Key** — the secret is shown once.
+3. The **S3 API endpoint** is `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`. For this
+   account that is:
+
+   ```
+   AWS_S3_ENDPOINT_URL=https://ae47f22307c7d002fefcc4d58bc4280b.r2.cloudflarestorage.com
+   ```
+
+   Confirm it on the bucket's *Settings* page rather than trusting this verbatim.
+
+Prefer the dashboard for the whole thing? **R2** → *Create bucket* → name `susdevos-files`,
+location auto — then the token steps above.
+
+You now have four values for `backend/.env.prod`: `AWS_ACCESS_KEY_ID`,
+`AWS_SECRET_ACCESS_KEY`, `AWS_S3_ENDPOINT_URL`, and `AWS_STORAGE_BUCKET_NAME=susdevos-files`.
+
+### 0.3 — Transactional email
+
+Invitations, onboarding links and password resets all send email. Without a working sender, a
+new user can never set their password — so this is required for the product to function, even
+though the stack will start without it.
+
+Postmark is what `.env.prod.example` assumes: create a Server, copy its **Server API Token**,
+and use that same token as **both** `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`. Verify the
+sender signature for `noreply@susdevos.com` or Postmark will reject the send.
+
+Any SMTP provider works — adjust `EMAIL_HOST` and `EMAIL_PORT` to match.
+
+### 0.4 — What you need before starting, and what can wait
+
+**Required to launch:**
+
+| Value | Source |
+|-------|--------|
+| `SECRET_KEY`, `JWT_SIGNING_KEY`, `DB_PASSWORD` | Generated on the VPS — see §2 |
+| `SUPERADMIN_1_PASSWORD`, `SUPERADMIN_2_PASSWORD` | Chosen by you; change after first login |
+| R2 credentials ×4 | §0.2 |
+| SMTP credentials | §0.3 |
+
+**Safe to leave blank at launch** — each is guarded and degrades without breaking startup:
+
+| Value | Effect if unset |
+|-------|-----------------|
+| `CLIMATIQ_API_KEY` | Weekly emission-factor sync skips; seeded factors still work |
+| `COMPANIES_HOUSE_API_KEY` | Company lookup returns an error to the caller |
+| `IUCN_API_KEY` | Species enrichment skips the Red List status |
+| `OPEN_EXCHANGE_RATES_API_KEY` | ECB remains the only FX source; the fallback no-ops |
+| `VERRA_CSV_URL` | Verra credit validation skips |
+| `SENTRY_DSN` | No error reporting |
+
+Gold Standard validation needs no key — it queries a public registry — and is a no-op until
+offsets exist.
+
+### 0.5 — Known first-deploy notes
+
+- **The database starts empty**, so the `ecosystem/0004` foreign-key migration cannot hit the
+  orphaned-row problem that would affect an existing database (see SUS-6). A fresh deploy is
+  the safe time to apply it.
+- **Celery beat validates its schedule at startup.** If `beat_schedule` names a task no worker
+  has registered, beat exits with `ImproperlyConfigured` rather than silently publishing tasks
+  nobody runs. Verified passing with all 11 scheduled tasks.
+- **Reports render to R2, not local disk**, because `USE_S3=True`. Confirm the first generated
+  report appears in the bucket.
+
+---
+
 ## §1 — Provision the VPS
 
 1. Order a VPS at contabo.com → Cloud VPS → VPS S or VPS M → Ubuntu 24.04.
@@ -92,6 +230,30 @@ nano backend/.env.prod          # fill in all values
 #  are excluded from the image by frontend/.dockerignore.)
 ```
 
+**Generate the three secrets on the server** — this keeps them off your laptop, out of your
+shell history elsewhere, and out of any chat transcript:
+
+```bash
+cd /opt/susdevos
+
+# Prints three values. Copy each into backend/.env.prod, then clear the terminal.
+python3 - <<'PY'
+import secrets, string
+alphabet = string.ascii_letters + string.digits
+print("SECRET_KEY="      + secrets.token_urlsafe(60))
+print("JWT_SIGNING_KEY=" + secrets.token_urlsafe(60))
+print("DB_PASSWORD="     + "".join(secrets.choice(alphabet) for _ in range(32)))
+PY
+```
+
+`DB_PASSWORD` must be identical in **two** files — `backend/.env.prod` and the top-level
+`/opt/susdevos/.env` created below. Postgres reads it from the top-level file when it
+initialises its data volume on first start; if the two ever disagree, the API cannot
+authenticate and the only fix is to destroy and recreate the volume.
+
+Keep `DB_PASSWORD` alphanumeric. In a Compose `.env` file a `#` begins a comment and a `$`
+begins variable interpolation — either will silently truncate or mangle the password.
+
 **Required backend values before continuing:**
 
 | Variable | How to get it |
@@ -125,10 +287,15 @@ Nginx can't start with the HTTPS config until certs exist. Use the temporary HTT
 cd /opt/susdevos
 
 # Step 1: swap in the HTTP-only init config
+#   The init config lives in nginx/init/, NOT nginx/conf.d/ — conf.d is mounted into
+#   the container and nginx loads every *.conf in it, so a second port-80 server for
+#   susdevos.com there would shadow the real HTTP→HTTPS redirect.
 mv nginx/conf.d/susdevos.conf nginx/conf.d/susdevos.conf.bak
-cp nginx/conf.d/susdevos-init.conf nginx/conf.d/susdevos.conf
+cp nginx/init/susdevos-init.conf nginx/conf.d/susdevos.conf
 
 # Step 2: start Nginx on HTTP only
+#   nginx depends_on api + nextjs, so this also builds and starts them the first
+#   time — expect 5–10 minutes before nginx is actually listening.
 docker compose -f docker-compose.prod.yml up -d nginx
 
 # Verify ACME path is reachable (should return 200)
@@ -149,9 +316,25 @@ mv nginx/conf.d/susdevos.conf.bak nginx/conf.d/susdevos.conf
 
 # Step 5: reload Nginx (now has valid certs)
 docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+
+# Step 6: confirm conf.d holds ONLY the real config plus the shared snippet.
+#   Anything else ending in .conf becomes a live server block.
+ls nginx/conf.d/          # expect: proxy_params.conf  susdevos.conf  susdevos.conf.bak
+docker compose -f docker-compose.prod.yml exec nginx nginx -t
 ```
 
-If Certbot fails: check that port 80 is open, DNS has propagated, and the Nginx container is running.
+`nginx -t` must report `syntax is ok` / `test is successful` with **no** "conflicting server
+name" warnings. A conflict there means a stray `*.conf` is shadowing the real config.
+
+Verify the redirect actually works, rather than assuming:
+
+```bash
+curl -sI http://susdevos.com | head -1     # expect: HTTP/1.1 301 Moved Permanently
+curl -sI https://susdevos.com | head -1    # expect: HTTP/2 200
+```
+
+If Certbot fails: check that port 80 is open, DNS has propagated, and the Nginx container is
+running. DNS is already correct as of 2026-08-23 — both names resolve to `217.76.54.215`.
 
 ---
 

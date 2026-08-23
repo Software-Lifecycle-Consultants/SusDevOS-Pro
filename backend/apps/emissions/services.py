@@ -10,7 +10,6 @@ from decimal import Decimal
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils import timezone
-
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 logger = logging.getLogger(__name__)
