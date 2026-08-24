@@ -328,6 +328,42 @@ NEXT_PUBLIC_API_URL=http://api:8000
 EOF
 ```
 
+### Why these secrets live on the server, not in GitHub Secrets
+
+Both files are gitignored (`backend/.env.prod` and `.env`), and the CI deploy step only runs
+`git pull --ff-only origin main`, which never touches ignored or untracked files. **Deploys do
+not overwrite them.** Fill them in once; they persist.
+
+GitHub Secrets are for what *CI itself* needs — `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`. The
+application's runtime secrets are a different category: the containers read them on the server
+at start-up, and CI never needs to see `DB_PASSWORD` or the R2 keys. Routing them through
+GitHub would be strictly worse:
+
+- **Wider blast radius.** Today a GitHub compromise costs source code and deploy access. Add
+  app secrets and it also costs the database password, R2 credentials and JWT signing key.
+- **Secrets on ephemeral runners.** CI would have to materialise `.env.prod` on a runner, where
+  values can surface in logs, `set -x` output, or a failed-step dump.
+- **No real gain.** The claimed benefit is reproducibility, but the same file still ends up at
+  the same path — by a longer route with more exposure.
+
+Generating secrets on the server (see above) means they never transit a laptop, a transcript,
+or a third-party CI system.
+
+**The real risk is that nothing backs them up.** If the VPS is lost, `.env.prod` goes with it.
+Most values are regenerable, but `DB_PASSWORD` is not in any useful sense: Postgres bakes it
+into the data volume at first init, so restoring a volume snapshot without the matching
+password leaves a database you cannot authenticate to. Nightly backups (§7) are worthless if
+you cannot open what you restore.
+
+Once the file is complete, copy it into a password manager as a secure note:
+
+```bash
+cat /opt/susdevos/backend/.env.prod
+```
+
+The two `SUPERADMIN_*_PASSWORD` values are bootstrap-only and should be changed at first login,
+after which that part of the copy is stale — everything else stays authoritative.
+
 ---
 
 ## §3 — First-time SSL cert issuance
