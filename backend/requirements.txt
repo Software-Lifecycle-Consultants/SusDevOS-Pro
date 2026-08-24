@@ -6,6 +6,13 @@ drf-spectacular==0.27.2                    # OpenAPI 3.0 schema generation
 django-filter==24.3                        # Declarative queryset filtering
 django-cors-headers==4.4.0                # CORS for decoupled Vite frontend
 
+# ─── WSGI server (production) ──────────────────────────────────────────────────
+# backend/Dockerfile's CMD runs gunicorn. Local dev overrides that command with
+# `manage.py runserver` (docker-compose.yml), so this is only exercised in prod —
+# without it the production api container exits immediately with
+# `exec: "gunicorn": executable file not found in $PATH`.
+gunicorn==23.0.0                          # gthread worker class is built in
+
 # ─── Database ──────────────────────────────────────────────────────────────────
 psycopg2-binary==2.9.10                   # PostgreSQL adapter
 # Note: production deployments should use psycopg2 (non-binary) for performance
