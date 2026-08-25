@@ -386,88 +386,6 @@
         }
       }
     },
-    "/api/entities/{EntityId}/api-keys/": {
-      "get": {
-        "operationId": "entities_api_keys_retrieve",
-        "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "EntityId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "A unique integer value identifying this entities.",
-            "required": true
-          }
-        ],
-        "tags": [
-          "entities"
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EntitiesDetail"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      },
-      "post": {
-        "operationId": "entities_api_keys_create",
-        "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "EntityId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "A unique integer value identifying this entities.",
-            "required": true
-          }
-        ],
-        "tags": [
-          "entities"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EntitiesDetailRequest"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/EntitiesDetailRequest"
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/EntitiesDetailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EntitiesDetail"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/entities/{EntityId}/contacts/": {
       "get": {
         "operationId": "entities_contacts_retrieve",
@@ -792,40 +710,6 @@
               }
             },
             "description": ""
-          }
-        }
-      }
-    },
-    "/api/entities/{EntityId}/api-keys/{key_id}/": {
-      "delete": {
-        "operationId": "entities_api_keys_destroy",
-        "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "EntityId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "A unique integer value identifying this entities.",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "key_id",
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+$"
-            },
-            "required": true
-          }
-        ],
-        "tags": [
-          "entities"
-        ],
-        "responses": {
-          "204": {
-            "description": "No response body"
           }
         }
       }

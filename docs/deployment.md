@@ -457,9 +457,24 @@ docker compose -f docker-compose.prod.yml exec api python manage.py collectstati
 | URL | Expected |
 |-----|---------|
 | `https://susdevos.com` | Next.js homepage |
-| `https://susdevos.com/api/schema/` | DRF OpenAPI schema JSON |
+| `https://susdevos.com/api/schema/` | `404` — developer documentation is disabled in production |
+| `https://susdevos.com/api/entities/` (without a token) | `401` — authenticated API remains protected |
+| `https://susdevos.com/api/entities/1/api-keys/` | `404` — customer API-key management is retired |
+| `https://susdevos.com/health/` | `200` with `{"status":"ok"}` |
 | `https://susdevos.com/admin/` | Django admin login |
 | `https://www.susdevos.com` | Redirects → `https://susdevos.com` |
+
+The application API remains reachable through HTTPS because the browser frontend calls it
+directly. Reachability is not anonymous data access: Django's default DRF permission is
+`IsAuthenticated`, protected endpoints reject missing/invalid JWTs, tenant scoping is enforced
+server-side, and Nginx plus DRF apply separate rate limits. Only the explicitly public auth,
+published-blog, and public-plan views bypass the default permission. The production OpenAPI,
+Swagger, and ReDoc routes return `404` so they do not publish the route catalogue.
+Customer API-key list, create, and revoke routes are not registered for any role. Customer API
+access is not included in any plan during the PMF phase; first-party browser APIs remain active.
+
+Do not publish container ports `3000`, `8000`, `5432`, or `6379` on the VPS. The production
+Compose file deliberately uses `expose` for those services; only Nginx binds host ports 80/443.
 
 Log in to `/admin/` with `SUPERADMIN_1_EMAIL` / `SUPERADMIN_1_PASSWORD`.
 **Change the superadmin passwords immediately after first login.**
@@ -538,7 +553,9 @@ Upload to Cloudflare R2 for offsite backup (use the `aws` CLI with `--endpoint-u
 
 ## §8 — Monitoring
 
-**Uptime Robot (free):** uptimerobot.com → Add Monitor → HTTPS → `https://susdevos.com` and `https://susdevos.com/api/schema/` → alert by email.
+**Uptime Robot (free):** uptimerobot.com → Add Monitor → HTTPS → `https://susdevos.com`
+and `https://susdevos.com/health/` → alert by email. The OpenAPI/Swagger endpoints are
+deliberately unavailable in production and must not be used as uptime checks.
 
 **Sentry (free tier):** sentry.io → New Project → Django → paste DSN into `SENTRY_DSN` in `.env.prod`, then restart:
 

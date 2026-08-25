@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   BarChart3, Briefcase, Building2,
   CheckCircle2, FileText, Globe, Map,
-  TreePine, Target, Key, Download, Activity, Users, Leaf,
+  TreePine, Target, Download, Activity, Users, Leaf,
 } from "lucide-react";
 
 const TABS = [
@@ -32,7 +32,6 @@ const TABS = [
       { Icon: FileText,  title: "White-label reports",     body: "PDF reports with your firm's logo and brand colours for client delivery." },
       { Icon: Globe,     title: "Client read-only portal", body: "Share results with clients without sharing your login credentials." },
       { Icon: Download,  title: "Bulk CSV import",         body: "Multi-client annual reporting with no manual data entry." },
-      { Icon: Key,       title: "API access",              body: "Custom integrations and automated data pipelines for your workflow." },
       { Icon: Activity,  title: "Change tracking",         body: "Full audit log showing every correction, who made it, and when." },
     ],
   },

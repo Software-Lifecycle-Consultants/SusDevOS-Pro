@@ -174,7 +174,7 @@ def _member_client(entity):
 
 @pytest.mark.django_db
 class TestEntitySettingsAuthz:
-    """A non-admin member must not be able to change entity settings or mint keys."""
+    """A non-admin member must not be able to change entity settings."""
 
     def test_member_cannot_patch_settings(self, entity):
         client = _member_client(entity)
@@ -187,15 +187,6 @@ class TestEntitySettingsAuthz:
         entity.refresh_from_db()
         assert entity.ShareEmissionsWithPartners is not True
 
-    def test_member_cannot_mint_api_key(self, entity):
-        client = _member_client(entity)
-        resp = client.post(
-            f"/api/entities/{entity.EntityId}/api-keys/",
-            {"AuthorizedByFor": "steal"},
-            format="json",
-        )
-        assert resp.status_code == status.HTTP_403_FORBIDDEN
-
     def test_admin_can_still_patch_settings(self, auth_client, entity):
         resp = auth_client.patch(
             f"/api/entities/{entity.EntityId}/settings/",
@@ -203,3 +194,41 @@ class TestEntitySettingsAuthz:
             format="json",
         )
         assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+class TestRetiredApiKeyRoutes:
+    """Customer API-key routes must not exist, even for entity admins."""
+
+    def test_list_route_returns_404(self, auth_client, entity):
+        resp = auth_client.get(f"/api/entities/{entity.EntityId}/api-keys/")
+
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_create_route_returns_404_without_creating_key(self, auth_client, entity):
+        from apps.shared.models import EntityApiKeys
+
+        before = EntityApiKeys.objects.count()
+        resp = auth_client.post(
+            f"/api/entities/{entity.EntityId}/api-keys/",
+            {"AuthorizedByFor": "retired integration"},
+            format="json",
+        )
+
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert EntityApiKeys.objects.count() == before
+
+    def test_delete_route_returns_404_without_revoking_key(self, auth_client, entity):
+        from apps.entities.models import EntityApiKeysIntermediary
+        from apps.shared.tests.factories import EntityApiKeysFactory
+
+        key = EntityApiKeysFactory(EntityId=entity.EntityId, Status=1)
+        EntityApiKeysIntermediary.objects.create(EntityId=entity, ApiKeyId=key)
+
+        resp = auth_client.delete(
+            f"/api/entities/{entity.EntityId}/api-keys/{key.ApiKeyId}/"
+        )
+
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        key.refresh_from_db()
+        assert key.Status == 1

@@ -25,7 +25,7 @@ interface Subscription {
 const PLAN_FEATURES: Record<string, string[]> = {
   free:         ["1 entity","1 user","Scope 1 + 2","DEFRA factors","30-day audit log"],
   starter:      ["1 entity","5 users","All scopes","All factor libraries","Carbon goals & targets","CSV export"],
-  professional: ["5 entities","20 users","Verification workflow","TNFD reporting","GIS mapping","API access"],
+  professional: ["5 entities","20 users","Verification workflow","TNFD reporting","GIS mapping"],
   agency:       ["25 entities","Unlimited users","White-label reports","Client portal"],
   enterprise:   ["Unlimited entities","SSO/SAML","Dedicated instance","99.9% SLA"],
 };

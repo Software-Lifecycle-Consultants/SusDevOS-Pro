@@ -222,8 +222,9 @@ modules:
         name: Edit Entity
       - key: delete_entity
         name: Delete Entity (Soft)
-      - key: manage_entity_api_keys
-        name: Manage API Keys
+
+    # Customer API-key management is intentionally deferred during PMF. The
+    # historical interface row is soft-retired and is not seeded as active.
 
   - key: user_management
     name: User Management

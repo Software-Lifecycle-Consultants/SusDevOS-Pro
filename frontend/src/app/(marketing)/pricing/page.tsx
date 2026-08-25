@@ -164,7 +164,6 @@ const FEATURE_GROUPS: {
       { label: "Audit log (1 year)",           plans: { free: false, starter: false, professional: true, agency: true, enterprise: false } },
       { label: "Audit log (7 years)",          plans: { free: false, starter: false, professional: false, agency: false, enterprise: true } },
       { label: "User privilege overrides",     plans: { free: false, starter: false, professional: true, agency: true, enterprise: true } },
-      { label: "Entity API keys",              plans: { free: false, starter: false, professional: true, agency: true, enterprise: true } },
       { label: "SSO / SAML",                  plans: { free: false, starter: false, professional: false, agency: false, enterprise: true } },
       { label: "Dedicated instance",           plans: { free: false, starter: false, professional: false, agency: false, enterprise: true } },
     ],

@@ -44,11 +44,12 @@ All list endpoints support: `?page=1&pageSize=20&sortBy=<field>&sortDir=asc|desc
 | POST | `/entities/{id}/contacts/` | SA, A, M | |
 | GET | `/entities/{id}/documents/` | SA, A, M | |
 | POST | `/entities/{id}/documents/` | SA, A, M | |
-| GET | `/entities/{id}/api-keys/` | SA, A | |
-| POST | `/entities/{id}/api-keys/` | SA, A | Generate new key |
-| DELETE | `/entities/{id}/api-keys/{keyId}/` | SA, A | Revoke key |
 | GET | `/entities/{id}/settings/` | SA, A | Entity-level settings (ShareEmissions etc.) |
 | PATCH | `/entities/{id}/settings/` | SA, A | |
+
+> **Deferred during PMF:** Customer/developer API access and entity API-key management are not
+> active product features. The former API-key paths are deliberately unregistered and return
+> `404`; retained API-key tables and service code are dormant historical/future infrastructure.
 
 ---
 

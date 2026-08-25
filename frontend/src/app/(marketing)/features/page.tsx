@@ -174,10 +174,6 @@ const FEATURE_GROUPS = [
         body:  "Agency and Enterprise plans can replace the SusDevOS branding on PDF reports with your firm's logo and brand colours. Client-facing output with your identity.",
       },
       {
-        title: "API access",
-        body:  "Full REST API with OpenAPI 3.0 schema (drf-spectacular). Rate-limited per user. JWT authentication with 7-day HttpOnly refresh token. Available on Professional and above.",
-      },
-      {
         title: "Audit log",
         body:  "Every create, update, delete, state change, and login is logged with user identity, timestamp, and changed values. Retained for 7 years. Exportable for compliance review.",
       },

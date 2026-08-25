@@ -10,9 +10,6 @@ modules:
         name: Edit Entity
       - key: delete_entity
         name: Delete Entity (Soft)
-      - key: manage_entity_api_keys
-        name: Manage API Keys
-
   - key: user_management
     name: User Management
     interfaces:

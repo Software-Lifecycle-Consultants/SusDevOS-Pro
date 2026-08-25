@@ -80,8 +80,6 @@ Sustainability managers are often solo or in a team of 2. Seat pricing underchar
 | **Audit log (1 year)** | — | — | ✓ | ✓ | — |
 | **Audit log (7 years)** | — | — | — | — | ✓ |
 | **Blog (public-facing)** | ✓ (1 author) | ✓ | ✓ | ✓ | ✓ |
-| **Entity API keys** | — | — ↑ | ✓ | ✓ | ✓ |
-| **API access (rate limited)** | — | — | 500/day | 2,000/day | Custom |
 | **Client read-only portal** | — | — | — ↑ | ✓ | ✓ |
 | **Multi-entity dashboard** | — | — | ✓ | ✓ | ✓ |
 | **Bulk data import (CSV)** | — | — | ✓ | ✓ | ✓ |

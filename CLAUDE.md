@@ -25,6 +25,9 @@ emission factors via Climatiq (aggregator), generic Targets/milestones, reportin
 - **CDP** — no CDP export format / questionnaire mapping / Partner Program integration.
 - **NDC** — no "counts toward NDC" tagging (field removed).
 - **RE100** — no renewable-electricity commitment tracking.
+- **Customer/developer API access (temporary, until PMF)** — no customer-managed API keys,
+  public API documentation, API tier entitlements, or third-party programmatic access. The
+  first-party browser REST API and local OpenAPI → Orval development tooling remain in scope.
 
 Generic GHG capabilities that happen to *support* external frameworks (e.g. market-based
 Scope 2) stay in scope — just don't frame or build them as SBTi/CDP/NDC/RE100 features.

@@ -5,7 +5,7 @@
 **What Admins can do that Managers and Staff cannot:**
 - Verify a GHG inventory (set VerificationStatus → 2)
 - Manage users and assign roles
-- Manage entity settings and API keys
+- Manage entity settings
 - View the audit log
 - Delete records (soft-delete)
 
@@ -107,22 +107,7 @@ Once verified:
 
 ---
 
-## 4. Managing API Keys
-
-API keys allow integrations (e.g. IoT sensors, ERP systems, third-party tools) to push data to SusDevOS without a user login.
-
-1. Navigate to **Settings → API Keys**.
-2. Click **Generate New Key**. Give it a descriptive name (e.g. "Building Energy Meters").
-3. Copy the key immediately — it is shown only once.
-4. The key authenticates as your entity. It is subject to the same `entity_id` scoping as user requests.
-
-To revoke a key: find it in the list and click **Revoke**. It is immediately invalidated.
-
-API keys do not expire automatically. Rotate them regularly and immediately on suspected compromise.
-
----
-
-## 5. Audit Log
+## 4. Audit Log
 
 The audit log records all significant actions: user invitations, role changes, privilege overrides, inventory verifications, unlocks, and data access by SuperAdmins.
 
@@ -140,7 +125,7 @@ Purging is automatic. If you need to export audit records before retention expir
 
 ---
 
-## 6. Subscription and Billing
+## 5. Subscription and Billing
 
 1. Navigate to **Settings → Billing**.
 2. Your current plan, next billing date, and entity count are shown.
@@ -153,7 +138,7 @@ Purging is automatic. If you need to export audit records before retention expir
 
 ---
 
-## 7. Common Admin Tasks — Quick Reference
+## 6. Common Admin Tasks — Quick Reference
 
 | Task | Where to find it |
 |------|----------------|
@@ -162,7 +147,6 @@ Purging is automatic. If you need to export audit records before retention expir
 | Change a user's role | Settings → Users → [user] → Edit Role |
 | Override a single privilege | Settings → Users → [user] → Manage Privileges |
 | Verify an inventory | Emissions → Inventories → [inventory] → Approve |
-| Generate an API key | Settings → API Keys → Generate New Key |
 | Export audit log | Settings → Audit Log → Export CSV |
 | View billing | Settings → Billing |
 | Add another entity | Settings → Billing → Add Entity |

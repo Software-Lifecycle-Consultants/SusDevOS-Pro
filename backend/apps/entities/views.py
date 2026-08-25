@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from apps.shared.models import Contacts, Documents, EntityApiKeys, Locations
+from apps.shared.models import Contacts, Documents, Locations
 
 from .models import (
     Entities,
@@ -15,7 +15,6 @@ from .models import (
     EntityMembers,
 )
 from .serializers import (
-    ApiKeyListSerializer,
     ContactSerializer,
     DocumentSerializer,
     EntitiesDetailSerializer,
@@ -182,46 +181,6 @@ class EntitiesViewSet(ModelViewSet):
         )
         EntityDocuments.objects.create(EntityId=entity, DocumentId=doc)
         return Response(DocumentSerializer(doc).data, status=status.HTTP_201_CREATED)
-
-    # ── Nested: API Keys ──────────────────────────────────────────────────────
-
-    @action(detail=True, methods=["get", "post"], url_path="api-keys")
-    def api_keys(self, request, pk=None):
-        entity = self.get_object()
-        # API keys are long-lived tenant credentials — restrict both minting and
-        # enumeration to entity admins (SuperAdmin bypasses).
-        if not self._is_entity_admin(request):
-            return Response(
-                {"code": "permission_denied", "detail": "Only entity admins can manage API keys."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        if request.method == "GET":
-            keys = EntityApiKeys.objects.filter(
-                entity_links__EntityId=entity, Status__lt=4
-            )
-            return Response(ApiKeyListSerializer(keys, many=True).data)
-
-        from apps.entities.services import generate_api_key
-        result = generate_api_key(
-            entity          = entity,
-            created_by_user_id = request.user.UserId,
-            name            = request.data.get("AuthorizedByFor", ""),
-            expiry_date     = request.data.get("ExpiryDate"),
-        )
-        return Response(result, status=status.HTTP_201_CREATED)
-
-    @action(detail=True, methods=["delete"], url_path=r"api-keys/(?P<key_id>\d+)")
-    def revoke_api_key(self, request, pk=None, key_id=None):
-        from apps.entities.services import revoke_api_key
-        entity = self.get_object()
-        if not self._is_entity_admin(request):
-            return Response(
-                {"code": "permission_denied", "detail": "Only entity admins can revoke API keys."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        key = get_object_or_404(EntityApiKeys, ApiKeyId=key_id, entity_links__EntityId=entity)
-        revoke_api_key(key=key)
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
     # ── Settings ──────────────────────────────────────────────────────────────
 
