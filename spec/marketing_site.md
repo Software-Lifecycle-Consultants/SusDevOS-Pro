@@ -28,7 +28,6 @@ The marketing site is a separate Next.js app (or static site via Astro/Hugo) dep
 /blog
 /blog/{slug}
 /security
-/api-docs           → redirects to /app/api/schema/swagger-ui/
 /about
 /contact
 /demo
@@ -106,7 +105,6 @@ Tab labels: `For sustainability managers` / `For ESG consultants` / `For develop
 - White-label PDF reports with your branding
 - Client read-only portal — share results without sharing the login
 - Bulk data import for multi-client annual reporting
-- API access for custom integrations
 
 **Development projects tab:**
 - Land parcel and ecosystem mapping (PostGIS-powered)
@@ -221,7 +219,6 @@ Three feature cards linking to sub-pages:
 3. Approval workflow — diagram: Draft → Submitted → Reviewed → Approved → Verified
 4. Verification support — assurance levels (Limited/Reasonable), verifier organisation field, immutable verified records
 5. Audit log — every change, who made it, timestamp, old and new values. Retained per regulatory tier.
-6. API keys — enterprise integration, per-entity scoped keys
 
 ---
 
@@ -375,7 +372,6 @@ Public changelog of new features. Builds trust and gives existing users visibili
 - At rest: AES-256 (PostgreSQL on encrypted volume, S3 server-side encryption)
 - In transit: TLS 1.3 minimum. All HTTP redirected to HTTPS.
 - Passwords: Argon2id (Django default since 4.0)
-- API keys: SHA-256 hashed, only prefix stored in plaintext
 
 **Authentication**
 - JWT with 15-minute access tokens + 7-day HttpOnly refresh cookies
@@ -385,7 +381,6 @@ Public changelog of new features. Builds trust and gives existing users visibili
 **Data isolation**
 - Single-database multi-tenancy with row-level entity scoping via `TenantQueryMiddleware`
 - All queries filtered by `EntityId` — no cross-tenant data leakage
-- API keys are entity-scoped (cannot access other entities' data)
 
 **Compliance**
 - GDPR — EU data subject rights, DPA available on request, data processor agreements for enterprise

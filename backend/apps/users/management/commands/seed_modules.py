@@ -119,6 +119,13 @@ class Command(BaseCommand):
                 if created:
                     self.stdout.write(f"    Created interface: {iface_data['key']}")
 
+        # Customer-managed API keys are retired during the PMF phase. Keep the
+        # historical row for auditability, but never expose it as an active
+        # role-management interface when this idempotent seed command is run.
+        retired_interfaces = Interfaces.objects.filter(
+            InterfaceKey="manage_entity_api_keys", Status=1
+        ).update(Status=4)
+
         # ── Roles ─────────────────────────────────────────────────────────────
         role_map = {}
         for role_data in data.get("roles", []):
@@ -160,5 +167,6 @@ class Command(BaseCommand):
                 created_count += 1
 
         self.stdout.write(self.style.SUCCESS(
-            f"\nDone. {created_count} new RolePrivilege rows created."
+            f"\nDone. {created_count} new RolePrivilege rows created; "
+            f"{retired_interfaces} API-key interfaces retired."
         ))

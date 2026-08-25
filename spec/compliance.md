@@ -224,7 +224,7 @@ SOC 2 Type II is the enterprise procurement standard in the US and increasingly 
 ### Relevant controls already implemented
 
 The SusDevOS architecture covers most SOC 2 Security criteria already:
-- Logical access controls (RBAC, JWT, API keys)
+- Logical access controls (RBAC and JWT; customer API keys are deferred during PMF)
 - Encryption (AES-256 at rest, TLS 1.3)
 - Monitoring and logging (AuditLog, Sentry, CloudWatch)
 - Incident response process (breach notification procedure)
@@ -310,7 +310,7 @@ Middleware check: if `request.user.Role.RoleName == 'SuperAdmin'` and not `TOTPD
 GET /api/users/me/data-export/
 ```
 
-Returns: user record, last 12 months of audit log entries for this user, notification history, API key list (prefix only). Async: triggers Celery task, emails ZIP download link within 1 hour. Download link expires after 24 hours.
+Returns: user record, last 12 months of audit log entries for this user, and notification history. Async: triggers Celery task, emails ZIP download link within 1 hour. Download link expires after 24 hours.
 
 ### Account anonymisation (GDPR right to erasure)
 

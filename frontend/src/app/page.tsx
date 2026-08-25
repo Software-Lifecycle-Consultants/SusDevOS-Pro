@@ -666,7 +666,7 @@ const PLANS = [
       "Verification workflow + TNFD",
       "GIS land parcel mapping",
       "IPCC Tier 2/3 biomass",
-      "API access · bulk import",
+      "Bulk CSV import",
     ],
     cta: { label: "Start 14-day trial", href: "/register?plan=professional" },
   },

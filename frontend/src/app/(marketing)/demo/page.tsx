@@ -39,7 +39,6 @@ const DEMO_COVERS = [
   "Verra/Gold Standard credit validation and TNFD LEAP biodiversity reporting",
   "Land parcel mapping, IPCC biomass, and TNFD reporting (if relevant)",
   "Multi-entity setup for ESG consultancy workflows",
-  "API access and integration overview",
   "Pricing and migration from your current tooling",
 ];
 

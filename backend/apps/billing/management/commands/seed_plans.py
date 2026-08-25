@@ -11,8 +11,8 @@ from django.core.management.base import BaseCommand
 PLANS = [
     {"PlanKey": "free",         "PlanName": "Free",         "PriceMonthlyGBP": 0,    "PriceAnnualGBP": 0,     "MaxEntities": 1,  "MaxUsersPerEntity": 1,  "MaxReportingYears": 1, "MaxApiCallsPerDay": 0,    "SupportTier": "docs",          "IsPublic": True,  "SortOrder": 1},
     {"PlanKey": "starter",      "PlanName": "Starter",      "PriceMonthlyGBP": 49,   "PriceAnnualGBP": 470,   "MaxEntities": 1,  "MaxUsersPerEntity": 5,  "MaxReportingYears": 3, "MaxApiCallsPerDay": 0,    "SupportTier": "email_48h",     "IsPublic": True,  "SortOrder": 2},
-    {"PlanKey": "professional", "PlanName": "Professional", "PriceMonthlyGBP": 199,  "PriceAnnualGBP": 1908,  "MaxEntities": 5,  "MaxUsersPerEntity": 20, "MaxReportingYears": 0, "MaxApiCallsPerDay": 500,  "SupportTier": "email_24h",     "IsPublic": True,  "SortOrder": 3},
-    {"PlanKey": "agency",       "PlanName": "Agency",       "PriceMonthlyGBP": 499,  "PriceAnnualGBP": 4788,  "MaxEntities": 25, "MaxUsersPerEntity": 0,  "MaxReportingYears": 0, "MaxApiCallsPerDay": 2000, "SupportTier": "priority_8h",   "IsPublic": True,  "SortOrder": 4},
+    {"PlanKey": "professional", "PlanName": "Professional", "PriceMonthlyGBP": 199,  "PriceAnnualGBP": 1908,  "MaxEntities": 5,  "MaxUsersPerEntity": 20, "MaxReportingYears": 0, "MaxApiCallsPerDay": 0,    "SupportTier": "email_24h",     "IsPublic": True,  "SortOrder": 3},
+    {"PlanKey": "agency",       "PlanName": "Agency",       "PriceMonthlyGBP": 499,  "PriceAnnualGBP": 4788,  "MaxEntities": 25, "MaxUsersPerEntity": 0,  "MaxReportingYears": 0, "MaxApiCallsPerDay": 0,    "SupportTier": "priority_8h",   "IsPublic": True,  "SortOrder": 4},
     {"PlanKey": "enterprise",   "PlanName": "Enterprise",   "PriceMonthlyGBP": 0,    "PriceAnnualGBP": 0,     "MaxEntities": 0,  "MaxUsersPerEntity": 0,  "MaxReportingYears": 0, "MaxApiCallsPerDay": 0,    "SupportTier": "dedicated_csm", "IsPublic": False, "SortOrder": 5},
 ]
 
@@ -44,7 +44,6 @@ FEATURE_GATES = [
     ("audit_log_30d",              "30-day audit log on all plans.",                               ["free","starter"]),
     ("audit_log_1yr",              "1-year audit log requires Professional.",                       ["professional","agency"]),
     ("audit_log_7yr",              "7-year audit log requires Enterprise.",                        ["enterprise"]),
-    ("api_access",                 "API access requires Professional.",                            ["professional","agency","enterprise"]),
     ("client_portal",              "Client read-only portal requires Agency.",                      ["agency","enterprise"]),
     ("white_label_branding",       "White-label branding requires Agency.",                        ["agency","enterprise"]),
     ("bulk_data_import",           "Bulk CSV import requires Professional.",                        ["professional","agency","enterprise"]),
@@ -83,6 +82,12 @@ class Command(BaseCommand):
                 if created:
                     added += 1
 
+        # Customer/developer API access is retired during the PMF phase. This
+        # cleanup is deliberately idempotent because the old create-only seed
+        # behavior otherwise leaves stale production entitlements enabled.
+        retired, _ = PlanFeatures.objects.filter(FeatureKey="api_access").delete()
+
         self.stdout.write(self.style.SUCCESS(
-            f"\nDone. {added} new PlanFeature rows added."
+            f"\nDone. {added} new PlanFeature rows added; "
+            f"{retired} retired API-access rows removed."
         ))

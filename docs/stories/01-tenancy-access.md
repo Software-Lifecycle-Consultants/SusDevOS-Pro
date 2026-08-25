@@ -424,32 +424,29 @@ Primary diagrams: [UML 02](../diagrams/uml/02-domain-tenancy-rbac.md) ·
 
 ---
 
-### SDO-TEN-15 · Per-entity API keys can be issued and revoked
+### SDO-TEN-15 · Per-entity API keys are deferred during PMF
 
-**As an** entity Admin
-**I want** to mint a long-lived API key scoped to my entity
-**so that** server-to-server integrations can authenticate without a user's JWT.
+**As a** product and security owner
+**I want** customer-managed API credentials disabled during the PMF phase
+**so that** the application exposes only the first-party JWT-authenticated API surface.
 
 | | |
 |---|---|
-| **Status** | 🟡 Partial |
-| **Role** | Entity Admin (`_is_entity_admin`) |
+| **Status** | ⏸ Deferred by product decision (2026-08-25) |
+| **Role** | None — no customer-accessible route |
 | **Diagram** | [UML 02 — Token & credential models](../diagrams/uml/02-domain-tenancy-rbac.md) |
-| **Code** | `backend/apps/entities/services.py` · `generate_api_key()`, `revoke_api_key()` · `backend/apps/entities/views.py` · `EntitiesViewSet.api_keys()`, `.revoke_api_key()` |
-| **Tests** | `backend/apps/entities/tests/test_api.py::TestEntitySettingsAuthz::test_member_cannot_mint_api_key` (denial path only) |
+| **Code** | Dormant models/services retained; no view action or API-key authenticator is registered |
+| **Tests** | `backend/apps/entities/tests/test_api.py::TestRetiredApiKeyRoutes` |
 | **Linear** | `area:ten` · `type:spec` |
 
 **Acceptance criteria**
 
-1. **Given** a non-admin member of an entity,
-   **when** they `POST /api/entities/{id}/api-keys/`,
-   **then** it is rejected `403` (`test_member_cannot_mint_api_key`).
-2. **Given** an entity Admin,
-   **when** they `POST /api/entities/{id}/api-keys/`,
-   **then** `generate_api_key()` returns the raw key exactly once (`RawKey` in the response), persists only its SHA-256 hash (`HashedApiKey`) plus an 8-character `KeyPrefix` for identification, and creates the linking `EntityApiKeysIntermediary` row — **there is no test that exercises this success path**, nor one confirming the raw key is never returned again on a subsequent `GET`.
-3. **Given** an issued key,
-   **when** `DELETE /api/entities/{id}/api-keys/{key_id}/` is called by an entity Admin,
-   **then** `revoke_api_key()` soft-deletes it (`Status=4`) — **untested**.
+1. **Given** any anonymous or authenticated caller, **when** an old API-key list, create, or
+   revoke path is requested, **then** it returns `404` and changes no key data.
+2. **Given** the settings application, **when** it is built, **then** there is no API-key page,
+   navigation entry, or generated client operation.
+3. **Given** historical API-key rows, **when** the retirement migration runs, **then** the rows
+   and hashes are retained but every key is soft-revoked (`Status=4`).
 
 ---
 

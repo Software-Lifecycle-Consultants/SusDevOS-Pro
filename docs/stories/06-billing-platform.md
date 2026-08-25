@@ -285,7 +285,7 @@ spelling of `canceled`.
 
 <a id="sdo-bil-12"></a>
 
-### SDO-BIL-12 · The API publishes a schema the client is generated from
+### SDO-BIL-12 · Local development publishes the schema used for client generation
 
 **As a** frontend developer
 **I want** a typed client generated from the live API
@@ -300,9 +300,11 @@ spelling of `canceled`.
 
 **Acceptance criteria**
 
-1. **Given** the running API, **when** `/api/schema/` is fetched, **then** it returns a valid
-   OpenAPI 3 document; `/api/schema/swagger-ui/` renders it.
-2. **Given** the schema, **when** `npm run generate` is run, **then** the TypeScript client and
+1. **Given** a local `DEBUG=True` API, **when** `/api/schema/` is fetched, **then** it returns a
+   valid OpenAPI 3 document; Swagger UI and ReDoc render locally.
+2. **Given** production Django/Nginx, **when** the schema, Swagger, or ReDoc path is fetched,
+   **then** it returns `404` because customer/developer API access is deferred.
+3. **Given** the local schema, **when** `npm run generate` is run, **then** the TypeScript client and
    TanStack Query hooks in `frontend/src/lib/api/` are regenerated.
 
 <a id="sdo-bil-13"></a>

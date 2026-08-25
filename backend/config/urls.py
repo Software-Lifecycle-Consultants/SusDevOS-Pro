@@ -1,7 +1,9 @@
 """
 Root URL configuration for SusDevOS.
 All API routes are versioned under /api/.
-OpenAPI schema at /api/schema/ (Swagger UI at /api/schema/swagger-ui/).
+OpenAPI schema at /api/schema/ (Swagger UI at /api/schema/swagger-ui/) in
+development only. Production blocks these developer endpoints at both Django
+and Nginx so the route catalogue is not published unnecessarily.
 """
 
 from django.conf import settings
@@ -28,11 +30,6 @@ urlpatterns = [
     # Django admin
     path("admin/", admin.site.urls),
 
-    # OpenAPI schema
-    path("api/schema/",            SpectacularAPIView.as_view(),         name="schema"),
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/schema/redoc/",      SpectacularRedocView.as_view(url_name="schema"),   name="redoc"),
-
     # Application API routes
     path("api/auth/",          include("apps.users.urls.auth")),
     path("api/entities/",      include("apps.entities.urls")),
@@ -56,6 +53,24 @@ urlpatterns = [
     # Integration endpoints
     path("api/integrations/",  include("apps.shared.urls_integrations")),
 ]
+
+# Schema generation is development tooling used by Orval. Do not publish the
+# full API catalogue in production; generated clients consume the checked-in
+# schema and local development can still regenerate it with DEBUG=True.
+if settings.DEBUG:
+    urlpatterns += [
+        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path(
+            "api/schema/swagger-ui/",
+            SpectacularSwaggerView.as_view(url_name="schema"),
+            name="swagger-ui",
+        ),
+        path(
+            "api/schema/redoc/",
+            SpectacularRedocView.as_view(url_name="schema"),
+            name="redoc",
+        ),
+    ]
 
 # Serve media files in development
 if settings.DEBUG:
