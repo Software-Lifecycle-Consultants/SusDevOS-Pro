@@ -38,7 +38,7 @@ class TreeRemovalsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "GET":
             return Response(TreeRemovalSpeciesSerializer(
                 removal.removed_species.all(), many=True).data)
-        s = TreeRemovalSpeciesSerializer(data=request.data)
+        s = TreeRemovalSpeciesSerializer(data=request.data, context={"request": request})
         s.is_valid(raise_exception=True)
         obj = s.save(TreeRemovalId=removal)
         return Response(TreeRemovalSpeciesSerializer(obj).data, status=status.HTTP_201_CREATED)
@@ -51,7 +51,9 @@ class TreeRemovalsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "DELETE":
             item.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        s = TreeRemovalSpeciesSerializer(item, data=request.data, partial=True)
+        s = TreeRemovalSpeciesSerializer(
+            item, data=request.data, partial=True, context={"request": request}
+        )
         s.is_valid(raise_exception=True)
         s.save()
         return Response(TreeRemovalSpeciesSerializer(item).data)
@@ -62,7 +64,7 @@ class TreeRemovalsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "GET":
             return Response(TreeRemovalAffectedSpeciesSerializer(
                 removal.affected_species.all(), many=True).data)
-        s = TreeRemovalAffectedSpeciesSerializer(data=request.data)
+        s = TreeRemovalAffectedSpeciesSerializer(data=request.data, context={"request": request})
         s.is_valid(raise_exception=True)
         obj = s.save(TreeRemovalId=removal)
         return Response(TreeRemovalAffectedSpeciesSerializer(obj).data, status=status.HTTP_201_CREATED)
@@ -75,7 +77,9 @@ class TreeRemovalsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "DELETE":
             item.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        s = TreeRemovalAffectedSpeciesSerializer(item, data=request.data, partial=True)
+        s = TreeRemovalAffectedSpeciesSerializer(
+            item, data=request.data, partial=True, context={"request": request}
+        )
         s.is_valid(raise_exception=True)
         s.save()
         return Response(TreeRemovalAffectedSpeciesSerializer(item).data)
@@ -94,7 +98,7 @@ class RestorationsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "GET":
             return Response(RestorationSpeciesSerializer(
                 restoration.restoration_species.all(), many=True).data)
-        s = RestorationSpeciesSerializer(data=request.data)
+        s = RestorationSpeciesSerializer(data=request.data, context={"request": request})
         s.is_valid(raise_exception=True)
         obj = s.save(RestorationId=restoration)
         return Response(RestorationSpeciesSerializer(obj).data, status=status.HTTP_201_CREATED)
@@ -107,7 +111,9 @@ class RestorationsViewSet(TenantViewSetMixin, ModelViewSet):
         if request.method == "DELETE":
             item.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        s = RestorationSpeciesSerializer(item, data=request.data, partial=True)
+        s = RestorationSpeciesSerializer(
+            item, data=request.data, partial=True, context={"request": request}
+        )
         s.is_valid(raise_exception=True)
         s.save()
         return Response(RestorationSpeciesSerializer(item).data)
