@@ -12,7 +12,7 @@ VS Code Markdown preview, and in the published Artifact version. No tooling requ
 
 ## Companion: user stories
 
-[`docs/stories/`](../stories/README.md) is the behavioural specification — 96 stories covering
+[`docs/stories/`](../stories/README.md) is the behavioural specification — 98 stories covering
 what the system does, each linked to the diagram that shows its mechanism, plus a backlog of
 known gaps. Every diagram here carries a **Related user stories** line back to them.
 
@@ -119,7 +119,7 @@ support external frameworks (market-based Scope 2, for instance) are in scope an
 
 Two machine checks back this set, both re-run after every edit:
 
-- **Mermaid** — all 54 diagram definitions are parsed with the Mermaid compiler; a diagram that
+- **Mermaid** — all 58 diagram definitions are parsed with the Mermaid compiler; a diagram that
   would render as an error box fails the check.
 - **Field names** — every attribute asserted in a `classDiagram` is cross-checked against the
   live Django model fields. This caught 38 invented or misnamed attributes on the first run;
@@ -135,7 +135,7 @@ is the one whose *Source* footer names the file you touched — each diagram lis
 files it was derived from.
 
 `atlas.html` in this folder is a generated single-page rendering of every document here —
-open it directly in a browser to read all 54 diagrams with no Mermaid tooling installed. It is
+open it directly in a browser to read all 58 diagrams with no Mermaid tooling installed. It is
 built from the Markdown sources, so treat the `.md` files as authoritative and regenerate the
 page rather than editing it.
 

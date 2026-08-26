@@ -95,6 +95,11 @@ Each story names its diagram and its code. Each diagram links back to the storie
 That two-way link is the point of this package: a reviewer reading a sequence diagram can find
 the requirement, and someone picking up a story can see the mechanism before touching code.
 
+When a story is active work, its `Linear` row links to the issue and the affected diagram has a
+`Linear traceability` line. The Linear issue, in turn, links back to both canonical documents.
+This keeps requirements, mechanism, delivery state, and verification evidence navigable in
+both directions.
+
 | Epic | Primary diagrams |
 |------|------------------|
 | 01 Tenancy & access | [UML 02](../diagrams/uml/02-domain-tenancy-rbac.md) · [UML 06 §6.1](../diagrams/uml/06-sequences.md) · [BPMN 01](../diagrams/bpmn/01-tenant-onboarding.md) |

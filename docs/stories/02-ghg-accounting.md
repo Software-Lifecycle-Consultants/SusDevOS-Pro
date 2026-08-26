@@ -10,6 +10,8 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 ---
 
+<a id="sdo-ghg-01"></a>
+
 ### SDO-GHG-01 · Record a Scope 1 emission from activity data
 
 **As a** sustainability contributor
@@ -23,7 +25,7 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 | **Diagram** | [BPMN 02 — Main process](../diagrams/bpmn/02-emissions-lifecycle.md) |
 | **Code** | `backend/apps/emissions/views.py` · `EmissionsDataViewSet.create()` · `backend/apps/emissions/models.py` · `EmissionsData` |
 | **Tests** | `backend/apps/emissions/tests/test_api.py::TestGHGCalculation::test_scope1_co2_calculation` |
-| **Linear** | `area:ghg` · `type:spec` |
+| **Linear** | [SUS-21 · CFI-001](https://linear.app/susdevos/issue/SUS-21/cfi-001-stop-silently-discarding-emission-form-fields) · `area:ghg` · `risk:data-loss` |
 
 **Acceptance criteria**
 
@@ -62,6 +64,8 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 ---
 
+<a id="sdo-ghg-03"></a>
+
 ### SDO-GHG-03 · Input quantities are converted to a canonical unit before calculation
 
 **As a** sustainability contributor
@@ -75,7 +79,7 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 | **Diagram** | [UML 06 §6.2 — Unit conversion](../diagrams/uml/06-sequences.md) |
 | **Code** | `backend/apps/emissions/services.py` · `_apply_unit_conversion()` |
 | **Tests** | `backend/apps/emissions/tests/test_api.py::test_quantity_canonical_stored_for_audit` (no-unit fallback only) |
-| **Linear** | `area:ghg` · `type:spec` |
+| **Linear** | [SUS-20 · CFI-003](https://linear.app/susdevos/issue/SUS-20/cfi-003-define-and-enforce-the-canonical-emission-unitfactor-contract) · `area:ghg` · `type:spec` |
 
 **Acceptance criteria**
 
@@ -91,6 +95,8 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 ---
 
+<a id="sdo-ghg-04"></a>
+
 ### SDO-GHG-04 · Scope 2 always populates BOTH location-based and market-based amounts
 
 **As a** sustainability contributor
@@ -99,12 +105,12 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 | | |
 |---|---|
-| **Status** | ✅ Built |
+| **Status** | 🟡 Partial |
 | **Role** | Staff and above |
 | **Diagram** | [BPMN 02 — Scope 2 dual-method detail](../diagrams/bpmn/02-emissions-lifecycle.md) |
 | **Code** | `backend/apps/emissions/services.py` · `_compute_scope2()` |
 | **Tests** | `backend/apps/emissions/tests/test_services.py::test_scope2_dual_method_uses_separate_factors`, `test_scope2_market_falls_back_to_location_when_absent`, `test_scope2_fallback_amounts_refresh_on_edit` |
-| **Linear** | `area:ghg` · `type:spec` |
+| **Linear** | [SUS-23 · CFI-004](https://linear.app/susdevos/issue/SUS-23/cfi-004-capture-evidenced-scope-2-location-and-market-methods) · `area:ghg` · `risk:data-loss` |
 
 **Acceptance criteria**
 
@@ -120,6 +126,11 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 4. **Given** a legacy Scope 2 record with no explicit `EFLocationBased`/`EFMarketBased` (both fall back to the generic `EmissionFactor` result),
    **when** it is edited and re-saved with a changed `QuantityOrCost`,
    **then** `EmissionsAmountLocationBased`, `EmissionsAmountMarketBased`, and the primary `EmissionsAmount` all recompute from the new quantity — the fallback branches use `else` (not `elif ... is None`), so a re-save refreshes rather than retaining the first-save value (`test_scope2_fallback_amounts_refresh_on_edit`, regression-tested explicitly).
+5. **Given** the first-party emission form, **when** a user records Scope 2 activity,
+   **then** it can select only one generic library factor and cannot provide distinct,
+   evidenced location- and market-based inputs. The service-level dual calculation is built,
+   but the product flow can therefore collapse both columns to the same fallback value. This
+   unmet capture criterion is tracked by SUS-23 and is why the story remains 🟡 Partial.
 
 ---
 
@@ -278,6 +289,8 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 ---
 
+<a id="sdo-ghg-10"></a>
+
 ### SDO-GHG-10 · An emission can be attached to a project and phase
 
 **As a** sustainability contributor
@@ -286,24 +299,29 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 | | |
 |---|---|
-| **Status** | 🟡 Partial |
+| **Status** | ✅ Built |
 | **Role** | Staff and above |
-| **Diagram** | [UML 03 — Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
-| **Code** | `backend/apps/emissions/models.py` · `EmissionsData.ProjectId`, `.PhaseId` · `backend/apps/emissions/views.py` · `EmissionsDataViewSet.get_queryset()` |
-| **Tests** | none found |
-| **Linear** | `area:ghg` · `type:spec` |
+| **Diagram** | [BPMN 02 — Capture and relationship validation](../diagrams/bpmn/02-emissions-lifecycle.md) · [UML 03 — Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
+| **Code** | `frontend/src/app/(app)/projects/[id]/page.tsx` · `frontend/src/app/(app)/emissions/page.tsx` · `backend/apps/projects/views.py` · `backend/apps/emissions/serializers.py` |
+| **Tests** | `backend/apps/projects/tests/test_project_phases.py` · `backend/apps/emissions/tests/test_relationship_integrity.py` |
+| **Linear** | [SUS-25 · CFI-008](https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end) · [SUS-22 · CFI-006](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) |
 
 **Acceptance criteria**
 
-1. **Given** `POST /api/emissions/` includes `ProjectId` and/or `PhaseId` (both nullable FKs, `SET_NULL` on delete),
-   **when** the record is created,
-   **then** it is stored against the named `DevelopmentProjects`/`ProjectPhases` rows — **untested**; no test in `backend/apps/emissions/tests/` sets either field.
-2. **Given** `GET /api/emissions/?projectId=<id>` or `?phaseId=<id>`,
-   **when** called,
-   **then** `get_queryset()` filters accordingly (`views.py:71-76`) — **also untested**, unlike the `?scope=` and `?verificationStatus=` filters which do have coverage (see SDO-GHG-12).
-3. **Given** the parent `DevelopmentProjects` row is deleted,
-   **when** the deletion cascades,
-   **then** `ProjectId`/`PhaseId` on any attached `EmissionsData` rows are set to `NULL` (`on_delete=models.SET_NULL`), not cascaded — the emissions record itself survives its project being removed. **Untested.**
+1. **Given** a same-tenant project, **when** a user opens its detail page, **then** they can
+   create, edit, list, and remove unused phases through
+   `/api/projects/{projectId}/phases/`; a phase already referenced by emissions returns
+   `409 phase_in_use` instead of silently detaching operational data.
+2. **Given** the emission create or detail flow, **when** a project is selected, **then** the
+   phase selector lists that project's phases and the selected `ProjectId`/`PhaseId`
+   round-trip through the API and database.
+3. **Given** a phase and project that do not match, or any project/phase owned by another
+   entity, **when** the emission is created or edited, **then** validation returns HTTP 400
+   and writes nothing (`test_phase_must_belong_to_selected_project`,
+   `test_foreign_project_phase_and_inventory_are_rejected`).
+4. **Given** `GET /api/emissions/?projectId=<id>` or `?phaseId=<id>`, **when** called,
+   **then** `get_queryset()` applies the selected relationship filter. These filter paths
+   remain candidates for dedicated response-level tests under SDO-GHG-12.
 
 ---
 
@@ -361,10 +379,15 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
    **then** the verified record is included in the results (`test_filter_by_verification_status`).
 3. **Given** `get_queryset()` also supports `?projectId=`, `?phaseId=`, and `?reportingYear=` (`views.py:71-80`),
    **when** the test suite is searched,
-   **then** none of these three filters has a test — only `?scope=` and `?verificationStatus=` are verified (see also SDO-GHG-10 for the `projectId`/`phaseId` gap specifically).
+   **then** none of these three list filters has a dedicated response test — only `?scope=`
+   and `?verificationStatus=` are verified. Project/phase relationship writes and consistency
+   are covered separately by SDO-GHG-10.
 4. **Given** the list response,
    **when** its shape is inspected,
-   **then** it uses `EmissionsDataListSerializer` (a slimmer field set: `EmissionsId`, `Title`, `Scope`, `Scope3Category`, `Gas`, `EmissionsAmountTonnes`, `VerificationStatus`, `ProjectId`, `ReportingYear`, `Status`) rather than the full `EmissionsDataSerializer` used for detail/create (`get_serializer_class()`).
+   **then** it uses `EmissionsDataListSerializer` with the bounded review fields
+   `EmissionsId`, `Title`, `Scope`, `Scope3Category`, `Gas`, `EmissionsAmountTonnes`,
+   `VerificationStatus`, `ProjectId`, `PhaseId`, `InventoryId`, reporting-period dates,
+   `ReportingYear`, and `Status`, rather than the full detail/create serializer.
 
 ---
 
@@ -397,3 +420,40 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 4. **Given** a record's own detail/offset line items, or an offset reached via the standalone `EmissionsOffsetsViewSet` (`/api/emissions-offsets/`),
    **when** the parent record is locked either by its own `VerificationStatus >= 3` or by its parent inventory's `VerificationStatus >= 3`,
    **then** every write path — nested details, nested offsets, and the standalone offsets endpoint — is rejected `403` with `{"code": "verified_immutable"}` (`TestVerifiedInventoryLineItemLock`, `TestStandaloneOffsetVerifiedLock`) — this closes what the test file's module docstring calls out as three found gaps (F1–F3 in that file's own numbering, distinct from the FINDINGS.md register).
+
+---
+
+<a id="sdo-ghg-14"></a>
+
+### SDO-GHG-14 · Source context and reporting period survive emission capture
+
+**As a** sustainability contributor
+**I want** the period, supplier, activity context, and operational relationships I enter to
+be preserved
+**so that** a reviewer can trace a calculated figure back to the source evidence and boundary.
+
+| | |
+|---|---|
+| **Status** | ✅ Built |
+| **Role** | Staff and above |
+| **Diagram** | [BPMN 02 §Capture and lineage integrity](../diagrams/bpmn/02-emissions-lifecycle.md) · [UML 03 §Field lineage](../diagrams/uml/03-domain-ghg.md) |
+| **Code** | `frontend/src/app/(app)/emissions/page.tsx` · `backend/apps/emissions/models.py` · `backend/apps/emissions/serializers.py` |
+| **Tests** | `backend/apps/emissions/tests/test_relationship_integrity.py` · `backend/apps/emissions/tests/test_api.py` |
+| **Linear** | [SUS-21 · CFI-001](https://linear.app/susdevos/issue/SUS-21/cfi-001-stop-silently-discarding-emission-form-fields) · [SUS-22 · CFI-006](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) · [SUS-25 · CFI-008](https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end) |
+
+**Acceptance criteria**
+
+1. **Given** the first-party form, **when** a user submits `ReportingPeriodFrom`,
+   `ReportingPeriodTo`, `SupplierName`, `ActivityDescription`, and optional
+   `ProjectId`/`PhaseId`/`InventoryId`, **then** those exact keys persist and round-trip in
+   the detail/edit view; the legacy mismatched keys `DateFrom`, `DateTo`, `Supplier`, and
+   `Remarks` are no longer emitted.
+2. **Given** one reporting-period date without the other, an end before the start, or a
+   `ReportingYear` different from the period end year, **when** validation runs, **then** it
+   returns field-specific HTTP 400 errors rather than saving an ambiguous period.
+3. **Given** an inventory assignment, **when** the record period falls outside the inventory
+   period, the year differs, or an explicitly supplied GWP dataset differs, **then** the API
+   rejects the assignment. A valid assignment adopts the inventory's recorded GWP dataset.
+4. **Given** an unrecognised request key, **when** the emission serializer receives it,
+   **then** the API returns HTTP 400 naming the unknown field; visible user input is never
+   silently ignored.

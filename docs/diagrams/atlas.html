@@ -427,14 +427,14 @@ html { scroll-behavior: smooth; }
       <div class="stat"><b>12</b><span>Django apps</span></div>
       <div class="stat"><b>~70</b><span>Models</span></div>
       <div class="stat"><b>14</b><span>Documents</span></div>
-      <div class="stat"><b>54</b><span>Diagrams</span></div>
+      <div class="stat"><b>58</b><span>Diagrams</span></div>
       <div class="stat"><b>13</b><span>RBAC modules</span></div>
       <div class="stat"><b>10</b><span>Findings fixed</span></div>
     </div>
 
     <div class="provenance">
       <p><strong>Provenance.</strong> Every diagram was derived by reading <code>backend/apps/</code>, <code>backend/tasks/</code>, <code>backend/config/</code> and <code>frontend/src/</code> — not from the <code>spec/</code> documents. Where code and spec disagree, these diagrams follow the code and flag the divergence.</p>
-      <p>All 54 Mermaid definitions were parsed with the Mermaid compiler before publishing; every one renders. Ten findings surfaced along the way — they open this page as <a href="#findings">F1–F10</a>, and each is tagged <strong>✅ Fn</strong> at the exact node or transition it affected.</p>
+      <p>All 58 Mermaid definitions were parsed with the Mermaid compiler before publishing; every one renders. Ten findings surfaced along the way — they open this page as <a href="#findings">F1–F10</a>, and each is tagged <strong>✅ Fn</strong> at the exact node or transition it affected.</p>
       <p><strong>All ten are now fixed and verified against a running stack</strong> — 219 tests passing (up from a 199 baseline), the migration applied, and Celery worker and beat booting clean. Each finding keeps its original description so the diagrams still explain why the code looks the way it does.</p>
     </div>
 
@@ -734,7 +734,7 @@ and only writing the test caught it.</p>
   </header>
   <p>How the running system is composed. Everything inside <strong>SusDevOS Platform</strong> is code in this
 repo; everything in <strong>External Services</strong> is a third party reached over HTTPS.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-12, 13</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-12, 13</a></p>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
     subgraph Client["Client tier"]
         BROWSER["Browser&lt;br/&gt;Next.js 14 App Router"]
@@ -837,7 +837,7 @@ Backend processes must run inside the compose network to reach it.</p>
     <p class="doc-file"><code>docs/diagrams/uml/02-domain-tenancy-rbac.md</code></p>
   </header>
   <p>The multi-tenancy root (<code>Entities</code>) and the privilege system that governs every request.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-01…16</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-01…16</a></p>
 <h2>Tenancy</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     direction TB
@@ -1031,38 +1031,46 @@ rather than waiting for expiry.</p>
     <h2>GHG Accounting Domain Model</h2>
     <p class="doc-file"><code>docs/diagrams/uml/03-domain-ghg.md</code></p>
   </header>
-  <p>The emissions core: reference data (units, factors, GWP), the inventory container,
-the emissions records themselves, and the target/offset satellites.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-01…13</a> · <a href="../../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-01…13</a></p>
+  <p>The emissions core: source observations, operational relationships, formal inventory
+membership, calculation reference data, assurance provenance, targets, and offsets.</p>
+<p><strong>Related user stories</strong> — <a href="../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-01…14</a> · <a href="../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-01…14</a> · <a href="../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-11…14</a></p>
+<p><strong>Linear traceability</strong> — <a href="https://linear.app/susdevos/issue/SUS-19/cfi-002-make-ghg-inventory-creation-satisfy-its-data-contract">SUS-19 · inventory contract</a> · <a href="https://linear.app/susdevos/issue/SUS-21/cfi-001-stop-silently-discarding-emission-form-fields">SUS-21 · source-field preservation</a> · <a href="https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship">SUS-22 · tenant ownership</a> · <a href="https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition">SUS-24 · assurance transition</a> · <a href="https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end">SUS-25 · project/phase/inventory assignment</a> · <a href="https://linear.app/susdevos/issue/SUS-31/cfi-013-make-standalone-offset-creation-preserve-its-parent-emission">SUS-31 · offset parent</a> · <a href="https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets">SUS-32 · registry result ownership</a> · <a href="https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory">SUS-33 · exact membership totals</a></p>
 <h2>Reference data — units, factors, GWP</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     direction LR
 
     class GwpDatasets {
         +GwpDatasetId: PK
-        +Name «e.g. IPCC AR6» / Version
-        +Horizon «100»
-        +PublishedYear / IsDefault
+        +Name
+        +Version
+        +Horizon
+        +PublishedYear
+        +IsDefault
     }
     class GwpValues {
         +GwpValueId: PK
         +GwpDatasetId: FK PROTECT
-        +Gas / Subtype
+        +Gas
+        +Subtype
         +GwpFactor: Decimal
     }
     class Units {
         +UnitId: PK
-        +UnitName / UnitSymbol
+        +UnitName
+        +UnitSymbol
         +PhysicalDimension
-        +CanonicalUnit / IsCanonical
-        +ConversionFactor «to canonical unit»
+        +CanonicalUnit
+        +IsCanonical
+        +ConversionFactor
     }
     class EmissionFactorSets {
         +SetId: PK
-        +SetName «DEFRA, Climatiq, ...»
-        +Publisher / Version
+        +SetName
+        +Publisher
+        +Version
         +GeographicScope
-        +ApplicableYear / IsActive
+        +ApplicableYear
+        +IsActive
     }
     class EmissionFactors {
         +FactorId: PK
@@ -1071,63 +1079,109 @@ the emissions records themselves, and the target/offset satellites.</p>
         +FactorValue: Decimal
     }
 
-    GwpDatasets "1" --&gt; "*" GwpValues
-    EmissionFactorSets "1" --&gt; "*" EmissionFactors
-    Units "1" --&gt; "*" EmissionFactors : InputUnitId</pre></div></figure><h2>Inventory and emissions records</h2>
+    GwpDatasets &quot;1&quot; --&gt; &quot;*&quot; GwpValues
+    EmissionFactorSets &quot;1&quot; --&gt; &quot;*&quot; EmissionFactors
+    Units &quot;1&quot; --&gt; &quot;*&quot; EmissionFactors : InputUnitId</pre></div></figure><p>The backend can convert through <code>InputUnitId</code>, but the first-party form still supplies only
+free-text <code>Unit</code>; the denominator/canonical-unit contract remains open in
+<a href="https://linear.app/susdevos/issue/SUS-20/cfi-003-define-and-enforce-the-canonical-emission-unitfactor-contract">SUS-20</a>.</p>
+<p><a id="inventory-emissions-domain"></a></p>
+<h2>Inventory, project, emissions, and offsets</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     direction TB
 
     class GHGInventories {
         +InventoryId: PK
         +EntityId: FK PROTECT
-        +ReportingYear / PeriodFrom / PeriodTo
+        +ReportingYear
+        +ReportingPeriodFrom
+        +ReportingPeriodTo
         +BaselineYear
         +GwpDatasetId: FK PROTECT
-        +ConsolidationApproach «1..3»
-        +VerificationStatus «1..4»
+        +ConsolidationApproach
+        +BoundaryNotes
+        +VerificationStatus
         +VerifiedBy: FK Users SET_NULL
-        --
-        VerificationStatus &gt;= 3 → immutable
+        +VerifiedAt
+        +VerificationNotes
+        +TotalScope1Tonnes
+        +TotalScope2LocationTonnes
+        +TotalScope2MarketTonnes
+        +TotalScope3Tonnes
+        +TotalOffsetsTonnes
+        +NetEmissionsTonnes
+        +TotalsLastComputedAt
     }
 
     class Scope3RelevanceAssessments {
+        +AssessmentId: PK
         +InventoryId: FK CASCADE
         +EntityId: FK PROTECT
-        +AssessmentId: PK
-        +CategoryNumber «1..15»
+        +CategoryNumber
         +IsRelevant
-        +ExclusionReason / Notes
+        +ExclusionReason
+        +Notes
+    }
+
+    class DevelopmentProjects {
+        +ProjectId: PK
+        +EntityId: FK PROTECT
+        +ProjectName
+        +ProjectReference
+    }
+
+    class ProjectPhases {
+        +PhaseId: PK
+        +EntityId: FK PROTECT
+        +ProjectId: FK CASCADE
+        +PhaseName
+        +PhaseNumber
+        +StartDate
+        +EndDate
     }
 
     class EmissionsData {
         +EmissionsId: PK
         +EntityId: FK PROTECT
-        +ProjectId / PhaseId: FK nullable
-        +InventoryId: FK nullable
-        +Scope: SmallInt «1|2|3»
-        +Scope3Category: SmallInt nullable
-        +QuantityOrCost: Decimal «client input»
-        +InputUnitId: FK PROTECT
-        +QuantityCanonical: Decimal 🔒
-        +EmissionFactorId: FK
-        +EmissionFactor: Decimal
+        +ProjectId: FK SET_NULL nullable
+        +PhaseId: FK SET_NULL nullable
+        +InventoryId: FK SET_NULL nullable
+        +Title
+        +ActivityDescription
+        +SupplierName
+        +ReportingPeriodFrom
+        +ReportingPeriodTo
+        +ReportingYear
+        +Scope
+        +Scope3Category
+        +QuantityOrCost
+        +Unit
+        +InputUnitId: FK PROTECT nullable
+        +QuantityCanonical: Decimal CALCULATED
+        +EmissionFactorId: FK SET_NULL nullable
+        +EmissionFactor
+        +EmissionFactorSource
         +GwpDatasetId: FK PROTECT
-        +EmissionsAmount: Decimal 🔒
-        +EmissionsAmountTonnes: Decimal 🔒
-        +BiogenicCO2FactorKg: Decimal
-        +BiogenicCO2AmountTonnes: Decimal 🔒
-        +EFLocationBased / EFMarketBased
-        +EmissionsAmountLocationBased 🔒
-        +EmissionsAmountMarketBased 🔒
-        +VerificationStatus: SmallInt
-        +VerifiedBy: FK Users
+        +Gas
+        +GasSubtype
+        +EmissionsAmount: Decimal CALCULATED
+        +EmissionsAmountTonnes: Decimal CALCULATED
+        +BiogenicCO2AmountTonnes: Decimal CALCULATED
+        +EFLocationBased
+        +EFMarketBased
+        +EmissionsAmountLocationBased: Decimal CALCULATED
+        +EmissionsAmountMarketBased: Decimal CALCULATED
+        +VerificationStatus
+        +VerifiedBy: FK Users SET_NULL
+        +VerifiedAt
     }
 
     class EmissionsDetails {
+        +DetailId: PK
         +EmissionsId: FK CASCADE
         +EntityId: FK PROTECT
         +GwpDatasetId: FK PROTECT
-        +Gas / GasAmount
+        +Gas
+        +GasAmount
     }
 
     class EmissionsOffsets {
@@ -1135,40 +1189,68 @@ the emissions records themselves, and the target/offset satellites.</p>
         +EmissionsId: FK CASCADE
         +EntityId: FK PROTECT
         +OffsetAmountTonnes
+        +CertificateNumber
         +CreditSerialNumber
-        +CreditRegistry «verra | gold_standard»
-        +RegistryValidationStatus
-        +RegistryValidatedAt
-        +RegistryProjectName / Type / VintageYear
-        +RegistryRetirementBeneficiary
+        +CreditRegistry
+        +RegistryValidationStatus: SERVER MANAGED
+        +RegistryValidatedAt: SERVER MANAGED
+        +RegistryProjectName: SERVER MANAGED
+        +RegistryProjectType: SERVER MANAGED
+        +RegistryVintageYear: SERVER MANAGED
+        +RegistryRetirementBeneficiary: SERVER MANAGED
     }
 
     class Entities
-    class DevelopmentProjects
     class GwpDatasets
     class Units
     class EmissionFactors
 
-    Entities "1" --&gt; "*" GHGInventories
-    GHGInventories "1" --&gt; "*" Scope3RelevanceAssessments
-    GHGInventories "1" --&gt; "*" EmissionsData
-    GwpDatasets "1" --&gt; "*" GHGInventories
-    GwpDatasets "1" --&gt; "*" EmissionsData
-    Entities "1" --&gt; "*" EmissionsData
-    DevelopmentProjects "1" --&gt; "*" EmissionsData
-    Units "1" --&gt; "*" EmissionsData : InputUnitId
-    EmissionFactors "1" --&gt; "*" EmissionsData
-    EmissionsData "1" --&gt; "*" EmissionsDetails
-    EmissionsData "1" --&gt; "*" EmissionsOffsets</pre></div></figure><p>🔒 = <strong>server-computed</strong>. Client-submitted values for these fields are overwritten in
-<code>EmissionsData.save()</code> → <code>compute_emissions()</code>. They are never trusted from the request body.</p>
-<h2>Targets</h2>
+    Entities &quot;1&quot; --&gt; &quot;*&quot; GHGInventories
+    Entities &quot;1&quot; --&gt; &quot;*&quot; DevelopmentProjects
+    DevelopmentProjects &quot;1&quot; --&gt; &quot;*&quot; ProjectPhases
+    GHGInventories &quot;1&quot; --&gt; &quot;*&quot; Scope3RelevanceAssessments
+    GHGInventories &quot;1&quot; --&gt; &quot;*&quot; EmissionsData : explicit InventoryId
+    DevelopmentProjects &quot;1&quot; --&gt; &quot;*&quot; EmissionsData : optional ProjectId
+    ProjectPhases &quot;1&quot; --&gt; &quot;*&quot; EmissionsData : optional PhaseId
+    GwpDatasets &quot;1&quot; --&gt; &quot;*&quot; GHGInventories
+    GwpDatasets &quot;1&quot; --&gt; &quot;*&quot; EmissionsData
+    Entities &quot;1&quot; --&gt; &quot;*&quot; EmissionsData
+    Units &quot;1&quot; --&gt; &quot;*&quot; EmissionsData : InputUnitId
+    EmissionFactors &quot;1&quot; --&gt; &quot;*&quot; EmissionsData
+    EmissionsData &quot;1&quot; --&gt; &quot;*&quot; EmissionsDetails
+    EmissionsData &quot;1&quot; --&gt; &quot;*&quot; EmissionsOffsets : immutable parent</pre></div></figure><p>Calculated emission fields are overwritten by <code>EmissionsData.save()</code> →
+<code>compute_emissions()</code>. Inventory status/provenance/totals and offset registry results are
+server-managed request fields: normal client mutation is rejected with HTTP 400 rather than
+silently trusted. Every critical relationship is validated against the active request entity.</p>
+<p><code>InventoryId</code> is nullable because working records can exist before formal assignment. Once
+assigned, it—not reporting year—is the authoritative membership boundary. Offsets inherit that
+membership through their immutable parent emission.</p>
+<p><a id="ghg-field-lineage"></a></p>
+<h2>Field lineage</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A[&quot;User observations&lt;br/&gt;period · supplier · context&lt;br/&gt;quantity · factor identity&quot;] --&gt; B[&quot;Validated request contract&lt;br/&gt;known keys · same tenant&lt;br/&gt;consistent project/phase/inventory&quot;]
+    B --&gt; C[(&quot;EmissionsData source fields&quot;)]
+    C --&gt; D[&quot;Server calculation&lt;br/&gt;unit conversion · factor · GWP&quot;]
+    D --&gt; E[(&quot;Calculated gross results&quot;)]
+    C --&gt; F[(&quot;Explicit InventoryId membership&quot;)]
+    F --&gt; G[&quot;Submit and verify recomputation&quot;]
+    H[(&quot;Offset identity claim&quot;)] --&gt; I[&quot;Registry integration&quot;]
+    I --&gt; J[(&quot;Server-owned registry evidence&quot;)]
+    J --&gt; G
+    G --&gt; K[(&quot;Frozen inventory totals&lt;br/&gt;verifier and audit provenance&quot;)]
+
+    style B fill:#e3f2fd,stroke:#0d47a1,color:#000
+    style E fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style J fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style K fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><h2>Targets</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     class Targets {
         +TargetId: PK
         +EntityId: FK PROTECT
-        +BaselineYear / TargetYear
+        +BaselineYear
+        +TargetYear
         +ReductionPercent
-        +ValidationStatus: SmallInt
+        +ValidationStatus
     }
     class TargetMilestones {
         +MilestoneId: PK
@@ -1176,26 +1258,27 @@ the emissions records themselves, and the target/offset satellites.</p>
         +EntityId: FK PROTECT
         +MilestoneYear
         +TargetEmissionsTonnes
-        +ActualEmissionsTonnes «filled nightly»
-        +IsAchieved / Notes
+        +ActualEmissionsTonnes
+        +IsAchieved
+        +Notes
     }
-    Targets "1" --&gt; "*" TargetMilestones</pre></div></figure><p>Targets are <strong>generic</strong> reduction targets. Per <code>CLAUDE.md</code> there is deliberately no SBTi
-validation, registry sync, or SBTi-specific tiering — <code>ValidationStatus</code> is an internal
-review flag, not an external submission state.</p>
-<p><code>tasks.emissions.link_milestone_actuals</code> (nightly, 01:30) populates <code>ActualEmissionsTonnes</code> from
-recorded emissions.</p>
+    Targets &quot;1&quot; --&gt; &quot;*&quot; TargetMilestones</pre></div></figure><p>Targets are generic reduction targets. There is deliberately no SBTi validation or registry
+sync. <code>tasks.emissions.link_milestone_actuals</code> populates milestone actuals nightly from formal
+inventory net totals.</p>
 <h2>Currency</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     class ExchangeRates {
         +RateId: PK
-        +FromCurrency / ToCurrency
-        +Rate: Decimal
-        +RateDate / Source
-    }</pre></div></figure><p>Populated by <code>tasks.integrations.sync_ecb_fx_rates</code> (17:00 daily), with an
-Open Exchange Rates task as an alternative source. Needed because spend-based Scope 3
-factors are denominated per unit of currency.</p>
+        +FromCurrency
+        +ToCurrency
+        +Rate
+        +RateDate
+        +Source
+    }</pre></div></figure><p>FX sync populates reference rates, but spend-based emissions calculation does not yet consume
+them; the domain diagram does not imply that missing join is implemented.</p>
 <hr>
-<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/services.py</code>,
+<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/serializers.py</code>,
+<code>backend/apps/emissions/services.py</code>, <code>backend/apps/projects/models.py</code>,
 <code>backend/tasks/emissions.py</code>, <code>backend/tasks/integrations/fx.py</code></em></p>
 
 </section><section id="nature" class="doc">
@@ -1207,7 +1290,7 @@ factors are denominated per unit of currency.</p>
   <p>Land, ecosystems, species, and the two carbon-flux processes: <strong>tree removals</strong>
 (stock loss) and <strong>restorations</strong> (sequestration). This is the IPCC LULUCF /
 TNFD side of the platform.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-01…15</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-01…15</a></p>
 <h2>Land &amp; ecosystem</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     direction TB
@@ -1431,7 +1514,7 @@ synchronous, user-triggered lookup at species-creation time — not a scheduled 
   </header>
   <p>Cross-cutting infrastructure: projects, billing, reports, notifications, audit,
 and the shared resource pool every module attaches to.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-01…13</a> · <a href="../../stories/05-reporting-notifications.md">Reporting — SDO-REP-01…11</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-01…13</a> · <a href="../stories/05-reporting-notifications.md">Reporting — SDO-REP-01…11</a></p>
 <h2>Development projects</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">classDiagram
     direction TB
@@ -1704,7 +1787,7 @@ reader at <code>/api/public/blog/{slug}/</code> (<code>apps/blog/urls_public.py<
     <p class="doc-file"><code>docs/diagrams/uml/06-sequences.md</code></p>
   </header>
   <p>The four interaction paths a reviewer most needs to trace end to end.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-03…05</a> · <a href="../../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-02</a> · <a href="../../stories/05-reporting-notifications.md">Reporting — SDO-REP-02…06</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-03…05</a> · <a href="../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-02</a> · <a href="../stories/05-reporting-notifications.md">Reporting — SDO-REP-02…06</a></p>
 <h2>6.1 Login, tenant resolution, and refresh</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">sequenceDiagram
     autonumber
@@ -1930,10 +2013,12 @@ See <a href="#f4">F4 in the findings register</a>.</p>
   </header>
   <p>Every lifecycle in the system that is driven by a status column, and the transitions
 that are legal between states.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-06…10</a> · <a href="../../stories/05-reporting-notifications.md">Reporting — SDO-REP-03</a> · <a href="../../stories/06-billing-platform.md">Billing — SDO-BIL-06, 07</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-05…10, 14</a> · <a href="../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-11…13</a> · <a href="../stories/05-reporting-notifications.md">Reporting — SDO-REP-03</a> · <a href="../stories/06-billing-platform.md">Billing — SDO-BIL-06, 07</a></p>
+<p><strong>Linear traceability</strong> — <a href="https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition">SUS-24 · inventory verification</a> · <a href="https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets">SUS-32 · offset validation ownership</a> · <a href="https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory">SUS-33 · verification over exact members</a></p>
+<p><a id="inventory-verification-state"></a></p>
 <h2>7.1 GHG inventory verification</h2>
-<p><code>GHGInventories.VerificationStatus</code> — the immutability rule that governs the whole
-compliance story.</p>
+<p><code>GHGInventories.VerificationStatus</code> is server-managed. The public first-party workflow has
+only two forward transitions and one privileged correction path.</p>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
     direction LR
     [*] --&gt; Unverified
@@ -1943,20 +2028,30 @@ compliance story.</p>
     VerifiedFirst: 3 — Verified, First Party
     VerifiedThird: 4 — Verified, Third Party
 
-    Unverified --&gt; Pending: submit for review
-    Pending --&gt; Unverified: reject / send back
-    Pending --&gt; VerifiedFirst: internal sign-off
-    Pending --&gt; VerifiedThird: external assurance
-    VerifiedFirst --&gt; VerifiedThird: escalate to third-party
-    VerifiedThird --&gt; Unverified: SuperAdmin unlock
-    VerifiedFirst --&gt; Unverified: SuperAdmin unlock
+    Unverified --&gt; Pending: POST /submit/; reconcile + recompute + audit
+    Pending --&gt; VerifiedFirst: Entity Admin POST /verify/; recompute + provenance + audit
+    VerifiedFirst --&gt; Unverified: SuperAdmin POST /unlock/; mandatory reason + audit
+    VerifiedThird --&gt; Unverified: SuperAdmin POST /unlock/ for legacy/admin state
 
     note right of VerifiedFirst
-        Status &gt;= 3 is IMMUTABLE.
-        PATCH and DELETE return 403.
-        Enforced in the view, not the serializer.
-    end note</pre></div></figure><p>The <code>&gt;= 3</code> threshold is what makes the check work: both verified states are locked by a
-single comparison, so adding a state 5 would automatically inherit immutability.</p>
+        Status &gt;= 3 is immutable.
+        Inventory, member, detail, and offset
+        writes return 403 until unlock.
+    end note
+
+    note right of VerifiedThird
+        Model-reserved compatibility state.
+        No public endpoint or UI transition
+        can claim third-party assurance.
+    end note
+
+    note left of Unverified
+        Normal POST/PATCH cannot set status,
+        verifier, notes, timestamp, or totals;
+        serializer returns HTTP 400.
+    end note</pre></div></figure><p>There is no implemented Pending → Unverified rejection route and no inbound transition to
+third-party status <code>4</code>. Documentation must not imply either exists. Both retained verified
+states still inherit the <code>&gt;= 3</code> immutability guard.</p>
 <h2>7.2 Emissions record verification</h2>
 <p><code>EmissionsData.VerificationStatus</code> — same shape, but note the field is a bare
 <code>PositiveSmallIntegerField(default=1)</code> with <strong>no <code>choices</code></strong> declared, unlike its
@@ -1989,11 +2084,11 @@ it &quot;does not guard against double-verification&quot; — the caller had to 
 first, and only <code>EmissionsDataViewSet</code> did. The <code>Verified → Verified</code> self-transition above
 was reachable from any future call site — a retried request, a management command, a
 bulk-verify endpoint — and would silently overwrite <code>VerifiedBy</code>, <code>VerifiedAt</code> and
-<code>VerificationNotes</code> with the second caller&#39;s identity, losing the original verifier&#39;s
+<code>VerificationNotes</code> with the second caller's identity, losing the original verifier's
 attestation with no audit record.
 <strong>Now:</strong> <code>verify_record()</code> raises <code>ValidationError({&quot;code&quot;: &quot;already_verified&quot;})</code> when
 <code>VerificationStatus &gt;= 3</code>, so every call site inherits the guard, not only the viewset. The
-view&#39;s own check is retained deliberately — it returns the exact response body existing
+view's own check is retained deliberately — it returns the exact response body existing
 tests assert on, so the API is unchanged. A test calls the service directly twice and asserts
 <code>VerifiedBy</code>/<code>VerifiedAt</code> survive the second call.
 See <a href="#f3">F3 in the findings register</a>.</p>
@@ -2028,30 +2123,42 @@ See <a href="#f3">F3 in the findings register</a>.</p>
         terminal attempt, after retries run out.
     end note</pre></div></figure><p><code>tasks.reports.purge_expired_reports</code> (04:00 daily) deletes expired jobs and their S3
 objects via <code>_delete_s3_objects()</code>.</p>
+<p><a id="offset-registry-state"></a></p>
 <h2>7.4 Carbon credit registry validation</h2>
-<p><code>EmissionsOffsets.RegistryValidationStatus</code> — the MRV assurance state, driven by the
-nightly registry sync tasks.</p>
+<p><code>EmissionsOffsets.RegistryValidationStatus</code> is a server-owned result. Users supply identity
+evidence; nightly registry tasks supply the validation outcome.</p>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
     direction LR
     [*] --&gt; Unverified
 
     Unverified: unverified — default on create
-    Pending: pending — awaiting next sync
+    Pending: pending — accepted legacy/system queue state
     Valid: valid — serial found in registry
     Invalid: invalid — serial absent
 
-    Unverified --&gt; Pending: CreditSerialNumber +&lt;br/&gt;CreditRegistry supplied
-    Pending --&gt; Valid: serial matched&lt;br/&gt;RegistryValidatedAt set
-    Pending --&gt; Invalid: no match in registry CSV
-    Invalid --&gt; Pending: serial corrected, re-queued
-    Valid --&gt; Pending: re-validated on next sync
+    Unverified --&gt; Valid: registry task finds a conclusive match
+    Unverified --&gt; Invalid: usable registry response has no match
+    Pending --&gt; Valid: registry task finds a conclusive match
+    Pending --&gt; Invalid: usable registry response has no match
+    Valid --&gt; Unverified: identity evidence changed; results cleared
+    Invalid --&gt; Unverified: identity evidence changed; results cleared
+    Unverified --&gt; Unverified: identity evidence edited before validation
 
     note right of Valid
-        Sync also backfills RegistryProjectName,
-        RegistryProjectType, RegistryVintageYear,
-        RegistryRetirementBeneficiary.
+        Integration may backfill project, vintage,
+        and beneficiary evidence. API clients
+        cannot write any result field.
+    end note
+
+    note left of Invalid
+        Network/server failure or an empty Verra
+        CSV writes no downgrade. Only a usable,
+        conclusive lookup can set invalid.
     end note</pre></div></figure><p>Registries: <code>verra</code> (VCS) and <code>gold_standard</code>, synced at 03:00 and 03:30 daily onto the
-<code>integrations</code> queue. The Verra CSV is ~500 MB and is streamed, not buffered.</p>
+<code>integrations</code> queue. The Verra CSV is streamed, not buffered. Valid/invalid rows are not
+automatically revalidated by the current task query; editing identity evidence deliberately
+clears stale proof and returns the row to <code>unverified</code>. Gold Standard claim-depth hardening and
+coverage remain tracked by SUS-32.</p>
 <h2>7.5 Blog post</h2>
 <p><code>Blogs.BlogStatus</code> — gates what the public marketing router will serve.</p>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">stateDiagram-v2
@@ -2137,7 +2244,7 @@ nightly registry sync tasks.</p>
     <p class="doc-file"><code>docs/diagrams/uml/08-async-topology.md</code></p>
   </header>
   <p>Celery queues, the beat schedule, and where each task reaches outside the platform.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-13</a> · <a href="../../stories/07-backlog-gaps.md">Backlog — SDO-GAP-09</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/06-billing-platform.md">Billing &amp; platform — SDO-BIL-13</a> · <a href="../stories/07-backlog-gaps.md">Backlog — SDO-GAP-09</a></p>
 <h2>Queue routing</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
     subgraph Producers
@@ -2289,7 +2396,7 @@ request path — a provider outage there surfaces as a failed user action.</p>
   <p>From a prospect arriving on the marketing site to a fully provisioned user who can log in.</p>
 <p><strong>Lanes</strong> map to the four seeded roles: <code>SuperAdmin</code> (1), <code>Admin</code> (2), <code>Manager</code> (3),
 <code>Staff</code> (4), plus the automated <strong>System</strong> lane.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-01, 02, 07</a> · <a href="../../stories/06-billing-platform.md">Billing — SDO-BIL-02</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/01-tenancy-access.md">Tenancy &amp; access — SDO-TEN-01, 02, 07</a> · <a href="../stories/06-billing-platform.md">Billing — SDO-BIL-02</a></p>
 <h2>Process</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
     subgraph L1["🧑 Prospect / Public"]
@@ -2330,7 +2437,7 @@ exist.</strong> <code>SignupView</code> is <code>AllowAny</code> and <code>regis
 so an anonymous prospect cannot reach it. The lookup is available to an already-authenticated
 user maintaining entity details, not to a prospect signing up. The original was inferred from
 <code>spec/api_integrations.md</code> rather than read from the code — the drift that
-<a href="../../stories/07-backlog-gaps.md#sdo-gap-10">SDO-GAP-10</a> is about.</p>
+<a href="../stories/07-backlog-gaps.md#sdo-gap-10">SDO-GAP-10</a> is about.</p>
 </blockquote>
 <p><strong>Ordering constraint.</strong> <code>seed_plans</code> must have run before any entity is created —
 <code>EntityCreateSerializer</code> looks up the free plan to attach a subscription, and entity creation
@@ -2402,124 +2509,152 @@ entity (<code>Users.EntityId</code>).</p>
     <h2>Emissions Data Lifecycle</h2>
     <p class="doc-file"><code>docs/diagrams/bpmn/02-emissions-lifecycle.md</code></p>
   </header>
-  <p>From activity data capture to a locked, verified record — including the correction path.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-01…05</a> · <a href="../../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-06…09</a></p>
+  <p>From source activity capture to a calculated, attributable, and optionally verified record.</p>
+<p><strong>Related user stories</strong> — <a href="../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-01…14</a> · <a href="../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-03, 06…09</a></p>
+<p><strong>Linear traceability</strong> — <a href="https://linear.app/susdevos/issue/SUS-21/cfi-001-stop-silently-discarding-emission-form-fields">SUS-21 · source-field preservation</a> · <a href="https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship">SUS-22 · tenant-owned relationships</a> · <a href="https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end">SUS-25 · project/phase/inventory assignment</a> · <a href="https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory">SUS-33 · explicit inventory membership</a></p>
+<p>Open capture gaps are shown in the process rather than hidden: <a href="https://linear.app/susdevos/issue/SUS-20/cfi-003-define-and-enforce-the-canonical-emission-unitfactor-contract">SUS-20 · canonical unit/factor contract</a> and <a href="https://linear.app/susdevos/issue/SUS-23/cfi-004-capture-evidenced-scope-2-location-and-market-methods">SUS-23 · evidenced Scope 2 methods</a>.</p>
+<p><a id="emissions-main-process"></a></p>
 <h2>Main process</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
-    subgraph L1["👤 Staff — data contributor"]
-        A([Activity data available&lt;br/&gt;fuel, electricity, travel, spend]) --&gt; B[Open /emissions — new record]
-        B --&gt; C[Enter Scope, quantity,&lt;br/&gt;input unit, activity description]
-        C --&gt; D{"Scope?"}
-        D --&gt;|"Scope 1"| E[Select emission factor]
-        D --&gt;|"Scope 2"| F[Supply EFLocationBased&lt;br/&gt;AND EFMarketBased]
-        D --&gt;|"Scope 3"| G[Select category 1-15&lt;br/&gt;+ factor]
-        E --&gt; H[Submit POST /api/emissions/]
-        F --&gt; H
-        G --&gt; H
+    subgraph L1[&quot;👤 Staff — data contributor&quot;]
+        A([Source activity available&lt;br/&gt;bill, meter, fuel, travel, spend]) --&gt; B[Open new emission]
+        B --&gt; C[Select optional formal inventory,&lt;br/&gt;project, and project phase]
+        C --&gt; D[Enter reporting period,&lt;br/&gt;supplier, and activity context]
+        D --&gt; E[Select scope, factor, quantity,&lt;br/&gt;and factor-labelled free-text unit]
+        E --&gt; F{&quot;Scope?&quot;}
+        F --&gt;|&quot;1&quot;| G[Use selected factor]
+        F --&gt;|&quot;2&quot;| H[Use selected generic factor&lt;br/&gt;⚠ distinct method evidence not yet in UI — SUS-23]
+        F --&gt;|&quot;3&quot;| I[Select category 1–15&lt;br/&gt;and factor]
+        G --&gt; J[POST /api/emissions/]
+        H --&gt; J
+        I --&gt; J
     end
 
-    subgraph L2["⚙️ System — server-side only"]
-        H --&gt; I{"Feature gate&lt;br/&gt;is_feature_enabled()"}
-        I --&gt;|"Denied"| J([402 feature_gated&lt;br/&gt;upgrade modal])
-        I --&gt;|"Allowed"| K[/"Force EntityId = request.entity_id&lt;br/&gt;CreatedBy = request.user"/]
-        K --&gt; L[/"EmissionsData.save()&lt;br/&gt;compute_emissions()"/]
-        L --&gt; M[/"Unit conversion&lt;br/&gt;QuantityCanonical"/]
-        M --&gt; N[/"GWP lookup&lt;br/&gt;GwpValues by gas"/]
-        N --&gt; O[/"kg CO2e = qty x EF x GWP100"/]
-        O --&gt; P{"Biogenic factor&lt;br/&gt;present?"}
-        P --&gt;|"Yes"| Q[/"BiogenicCO2AmountTonnes&lt;br/&gt;EXCLUDED from total"/]
-        P --&gt;|"No"| R
-        Q --&gt; R{"Scope 2?"}
-        R --&gt;|"Yes"| S[/"Compute BOTH location-based&lt;br/&gt;and market-based amounts"/]
-        R --&gt;|"No"| T
-        S --&gt; T[("INSERT emissions_data")]
-        T --&gt; U[("AuditLog: Create")]
-        U --&gt; V[/"Client-submitted EmissionsAmount&lt;br/&gt;is discarded"/]
+    subgraph L2[&quot;⚙️ API — reject or establish boundary&quot;]
+        J --&gt; K{&quot;Known request keys?&quot;}
+        K --&gt;|&quot;No&quot;| K1([400 names unknown fields])
+        K --&gt;|&quot;Yes&quot;| L{&quot;Scope feature enabled?&quot;}
+        L --&gt;|&quot;No&quot;| LDenied([402 feature_gated])
+        L --&gt;|&quot;Yes&quot;| M[Force EntityId from request context]
+        M --&gt; N{&quot;Project, phase, inventory&lt;br/&gt;belong to entity?&quot;}
+        N --&gt;|&quot;No&quot;| N1([400 relationship error&lt;br/&gt;no write])
+        N --&gt;|&quot;Yes&quot;| O{&quot;Phase belongs to project?&lt;br/&gt;Inventory period/year/GWP match?&quot;}
+        O --&gt;|&quot;No&quot;| O1([400 field-specific boundary error])
+        O --&gt;|&quot;Yes&quot;| P[Adopt inventory GWP dataset&lt;br/&gt;or active system default]
     end
 
-    subgraph L3["👤 Manager — verifier"]
-        V -.-&gt; W[Reviews record on /emissions/id]
-        W --&gt; X{"Data&lt;br/&gt;defensible?"}
-        X --&gt;|"No"| Y[Request correction]
-        X --&gt;|"Yes"| Z[POST /emissions/id/verify/]
+    subgraph L3[&quot;⚙️ Model/service — calculate and persist&quot;]
+        P --&gt; Q[Persist source fields and relationship IDs]
+        Q --&gt; R[EmissionsData.save → compute_emissions]
+        R --&gt; S[QuantityCanonical from InputUnitId&lt;br/&gt;⚠ UI still omits this ID — SUS-20]
+        S --&gt; T[GWP lookup by dataset, gas, subtype]
+        T --&gt; U[kg CO2e = canonical quantity × factor × GWP]
+        U --&gt; V{&quot;Biogenic factor?&quot;}
+        V --&gt;|&quot;Yes&quot;| W[Compute separate biogenic tonnes&lt;br/&gt;excluded from GWP total]
+        V --&gt;|&quot;No&quot;| X
+        W --&gt; X{&quot;Scope 2?&quot;}
+        X --&gt;|&quot;Yes&quot;| Y[Compute both result columns;&lt;br/&gt;missing method factor uses documented fallback]
+        X --&gt;|&quot;No&quot;| Z
+        Y --&gt; Z[(INSERT emissions_data)]
+        Z --&gt; AA[(AuditLog Create)]
+        AA --&gt; AB([Calculated detail returned;&lt;br/&gt;source inputs round-trip])
     end
 
-    subgraph L4["⚙️ System — verification"]
-        Z --&gt; AA[/"verify_record()&lt;br/&gt;VerificationStatus = 3"/]
-        AA --&gt; AB[("VerifiedBy, VerifiedAt,&lt;br/&gt;VerificationNotes")]
-        AB --&gt; AC[("Notification:&lt;br/&gt;emissions_verified")]
-        AC --&gt; AD([🔒 Record locked&lt;br/&gt;PATCH/DELETE now 403])
+    subgraph L4[&quot;👤 Manager — individual-record review&quot;]
+        AB -.-&gt; AC[Review record and evidence]
+        AC --&gt; AD{&quot;Defensible?&quot;}
+        AD --&gt;|&quot;No&quot;| AE[Request correction]
+        AD --&gt;|&quot;Yes&quot;| AF[POST /emissions/id/verify/]
     end
 
-    Y -.-&gt; C
+    subgraph L5[&quot;⚙️ Verification&quot;]
+        AF --&gt; AG[verify_record → status 3]
+        AG --&gt; AH[(VerifiedBy, VerifiedAt,&lt;br/&gt;VerificationNotes)]
+        AH --&gt; AI[(Notification emissions_verified)]
+        AI --&gt; AJ([🔒 Record locked&lt;br/&gt;PATCH/DELETE return 403])
+    end
 
-    style J fill:#ffebee,stroke:#b71c1c,color:#000
-    style V fill:#fff3e0,stroke:#e65100,color:#000
-    style AD fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><strong>The controlling rule:</strong> emissions are never computed on the client. <code>EmissionsAmount</code>,
-<code>EmissionsAmountTonnes</code>, <code>QuantityCanonical</code>, <code>BiogenicCO2AmountTonnes</code>, and both Scope 2
-amounts are populated by <code>compute_emissions()</code> inside <code>EmissionsData.save()</code>. Whatever the
-client sends for those fields is overwritten.</p>
+    AE -.-&gt; D
+
+    style K1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style LDenied fill:#ffebee,stroke:#b71c1c,color:#000
+    style N1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style O1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style H fill:#fff3e0,stroke:#e65100,color:#000
+    style S fill:#fff3e0,stroke:#e65100,color:#000
+    style AJ fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>The raw source context and the derived result have different ownership. Reporting dates,
+supplier/context, quantity, factor reference, and operational relationships are user inputs and
+must persist or fail explicitly. <code>QuantityCanonical</code>, emissions amounts, biogenic totals, and
+Scope 2 result columns are server-owned and recomputed on every save.</p>
+<p><a id="emissions-lineage"></a></p>
+<h2>Capture and lineage integrity</h2>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A[&quot;UI inputs&lt;br/&gt;period · supplier · context&lt;br/&gt;quantity · factor&lt;br/&gt;project · phase · inventory&quot;] --&gt; B[&quot;Serializer&lt;br/&gt;unknown-field rejection&lt;br/&gt;tenant + boundary validation&quot;]
+    B --&gt; C[(&quot;Persisted observations&lt;br/&gt;and exact relationship FKs&quot;)]
+    C --&gt; D[&quot;Deterministic transform&lt;br/&gt;unit → factor → GWP&quot;]
+    D --&gt; E[(&quot;Server-owned result&lt;br/&gt;gross kg and tonnes CO2e&quot;)]
+    C --&gt; F{&quot;InventoryId assigned?&quot;}
+    F --&gt;|&quot;Yes&quot;| G[(&quot;Exact formal inventory member&quot;)]
+    F --&gt;|&quot;No&quot;| H[(&quot;Unassigned working record&lt;br/&gt;visible in reconciliation&quot;)]
+    G --&gt; I[&quot;Submit/verify recomputation&quot;]
+    H -.-&gt; J[&quot;User deliberately assigns&lt;br/&gt;or acknowledges exclusion&quot;]
+
+    style B fill:#e3f2fd,stroke:#0d47a1,color:#000
+    style E fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style H fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>This is the audit invariant: a visible user value is persisted, deliberately transformed with
+traceable provenance, or rejected with a field-specific error. Reporting year alone never
+implies formal inventory membership.</p>
 <h2>Correction path — unlocking a verified record</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
-    subgraph U1["👤 Staff / Manager"]
-        A([Error found in a&lt;br/&gt;verified record]) --&gt; B[Attempt edit]
+    subgraph U1[&quot;👤 Staff / Manager&quot;]
+        A([Error found in a verified record]) --&gt; B[Attempt edit]
         B --&gt; C([403 — record is locked])
         C --&gt; D[Escalate to SuperAdmin&lt;br/&gt;with justification]
     end
 
-    subgraph U2["🛡️ SuperAdmin"]
-        D -.-&gt; E{"Correction&lt;br/&gt;justified?"}
-        E --&gt;|"No"| F([Refuse — record stands])
-        E --&gt;|"Yes"| G[POST /emissions/id/unlock/&lt;br/&gt;with mandatory reason]
+    subgraph U2[&quot;🛡️ SuperAdmin&quot;]
+        D -.-&gt; E{&quot;Correction justified?&quot;}
+        E --&gt;|&quot;No&quot;| F([Refuse — record stands])
+        E --&gt;|&quot;Yes&quot;| G[POST /emissions/id/unlock/&lt;br/&gt;with mandatory reason]
     end
 
-    subgraph U3["⚙️ System"]
-        G --&gt; H{"✅ F9 — IsSuperAdmin?&lt;br/&gt;enforced in the VIEW&lt;br/&gt;AND in unlock_record()"}
-        H --&gt;|"No"| I([403 denied])
-        H --&gt;|"Yes"| J[/"unlock_record()&lt;br/&gt;VerificationStatus = 1"/]
-        J --&gt; K[("AuditLog&lt;br/&gt;Action = Unlock_Verified&lt;br/&gt;RetentionTier = 3 → 7 years")]
-        K --&gt; L[("Notification:&lt;br/&gt;emissions_unlocked")]
+    subgraph U3[&quot;⚙️ System&quot;]
+        G --&gt; H{&quot;IsSuperAdmin?&lt;br/&gt;view and service guard&quot;}
+        H --&gt;|&quot;No&quot;| I([403 denied])
+        H --&gt;|&quot;Yes&quot;| J[unlock_record → status 1]
+        J --&gt; K[(AuditLog&lt;br/&gt;Action = Unlock_Verified&lt;br/&gt;RetentionTier = 3)]
+        K --&gt; L[(Notification emissions_unlocked)]
         L --&gt; M([Record editable again])
     end
 
-    M -.-&gt; N[Re-enter the main process&lt;br/&gt;at correction + re-verification]
+    M -.-&gt; N[Re-enter correction and re-verification]
 
     style C fill:#ffebee,stroke:#b71c1c,color:#000
     style I fill:#ffebee,stroke:#b71c1c,color:#000
-    style K fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>The 7-year audit entry is the compliance artefact: every unlock is permanently attributable
-to a named SuperAdmin with a stated reason.</p>
-<blockquote>
-<p><strong>✅ F9 · Authorization — guard moved into the service — fixed 2026-08-21.</strong>
-<code>unlock_record()</code> (<code>apps/emissions/services.py:169</code>) performed the privileged state change
-but checked nothing itself — its own docstring said <em>&quot;Only callable by SuperAdmin — the view
-enforces that guard.&quot;</em> A management command, admin action or bulk-correction task could have
-unlocked verified records with no authorization check; the audit row would still be written,
-so the action stayed traceable, but it was never authorized.
-<strong>Now:</strong> <code>unlock_record()</code> raises <code>PermissionDenied</code> when <code>unlocked_by</code> is not a SuperAdmin,
-before any mutation or audit write, so a rejected unlock leaves no trace. The view&#39;s inline
-check is retained for its specific response body — the guard now lives in both places.
-See <a href="#f9">F9 in the findings register</a>.</p>
-</blockquote>
+    style K fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>The seven-year audit entry attributes every unlock to a named SuperAdmin and a stated reason.
+The service guard prevents non-view callers from bypassing authorisation.</p>
+<p><a id="scope-2-dual-method"></a></p>
 <h2>Scope 2 dual-method detail</h2>
-<p>GHG Protocol Scope 2 Guidance requires both methods to be reported. The platform always
-populates both columns, even when only one factor was supplied.</p>
+<p>The calculation service supports distinct location- and market-based factors and always
+populates both result columns. The first-party capture flow does <strong>not yet</strong> collect both
+evidence sets; that product gap remains SUS-23.</p>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
-    A([Scope 2 record saved]) --&gt; B{"EFLocationBased&lt;br/&gt;supplied?"}
-    B --&gt;|"Yes"| C[/"LocationBased =&lt;br/&gt;qty x EFLocationBased"/]
-    B --&gt;|"No"| D[/"LocationBased =&lt;br/&gt;generic fallback result"/]
-    C --&gt; E{"EFMarketBased&lt;br/&gt;supplied?"}
+    A([Scope 2 record saved]) --&gt; B{&quot;EFLocationBased supplied?&quot;}
+    B --&gt;|&quot;Yes&quot;| C[Location result = quantity × location factor]
+    B --&gt;|&quot;No&quot;| D[Location result = generic fallback]
+    C --&gt; E{&quot;EFMarketBased supplied?&quot;}
     D --&gt; E
-    E --&gt;|"Yes"| F[/"MarketBased =&lt;br/&gt;qty x EFMarketBased"/]
-    E --&gt;|"No"| G[/"MarketBased =&lt;br/&gt;LocationBased"/]
-    F --&gt; H[/"Primary EmissionsAmount&lt;br/&gt;= market-based"/]
+    E --&gt;|&quot;Yes&quot;| F[Market result = quantity × market factor]
+    E --&gt;|&quot;No&quot;| G[Market result = location result]
+    F --&gt; H[Primary EmissionsAmount = market result]
     G --&gt; H
-    H --&gt; I([Both columns always populated])
+    H --&gt; I([Both result columns populated])
 
-    style I fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>Both branches recompute on <strong>every</strong> save rather than only when the column is null — that
-keeps re-saves idempotent instead of preserving a stale value from a previous save.</p>
-<hr>
-<p><em>Source: <code>backend/apps/emissions/views.py</code>, <code>backend/apps/emissions/services.py</code>,
-<code>backend/apps/emissions/models.py</code>, <code>backend/apps/billing/mixins.py</code></em></p>
+    style G fill:#fff3e0,stroke:#e65100,color:#000
+    style I fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><hr>
+<p><em>Source: <code>frontend/src/app/(app)/emissions/page.tsx</code>,
+<code>backend/apps/emissions/serializers.py</code>, <code>backend/apps/emissions/views.py</code>,
+<code>backend/apps/emissions/services.py</code>, <code>backend/apps/emissions/models.py</code></em></p>
 
 </section><section id="inventory" class="doc">
   <header class="doc-head">
@@ -2527,128 +2662,156 @@ keeps re-saves idempotent instead of preserving a stale value from a previous sa
     <h2>GHG Inventory Close & Verification</h2>
     <p class="doc-file"><code>docs/diagrams/bpmn/03-inventory-verification.md</code></p>
   </header>
-  <p>The annual reporting cycle: open an inventory, assess Scope 3 relevance, accumulate records,
-close, verify, and lock.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-01…11</a></p>
+  <p>The implemented annual assurance cycle: define a formal boundary, assign exact members,
+reconcile unassigned work, recompute totals, verify through an authorised transition, and lock.</p>
+<p><strong>Related user stories</strong> — <a href="../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-01…14</a> · <a href="../stories/02-ghg-accounting.md">GHG accounting — SDO-GHG-10, 13, 14</a></p>
+<p><strong>Linear traceability</strong> — <a href="https://linear.app/susdevos/issue/SUS-19/cfi-002-make-ghg-inventory-creation-satisfy-its-data-contract">SUS-19 · inventory contract</a> · <a href="https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship">SUS-22 · tenant ownership</a> · <a href="https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition">SUS-24 · authorised verification</a> · <a href="https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end">SUS-25 · assignment flow</a> · <a href="https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory">SUS-33 · exact membership totals</a></p>
+<p><a id="annual-inventory-process"></a></p>
 <h2>Annual inventory process</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
-    subgraph L1["👤 Manager — sustainability lead"]
-        A([Reporting year begins]) --&gt; B[POST /ghg-inventories/&lt;br/&gt;ReportingYear, period from/to]
-        B --&gt; C[Choose GwpDatasetId&lt;br/&gt;e.g. IPCC AR6 GWP100]
-        C --&gt; D[Choose ConsolidationApproach&lt;br/&gt;1 Equity / 2 Financial / 3 Operational]
-        D --&gt; E[Assess Scope 3 relevance&lt;br/&gt;categories 1-15]
+    subgraph L1[&quot;👤 Sustainability lead&quot;]
+        A([Open reporting inventory]) --&gt; B[Enter reporting year and period]
+        B --&gt; C[Enter optional baseline year&lt;br/&gt;and boundary rationale]
+        C --&gt; D[Choose consolidation approach]
+        D --&gt; E[POST /api/ghg-inventories/]
     end
 
-    subgraph L2["⚙️ System"]
-        E --&gt; F[("INSERT Scope3RelevanceAssessments&lt;br/&gt;⬜ Django admin only - no REST API")]
-        F --&gt; G[("GHGInventories&lt;br/&gt;VerificationStatus = 1 Unverified")]
+    subgraph L2[&quot;⚙️ System — establish the formal boundary&quot;]
+        E --&gt; F{&quot;Period, year, baseline valid?&quot;}
+        F --&gt;|&quot;No&quot;| F1([400 field-specific error])
+        F --&gt;|&quot;Yes&quot;| G[Record active default GWP dataset]
+        G --&gt; H[(GHGInventories&lt;br/&gt;status 1 Unverified)]
+        H --&gt; I[(AuditLog Create)]
     end
 
-    subgraph L3["👤 Staff — throughout the year"]
-        G -.-&gt; H[Record emissions against&lt;br/&gt;InventoryId]
-        H --&gt; I[/"See BPMN 02 —&lt;br/&gt;emissions lifecycle"/]
-        I --&gt; J{"Reporting period&lt;br/&gt;ended?"}
-        J --&gt;|"No"| H
-        J --&gt;|"Yes"| K([Data collection closed])
+    subgraph L3[&quot;👤 Staff — collect and assign&quot;]
+        I -.-&gt; J[Create or edit emissions]
+        J --&gt; K{&quot;Formal member?&quot;}
+        K --&gt;|&quot;Yes&quot;| L[Select this InventoryId]
+        K --&gt;|&quot;Not yet&quot;| M[Leave as explicit&lt;br/&gt;unassigned working record]
     end
 
-    subgraph L4["⚙️ System — nightly"]
-        K -.-&gt; L[/"recompute_stale_inventory_totals&lt;br/&gt;01:00 daily"/]
-        L --&gt; M[/"_compute_inventory_totals()&lt;br/&gt;sum by scope"/]
-        M --&gt; N[("Scope 1 / 2 / 3 totals&lt;br/&gt;written to inventory")]
+    subgraph L4[&quot;⚙️ API — membership validation&quot;]
+        L --&gt; N{&quot;Same entity, period inside boundary,&lt;br/&gt;same year and GWP dataset?&quot;}
+        N --&gt;|&quot;No&quot;| N1([400 and no assignment])
+        N --&gt;|&quot;Yes&quot;| O[(EmissionsData.InventoryId&lt;br/&gt;exact membership persisted)]
+        M --&gt; P[(InventoryId = null)]
     end
 
-    subgraph L5["👤 Manager"]
-        N -.-&gt; O[Review totals vs prior year]
-        O --&gt; P{"Complete and&lt;br/&gt;defensible?"}
-        P --&gt;|"No"| Q[Reopen data collection]
-        P --&gt;|"Yes"| R[Submit for verification&lt;br/&gt;VerificationStatus = 2 Pending]
+    subgraph L5[&quot;👤 Sustainability lead — reconciliation&quot;]
+        O -.-&gt; Q[GET /ghg-inventories/id/&lt;br/&gt;unassigned-emissions/]
+        P -.-&gt; Q
+        Q --&gt; R[Review period-matching candidates&lt;br/&gt;and records with incomplete dates]
+        R --&gt; S{&quot;Assign any candidate?&quot;}
+        S --&gt;|&quot;Yes&quot;| J
+        S --&gt;|&quot;No — deliberately outside&quot;| T[Prepare submission]
     end
 
-    Q -.-&gt; H
-
-    subgraph L6["👤 Verifier — internal or third party"]
-        R -.-&gt; S{"Assurance&lt;br/&gt;type?"}
-        S --&gt;|"Internal"| T[Sign off&lt;br/&gt;VerificationStatus = 3]
-        S --&gt;|"External"| U[Third-party assurance&lt;br/&gt;VerificationStatus = 4]
-        S --&gt;|"Rejected"| V[Send back to Unverified = 1]
+    subgraph L6[&quot;⚙️ System — submit&quot;]
+        T --&gt; U[POST /ghg-inventories/id/submit/]
+        U --&gt; V{&quot;Unassigned review needed&lt;br/&gt;and not acknowledged?&quot;}
+        V --&gt;|&quot;Yes&quot;| V1([409 unassigned_records_require_review])
+        V --&gt;|&quot;No / acknowledged&quot;| W[Recompute totals from exact InventoryId members]
+        W --&gt; X[(Audit acknowledgement and status 2 Pending)]
     end
 
-    subgraph L7["⚙️ System — lock"]
-        T --&gt; W[("VerifiedBy, VerifiedAt recorded")]
-        U --&gt; W
-        W --&gt; X([🔒 Status &gt;= 3&lt;br/&gt;PATCH/DELETE return 403])
+    subgraph L7[&quot;🛡️ Entity Admin — first-party assurance&quot;]
+        X -.-&gt; Y[Review boundary, evidence, and totals]
+        Y --&gt; Z[POST /ghg-inventories/id/verify/&lt;br/&gt;notes + optional acknowledgement]
     end
 
-    V -.-&gt; O
+    subgraph L8[&quot;⚙️ System — verify and lock&quot;]
+        Z --&gt; AA{&quot;Entity Admin and status 2?&quot;}
+        AA --&gt;|&quot;No&quot;| AA1([403 permission or&lt;br/&gt;409 invalid_transition])
+        AA --&gt;|&quot;Yes&quot;| AB[Repeat reconciliation gate]
+        AB --&gt; AC[Recompute exact-member totals again]
+        AC --&gt; AD[(status 3 First Party&lt;br/&gt;VerifiedBy · VerifiedAt · notes)]
+        AD --&gt; AE[(AuditLog Verify)]
+        AE --&gt; AF([🔒 Inventory and member writes locked])
+    end
 
-    style X fill:#e8f5e9,stroke:#1b5e20,color:#000
-    style L fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>The immutability check is a single comparison — <code>VerificationStatus &gt;= 3</code> — so both the
-first-party (3) and third-party (4) states are locked by the same guard. It is enforced in
-the <strong>view</strong>, not the serializer.</p>
-<h2>Scope 3 relevance assessment</h2>
-<p>GHG Protocol requires reporters to justify which of the 15 Scope 3 categories are material.
-<code>Scope3RelevanceAssessments</code> is that record.</p>
-<blockquote>
-<p><strong>⬜ Not exposed through the API.</strong> The model exists and is registered in Django admin, but
-there is <strong>no serializer and no viewset</strong> — <code>grep</code> finds it only in <code>emissions/admin.py</code>.
-The assessment therefore cannot be performed by a sustainability manager in the product; it
-is an admin-console activity today. An earlier version of this diagram implied a user-facing
-flow. Tracked as
-<a href="../../stories/03-inventory-assurance.md">SDO-INV-02</a>.</p>
-</blockquote>
+    V1 -.-&gt; R
+
+    style F1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style N1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style V1 fill:#fff3e0,stroke:#e65100,color:#000
+    style AA1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style AF fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><code>InventoryId</code> is the authoritative membership boundary. <code>EntityId + ReportingYear</code> is useful
+for finding reconciliation candidates, but it never silently assigns a record and never drives
+formal totals. The same-year isolation regression test covers two inventories plus unassigned
+work and proves there is no cross-contamination.</p>
+<p><a id="exact-boundary-totals"></a></p>
+<h2>Exact-boundary totals</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
-    subgraph A1["👤 Manager"]
-        A([For each of 15 categories]) --&gt; B{"Relevant to&lt;br/&gt;this entity?"}
-        B --&gt;|"Yes"| C[Mark relevant&lt;br/&gt;+ plan data source]
-        B --&gt;|"No"| D[Mark not relevant&lt;br/&gt;+ MANDATORY justification]
-    end
+    A[(Active emissions)] --&gt; B{&quot;InventoryId equals&lt;br/&gt;this inventory?&quot;}
+    B --&gt;|&quot;No&quot;| C[Excluded from formal totals]
+    B --&gt;|&quot;Yes&quot;| D[Sum gross Scope 1, 2 location,&lt;br/&gt;2 market, and Scope 3]
+    D --&gt; E[(Offsets through member emissions)]
+    E --&gt; F{&quot;Registry status valid&lt;br/&gt;from server validation?&quot;}
+    F --&gt;|&quot;No&quot;| G[Do not deduct]
+    F --&gt;|&quot;Yes&quot;| H[Sum TotalOffsetsTonnes]
+    D --&gt; I[Gross = Scope 1 + market Scope 2 + Scope 3]
+    H --&gt; J[Net = gross − valid offsets]
+    I --&gt; J
+    J --&gt; K[(Persist totals and computed timestamp)]
 
-    subgraph A2["⚙️ System"]
-        C --&gt; E[("Scope3RelevanceAssessments&lt;br/&gt;IsRelevant = true - admin only")]
-        D --&gt; F[("Scope3RelevanceAssessments&lt;br/&gt;IsRelevant = false&lt;br/&gt;+ ExclusionReason - admin only")]
-        E --&gt; G[/"Category expected in&lt;br/&gt;emissions data"/]
-        F --&gt; H[/"Exclusion documented&lt;br/&gt;for the assurance file"/]
-    end
-
-    subgraph A3["👤 Verifier"]
-        G -.-&gt; I{"Relevant categories&lt;br/&gt;actually populated?"}
-        H -.-&gt; J{"Exclusions&lt;br/&gt;defensible?"}
-        I --&gt;|"Gaps"| K([Query raised])
-        J --&gt;|"Weak"| K
-        I --&gt;|"Complete"| L([Proceed to sign-off])
-        J --&gt;|"Sound"| L
-    end
-
-    style K fill:#ffebee,stroke:#b71c1c,color:#000
-    style L fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>The justification field is what makes an omitted category auditable rather than simply absent.</p>
-<h2>Multi-entity consolidation</h2>
-<p>For a parent entity with subsidiaries, totals are consolidated by the chosen approach.</p>
+    style C fill:#fff3e0,stroke:#e65100,color:#000
+    style G fill:#fff3e0,stroke:#e65100,color:#000
+    style K fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>Totals are recomputed synchronously during both submit and verify. The 01:00 Celery task is a
+freshness backstop for editable inventories; it skips <code>VerificationStatus &gt;= 3</code>.</p>
+<p><a id="controlled-assurance-transition"></a></p>
+<h2>Controlled assurance transition</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
-    subgraph C1["👤 Manager — group level"]
-        A([Group inventory needed]) --&gt; B[Request consolidated totals]
-    end
+    A[Normal POST or PATCH] --&gt; B{&quot;Contains status, verifier,&lt;br/&gt;notes, timestamp, or totals?&quot;}
+    B --&gt;|&quot;Yes&quot;| C([400 server-managed field])
+    B --&gt;|&quot;No&quot;| D[Normal editable-field mutation]
 
-    subgraph C2["⚙️ System"]
-        B --&gt; C[/"compute_consolidated_emissions(&lt;br/&gt;entity, reporting_year, approach)"/]
-        C --&gt; D[/"accessible_entity_ids()&lt;br/&gt;walk ParentEntityId hierarchy"/]
-        D --&gt; E[/"_entity_scope_totals()&lt;br/&gt;per entity, per scope"/]
-        E --&gt; F{"Consolidation&lt;br/&gt;approach"}
-        F --&gt;|"1 Equity Share"| G[/"Weight by ownership %"/]
-        F --&gt;|"2 Financial Control"| H[/"Include 100% where&lt;br/&gt;financial control held"/]
-        F --&gt;|"3 Operational Control"| I[/"Include 100% where&lt;br/&gt;operational control held"/]
-        G --&gt; J[/"_round_scopes()"/]
-        H --&gt; J
-        I --&gt; J
-        J --&gt; K([Consolidated Scope 1/2/3 returned])
-    end
+    E([Status 1 Unverified]) --&gt; F[POST /submit/]
+    F --&gt; G([Status 2 Pending])
+    G --&gt; H[Entity Admin POST /verify/]
+    H --&gt; I([Status 3 First-party verified and locked])
+    I --&gt; J[SuperAdmin POST /unlock/&lt;br/&gt;mandatory reason]
+    J --&gt; E
 
-    style K fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p><code>ConsolidationApproach</code> is stored on <code>Entities</code>, <code>DevelopmentProjects</code>, <strong>and</strong>
-<code>GHGInventories</code> — the inventory&#39;s own value is the one that governs its reported figures,
-allowing an entity to change approach between reporting years without rewriting history.</p>
-<hr>
-<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/views.py</code>,
-<code>backend/apps/entities/services.py</code>, <code>backend/tasks/emissions.py</code></em></p>
+    K([Status 4 Third-party]) -.-&gt; L[Model-reserved only:&lt;br/&gt;no public transition or UI]
+
+    style C fill:#ffebee,stroke:#b71c1c,color:#000
+    style I fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style L fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>There is currently no public rejection/send-back transition and no route into third-party
+status <code>4</code>. The model value is retained for compatibility, but the product does not make an
+assurance claim it cannot evidence.</p>
+<h2>Scope 3 relevance assessment</h2>
+<p>GHG Protocol category relevance remains a documented gap rather than a fictional product flow.
+<code>Scope3RelevanceAssessments</code> exists in the model/admin but has no REST serializer or endpoint;
+mandatory exclusion justification is therefore not enforceable in the first-party UI. It is
+tracked by <a href="https://linear.app/susdevos/issue/SUS-10">SUS-10</a>.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
+    A([For each Scope 3 category]) --&gt; B{&quot;Relevant?&quot;}
+    B --&gt;|&quot;Yes&quot;| C[Plan evidence and data source]
+    B --&gt;|&quot;No&quot;| D[Record exclusion rationale]
+    C --&gt; E[(Scope3RelevanceAssessments)]
+    D --&gt; E
+    E -.-&gt; F([⬜ Admin/model only today])
+
+    style F fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><h2>Multi-entity consolidation</h2>
+<p>Formal inventory membership and group consolidation are separate operations. The group endpoint
+walks the accessible entity hierarchy and applies the selected ownership/control approach; it
+does not redefine which records belong to an individual formal inventory.</p>
+<figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
+    A([Request consolidated totals]) --&gt; B[compute_consolidated_emissions]
+    B --&gt; C[Walk accessible ParentEntityId hierarchy]
+    C --&gt; D[Compute per-entity scope totals]
+    D --&gt; E{&quot;Approach&quot;}
+    E --&gt;|&quot;Equity share&quot;| F[Weight subsidiaries by ownership percent]
+    E --&gt;|&quot;Financial control&quot;| G[Include controlled subsidiaries at 100 percent]
+    E --&gt;|&quot;Operational control&quot;| H[Include operationally controlled subsidiaries at 100 percent]
+    F --&gt; I[Round and return consolidated scopes]
+    G --&gt; I
+    H --&gt; I</pre></div></figure><hr>
+<p><em>Source: <code>frontend/src/app/(app)/inventories/page.tsx</code>,
+<code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/serializers.py</code>,
+<code>backend/apps/emissions/views.py</code>, <code>backend/tasks/emissions.py</code>,
+<code>backend/apps/entities/services.py</code></em></p>
 
 </section><section id="mrv" class="doc">
   <header class="doc-head">
@@ -2656,107 +2819,106 @@ allowing an entity to change approach between reporting years without rewriting 
     <h2>Carbon Credit MRV & Registry Validation</h2>
     <p class="doc-file"><code>docs/diagrams/bpmn/04-carbon-credit-mrv.md</code></p>
   </header>
-  <p>How an offset claim is captured and then independently validated against the Verra or
-Gold Standard registry. This is the MRV assurance loop.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-11…14</a></p>
+  <p>How a user-declared offset is tied to an emissions record, kept separate from gross emissions,
+and promoted to registry evidence only by the integration path.</p>
+<p><strong>Related user stories</strong> — <a href="../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-11…14</a> · <a href="../stories/03-inventory-assurance.md">Inventory &amp; assurance — SDO-INV-04, 14</a></p>
+<p><strong>Linear traceability</strong> — <a href="https://linear.app/susdevos/issue/SUS-31/cfi-013-make-standalone-offset-creation-preserve-its-parent-emission">SUS-31 · preserve the parent emission</a> · <a href="https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets">SUS-32 · prevent client self-validation</a> · <a href="https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship">SUS-22 · tenant-owned relationships</a> · <a href="https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory">SUS-33 · exact inventory membership</a></p>
+<p><a id="offset-capture-validation"></a></p>
 <h2>Offset capture and validation</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
-    subgraph L1["👤 Manager / ESG consultant"]
-        A([Credits purchased or retired]) --&gt; B[Open the emissions record&lt;br/&gt;the offset applies to]
-        B --&gt; C[POST /emissions/id/offsets/&lt;br/&gt;title, provider, tonnes]
-        C --&gt; D{"Credit serial&lt;br/&gt;available?"}
-        D --&gt;|"Yes"| E[Enter CreditSerialNumber&lt;br/&gt;+ CreditRegistry]
-        D --&gt;|"No"| F[Leave blank —&lt;br/&gt;unverified claim]
+    subgraph L1[&quot;👤 Manager / ESG consultant&quot;]
+        A([Credit evidence available]) --&gt; B[Open offsets page or emission detail]
+        B --&gt; C[Select parent emission]
+        C --&gt; D[Enter title, provider, tonnes,&lt;br/&gt;registry, serial/certificate, validity dates]
+        D --&gt; E[POST standalone or nested offset route]
     end
 
-    subgraph L2["⚙️ System — on save"]
-        E --&gt; G[("EmissionsOffsets&lt;br/&gt;RegistryValidationStatus = pending")]
-        F --&gt; H[("EmissionsOffsets&lt;br/&gt;RegistryValidationStatus = unverified")]
-        G --&gt; I[/"Awaits next registry sync"/]
-        H --&gt; J[/"Never validated —&lt;br/&gt;flagged in reporting"/]
+    subgraph L2[&quot;⚙️ API — establish ownership and claim&quot;]
+        E --&gt; F{&quot;Parent supplied and&lt;br/&gt;owned by request entity?&quot;}
+        F --&gt;|&quot;No&quot;| F1([400/404 and no write])
+        F --&gt;|&quot;Yes&quot;| G{&quot;Parent record or inventory locked?&quot;}
+        G --&gt;|&quot;Yes&quot;| G1([403 verified_immutable])
+        G --&gt;|&quot;No&quot;| H{&quot;Client supplied registry&lt;br/&gt;result fields?&quot;}
+        H --&gt;|&quot;Yes&quot;| H1([400 server-managed field])
+        H --&gt;|&quot;No&quot;| I[(EmissionsOffsets&lt;br/&gt;parent persisted&lt;br/&gt;status unverified)]
     end
 
-    subgraph L3["⚙️ Celery — integrations queue, nightly"]
-        I -.-&gt; K{"Which&lt;br/&gt;registry?"}
-        K --&gt;|"verra"| L[/"sync_verra_registry&lt;br/&gt;03:00 daily"/]
-        K --&gt;|"gold_standard"| M[/"sync_gold_standard_registry&lt;br/&gt;03:30 daily"/]
+    subgraph L3[&quot;⚙️ Nightly integration&quot;]
+        I -.-&gt; J{&quot;Registry?&quot;}
+        J --&gt;|&quot;Verra&quot;| K[sync_verra_registry&lt;br/&gt;03:00]
+        J --&gt;|&quot;Gold Standard&quot;| L[sync_gold_standard_registry&lt;br/&gt;03:30]
+        J --&gt;|&quot;No supported identity&quot;| M([Remain unverified])
+        K --&gt; N{&quot;Registry lookup conclusive?&quot;}
+        L --&gt; N
+        N --&gt;|&quot;Matched&quot;| O[(status valid&lt;br/&gt;validated timestamp + evidence)]
+        N --&gt;|&quot;Conclusive no match&quot;| P[(status invalid&lt;br/&gt;validated timestamp)]
+        N --&gt;|&quot;Unavailable / inconclusive&quot;| Q([Keep prior status&lt;br/&gt;retry later])
     end
 
-    subgraph L4["🌍 Verra VCS registry"]
-        L --&gt; N[/"Stream ~500 MB CSV&lt;br/&gt;timeout 120s"/]
-        N --&gt; O{"Download&lt;br/&gt;succeeded?"}
-        O --&gt;|"No"| P([Log + abort —&lt;br/&gt;offsets stay pending])
-        O --&gt;|"Yes"| Q[/"Build set of valid serials&lt;br/&gt;+ retired serial → beneficiary map"/]
+    subgraph L4[&quot;👤 Manager — correction&quot;]
+        P -.-&gt; R[Investigate registry, serial,&lt;br/&gt;certificate, amount, or dates]
+        R --&gt; S[PATCH identity evidence]
     end
 
-    subgraph L5["⚙️ System — reconcile"]
-        Q --&gt; R{"Offset serial&lt;br/&gt;in registry?"}
-        M --&gt; R
-        R --&gt;|"Match"| S[("RegistryValidationStatus = valid&lt;br/&gt;RegistryValidatedAt = now")]
-        R --&gt;|"No match"| T[("RegistryValidationStatus = invalid")]
-        S --&gt; U[/"Backfill RegistryProjectName,&lt;br/&gt;ProjectType, VintageYear,&lt;br/&gt;RetirementBeneficiary"/]
-    end
+    S --&gt; T[Clear all prior registry results&lt;br/&gt;reset status to unverified]
+    T -.-&gt; J
 
-    subgraph L6["👤 Manager"]
-        U -.-&gt; V([✅ Offset evidenced])
-        T -.-&gt; W[Investigate — typo,&lt;br/&gt;wrong registry, or bad credit]
-        W --&gt; X[Correct serial → back to pending]
-    end
-
-    X -.-&gt; I
-
+    style F1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style G1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style H1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style M fill:#fff3e0,stroke:#e65100,color:#000
     style P fill:#ffebee,stroke:#b71c1c,color:#000
-    style T fill:#ffebee,stroke:#b71c1c,color:#000
-    style V fill:#e8f5e9,stroke:#1b5e20,color:#000
-    style J fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p><strong>Design property worth noting in review:</strong> validation is <em>asynchronous and external</em>. A
-user can never mark their own credit valid — only a registry match sets <code>valid</code>. That is what
-makes the offset column defensible in an assurance context.</p>
+    style Q fill:#fff3e0,stroke:#e65100,color:#000
+    style O fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>The parent relationship is required on standalone creation, tenant-scoped, and immutable after
+creation. Nested creation binds the parent from the URL. A user can declare a registry identity,
+but cannot declare validation status, timestamp, project/vintage metadata, or beneficiary.</p>
+<p>SUS-32 remains in progress because registry <strong>claim depth</strong> still needs hardening and complete
+tests: the Verra path matches an exact serial, while the Gold Standard path currently proves a
+project endpoint exists and does not yet establish every retirement/ownership assertion needed
+for full assurance.</p>
+<p><a id="offset-failure-semantics"></a></p>
 <h2>Failure semantics</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
-    A([Sync task runs]) --&gt; B{"Registry&lt;br/&gt;reachable?"}
-    B --&gt;|"No — RequestException"| C[/"Log error, abort run"/]
-    C --&gt; D([Offsets keep prior status&lt;br/&gt;no false 'invalid'])
-    B --&gt;|"Yes"| E{"Serial found?"}
-    E --&gt;|"Yes"| F([valid])
-    E --&gt;|"No"| G([invalid])
+    A([Sync task runs]) --&gt; B{&quot;Registry response usable?&quot;}
+    B --&gt;|&quot;Network/server failure&quot;| C[Log, retry, or defer]
+    B --&gt;|&quot;Empty/unparseable Verra CSV&quot;| D[Abort entire run]
+    C --&gt; E([Do not downgrade any offset])
+    D --&gt; E
+    B --&gt;|&quot;Usable&quot;| F{&quot;Identity matched?&quot;}
+    F --&gt;|&quot;Yes&quot;| G([valid])
+    F --&gt;|&quot;No&quot;| H([invalid])
 
-    style D fill:#fff3e0,stroke:#e65100,color:#000
-    style F fill:#e8f5e9,stroke:#1b5e20,color:#000
-    style G fill:#ffebee,stroke:#b71c1c,color:#000</pre></div></figure><p>An unreachable registry deliberately does <strong>not</strong> downgrade offsets to <code>invalid</code> — a network
-outage must not look like a fraudulent credit. Status only moves to <code>invalid</code> on a successful
-download where the serial is genuinely absent.</p>
+    style E fill:#fff3e0,stroke:#e65100,color:#000
+    style G fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style H fill:#ffebee,stroke:#b71c1c,color:#000</pre></div></figure><p>An outage cannot masquerade as a fraudulent credit. <code>invalid</code> is written only after a usable,
+registry-specific lookup produces a conclusive absence; unavailable or suspiciously empty data
+leaves the prior status untouched.</p>
+<p><a id="offset-gross-net-boundary"></a></p>
 <h2>Where offsets sit relative to gross emissions</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
-    subgraph Gross["Gross emissions — never reduced by offsets"]
-        A[("EmissionsData&lt;br/&gt;EmissionsAmountTonnes")]
-    end
-    subgraph Offset["Offset register — reported separately"]
-        B[("EmissionsOffsets&lt;br/&gt;OffsetAmountTonnes")]
-    end
-    subgraph Report["Reporting"]
-        C[/"Gross emissions"/]
-        D[/"Offsets applied"/]
-        E[/"Net position"/]
-    end
-
-    A --&gt; C
-    B --&gt; D
-    C --&gt; E
-    D --&gt; E
+    A[(EmissionsData&lt;br/&gt;gross EmissionsAmountTonnes)] --&gt; B[Gross Scope totals]
+    C[(EmissionsOffsets&lt;br/&gt;through parent EmissionsId)] --&gt; D{&quot;Parent InventoryId equals&lt;br/&gt;this formal inventory?&quot;}
+    D --&gt;|&quot;No&quot;| E[Excluded]
+    D --&gt;|&quot;Yes&quot;| F{&quot;Server validation status valid?&quot;}
+    F --&gt;|&quot;No&quot;| E
+    F --&gt;|&quot;Yes&quot;| G[TotalOffsetsTonnes]
+    B --&gt; H[Gross position]
+    G --&gt; I[Net = gross − valid offsets]
+    H --&gt; I
 
     style A fill:#e3f2fd,stroke:#0d47a1,color:#000
-    style B fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><p>Offsets are a <strong>separate table joined to</strong> the emissions record, not a deduction applied to
-<code>EmissionsAmount</code>. Gross emissions stay gross — GHG Protocol requires offsets to be reported
-separately rather than netted into the inventory total. This mirrors the biogenic CO₂
-treatment in <code>EmissionsData</code>, where the biogenic figure is likewise held apart from the
-GWP total.</p>
+    style C fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style E fill:#fff3e0,stroke:#e65100,color:#000</pre></div></figure><p>Offsets never mutate <code>EmissionsAmount</code>. They appear separately in formal inventory totals, and
+only when their immutable parent emission is an explicit member of that inventory. Unassigned
+or other same-year records cannot reduce the inventory's net figure.</p>
 <h2>Scope boundary</h2>
-<p>Per <code>CLAUDE.md</code>, MRV here means <strong>Verra / Gold Standard credit validation</strong> only. There is
-deliberately no SBTi target validation, no CDP questionnaire export, and no NDC tagging —
-if a spec document describes those, the document is stale, not a backlog item.</p>
+<p>MRV here means Verra / Gold Standard registry validation for the implemented product mandate.
+There is no implied SBTi target validation, CDP export, NDC tagging, or RE100 workflow.</p>
 <hr>
-<p><em>Source: <code>backend/apps/emissions/models.py</code>, <code>backend/tasks/integrations/verra.py</code>,
-<code>backend/tasks/integrations/gold_standard.py</code>, <code>backend/config/celery.py</code></em></p>
+<p><em>Source: <code>frontend/src/app/(app)/offsets/page.tsx</code>,
+<code>backend/apps/emissions/models.py</code>, <code>backend/apps/emissions/serializers.py</code>,
+<code>backend/apps/emissions/views.py</code>, <code>backend/tasks/integrations/verra.py</code>,
+<code>backend/tasks/integrations/gold_standard.py</code>, <code>backend/tasks/emissions.py</code></em></p>
 
 </section><section id="reports" class="doc">
   <header class="doc-head">
@@ -2766,7 +2928,7 @@ if a spec document describes those, the document is stale, not a backlog item.</
   </header>
   <p>The only user-triggered asynchronous process in the platform. Everything else in the
 request path is synchronous.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/05-reporting-notifications.md">Reporting &amp; notifications — SDO-REP-01…08</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/05-reporting-notifications.md">Reporting &amp; notifications — SDO-REP-01…08</a></p>
 <h2>Process</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
     subgraph L1["👤 User"]
@@ -2876,7 +3038,7 @@ filesystem, not in MinIO, unless S3 storage is enabled in the environment.</p>
   </header>
   <p>The LULUCF / TNFD side of the platform: recording biomass carbon lost to tree removal and
 gained through restoration planting.</p>
-<p><strong>Related user stories</strong> — <a href="../../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-01…10</a></p>
+<p><strong>Related user stories</strong> — <a href="../stories/04-nature-mrv.md">Nature &amp; MRV — SDO-NAT-01…10</a></p>
 <h2>Tree removal — carbon stock loss</h2>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart TB
     subgraph L1["👤 Manager — project manager"]
@@ -2920,7 +3082,7 @@ gained through restoration planting.</p>
 <p><strong>⬜ Threatened-species flagging is not built.</strong> <code>Species.IUCNStatus</code> is populated from the
 IUCN Red List, but nothing in the codebase reads it to flag CR/EN/VU species for biodiversity
 reporting — the diagram step above is the intended behaviour, not the current one. Tracked as
-<a href="../../stories/04-nature-mrv.md">SDO-NAT-07</a>.</p>
+<a href="../stories/04-nature-mrv.md">SDO-NAT-07</a>.</p>
 </blockquote>
 <p>The <strong>removed vs affected</strong> split is the TNFD-relevant distinction: removed species carry the
 carbon computation, affected species record ecological impact without a carbon figure.</p>

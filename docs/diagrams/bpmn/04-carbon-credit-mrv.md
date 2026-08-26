@@ -1,126 +1,129 @@
 # BPMN 04 — Carbon Credit MRV & Registry Validation
 
-How an offset claim is captured and then independently validated against the Verra or
-Gold Standard registry. This is the MRV assurance loop.
+How a user-declared offset is tied to an emissions record, kept separate from gross emissions,
+and promoted to registry evidence only by the integration path.
 
+**Related user stories** — [Nature & MRV — SDO-NAT-11…14](../../stories/04-nature-mrv.md) · [Inventory & assurance — SDO-INV-04, 14](../../stories/03-inventory-assurance.md)
 
-**Related user stories** — [Nature & MRV — SDO-NAT-11…14](../../stories/04-nature-mrv.md)
+**Linear traceability** — [SUS-31 · preserve the parent emission](https://linear.app/susdevos/issue/SUS-31/cfi-013-make-standalone-offset-creation-preserve-its-parent-emission) · [SUS-32 · prevent client self-validation](https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets) · [SUS-22 · tenant-owned relationships](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) · [SUS-33 · exact inventory membership](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory)
+
+<a id="offset-capture-validation"></a>
 
 ## Offset capture and validation
 
 ```mermaid
 flowchart TB
     subgraph L1["👤 Manager / ESG consultant"]
-        A([Credits purchased or retired]) --> B[Open the emissions record<br/>the offset applies to]
-        B --> C[POST /emissions/id/offsets/<br/>title, provider, tonnes]
-        C --> D{"Credit serial<br/>available?"}
-        D -->|"Yes"| E[Enter CreditSerialNumber<br/>+ CreditRegistry]
-        D -->|"No"| F[Leave blank —<br/>unverified claim]
+        A([Credit evidence available]) --> B[Open offsets page or emission detail]
+        B --> C[Select parent emission]
+        C --> D[Enter title, provider, tonnes,<br/>registry, serial/certificate, validity dates]
+        D --> E[POST standalone or nested offset route]
     end
 
-    subgraph L2["⚙️ System — on save"]
-        E --> G[("EmissionsOffsets<br/>RegistryValidationStatus = pending")]
-        F --> H[("EmissionsOffsets<br/>RegistryValidationStatus = unverified")]
-        G --> I[/"Awaits next registry sync"/]
-        H --> J[/"Never validated —<br/>flagged in reporting"/]
+    subgraph L2["⚙️ API — establish ownership and claim"]
+        E --> F{"Parent supplied and<br/>owned by request entity?"}
+        F -->|"No"| F1([400/404 and no write])
+        F -->|"Yes"| G{"Parent record or inventory locked?"}
+        G -->|"Yes"| G1([403 verified_immutable])
+        G -->|"No"| H{"Client supplied registry<br/>result fields?"}
+        H -->|"Yes"| H1([400 server-managed field])
+        H -->|"No"| I[(EmissionsOffsets<br/>parent persisted<br/>status unverified)]
     end
 
-    subgraph L3["⚙️ Celery — integrations queue, nightly"]
-        I -.-> K{"Which<br/>registry?"}
-        K -->|"verra"| L[/"sync_verra_registry<br/>03:00 daily"/]
-        K -->|"gold_standard"| M[/"sync_gold_standard_registry<br/>03:30 daily"/]
+    subgraph L3["⚙️ Nightly integration"]
+        I -.-> J{"Registry?"}
+        J -->|"Verra"| K[sync_verra_registry<br/>03:00]
+        J -->|"Gold Standard"| L[sync_gold_standard_registry<br/>03:30]
+        J -->|"No supported identity"| M([Remain unverified])
+        K --> N{"Registry lookup conclusive?"}
+        L --> N
+        N -->|"Matched"| O[(status valid<br/>validated timestamp + evidence)]
+        N -->|"Conclusive no match"| P[(status invalid<br/>validated timestamp)]
+        N -->|"Unavailable / inconclusive"| Q([Keep prior status<br/>retry later])
     end
 
-    subgraph L4["🌍 Verra VCS registry"]
-        L --> N[/"Stream ~500 MB CSV<br/>timeout 120s"/]
-        N --> O{"Download<br/>succeeded?"}
-        O -->|"No"| P([Log + abort —<br/>offsets stay pending])
-        O -->|"Yes"| Q[/"Build set of valid serials<br/>+ retired serial → beneficiary map"/]
+    subgraph L4["👤 Manager — correction"]
+        P -.-> R[Investigate registry, serial,<br/>certificate, amount, or dates]
+        R --> S[PATCH identity evidence]
     end
 
-    subgraph L5["⚙️ System — reconcile"]
-        Q --> R{"Offset serial<br/>in registry?"}
-        M --> R
-        R -->|"Match"| S[("RegistryValidationStatus = valid<br/>RegistryValidatedAt = now")]
-        R -->|"No match"| T[("RegistryValidationStatus = invalid")]
-        S --> U[/"Backfill RegistryProjectName,<br/>ProjectType, VintageYear,<br/>RetirementBeneficiary"/]
-    end
+    S --> T[Clear all prior registry results<br/>reset status to unverified]
+    T -.-> J
 
-    subgraph L6["👤 Manager"]
-        U -.-> V([✅ Offset evidenced])
-        T -.-> W[Investigate — typo,<br/>wrong registry, or bad credit]
-        W --> X[Correct serial → back to pending]
-    end
-
-    X -.-> I
-
+    style F1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style G1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style H1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style M fill:#fff3e0,stroke:#e65100,color:#000
     style P fill:#ffebee,stroke:#b71c1c,color:#000
-    style T fill:#ffebee,stroke:#b71c1c,color:#000
-    style V fill:#e8f5e9,stroke:#1b5e20,color:#000
-    style J fill:#fff3e0,stroke:#e65100,color:#000
+    style Q fill:#fff3e0,stroke:#e65100,color:#000
+    style O fill:#e8f5e9,stroke:#1b5e20,color:#000
 ```
 
-**Design property worth noting in review:** validation is *asynchronous and external*. A
-user can never mark their own credit valid — only a registry match sets `valid`. That is what
-makes the offset column defensible in an assurance context.
+The parent relationship is required on standalone creation, tenant-scoped, and immutable after
+creation. Nested creation binds the parent from the URL. A user can declare a registry identity,
+but cannot declare validation status, timestamp, project/vintage metadata, or beneficiary.
+
+SUS-32 remains in progress because registry **claim depth** still needs hardening and complete
+tests: the Verra path matches an exact serial, while the Gold Standard path currently proves a
+project endpoint exists and does not yet establish every retirement/ownership assertion needed
+for full assurance.
+
+<a id="offset-failure-semantics"></a>
 
 ## Failure semantics
 
 ```mermaid
 flowchart LR
-    A([Sync task runs]) --> B{"Registry<br/>reachable?"}
-    B -->|"No — RequestException"| C[/"Log error, abort run"/]
-    C --> D([Offsets keep prior status<br/>no false 'invalid'])
-    B -->|"Yes"| E{"Serial found?"}
-    E -->|"Yes"| F([valid])
-    E -->|"No"| G([invalid])
+    A([Sync task runs]) --> B{"Registry response usable?"}
+    B -->|"Network/server failure"| C[Log, retry, or defer]
+    B -->|"Empty/unparseable Verra CSV"| D[Abort entire run]
+    C --> E([Do not downgrade any offset])
+    D --> E
+    B -->|"Usable"| F{"Identity matched?"}
+    F -->|"Yes"| G([valid])
+    F -->|"No"| H([invalid])
 
-    style D fill:#fff3e0,stroke:#e65100,color:#000
-    style F fill:#e8f5e9,stroke:#1b5e20,color:#000
-    style G fill:#ffebee,stroke:#b71c1c,color:#000
+    style E fill:#fff3e0,stroke:#e65100,color:#000
+    style G fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style H fill:#ffebee,stroke:#b71c1c,color:#000
 ```
 
-An unreachable registry deliberately does **not** downgrade offsets to `invalid` — a network
-outage must not look like a fraudulent credit. Status only moves to `invalid` on a successful
-download where the serial is genuinely absent.
+An outage cannot masquerade as a fraudulent credit. `invalid` is written only after a usable,
+registry-specific lookup produces a conclusive absence; unavailable or suspiciously empty data
+leaves the prior status untouched.
+
+<a id="offset-gross-net-boundary"></a>
 
 ## Where offsets sit relative to gross emissions
 
 ```mermaid
 flowchart LR
-    subgraph Gross["Gross emissions — never reduced by offsets"]
-        A[("EmissionsData<br/>EmissionsAmountTonnes")]
-    end
-    subgraph Offset["Offset register — reported separately"]
-        B[("EmissionsOffsets<br/>OffsetAmountTonnes")]
-    end
-    subgraph Report["Reporting"]
-        C[/"Gross emissions"/]
-        D[/"Offsets applied"/]
-        E[/"Net position"/]
-    end
-
-    A --> C
-    B --> D
-    C --> E
-    D --> E
+    A[(EmissionsData<br/>gross EmissionsAmountTonnes)] --> B[Gross Scope totals]
+    C[(EmissionsOffsets<br/>through parent EmissionsId)] --> D{"Parent InventoryId equals<br/>this formal inventory?"}
+    D -->|"No"| E[Excluded]
+    D -->|"Yes"| F{"Server validation status valid?"}
+    F -->|"No"| E
+    F -->|"Yes"| G[TotalOffsetsTonnes]
+    B --> H[Gross position]
+    G --> I[Net = gross − valid offsets]
+    H --> I
 
     style A fill:#e3f2fd,stroke:#0d47a1,color:#000
-    style B fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style C fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style E fill:#fff3e0,stroke:#e65100,color:#000
 ```
 
-Offsets are a **separate table joined to** the emissions record, not a deduction applied to
-`EmissionsAmount`. Gross emissions stay gross — GHG Protocol requires offsets to be reported
-separately rather than netted into the inventory total. This mirrors the biogenic CO₂
-treatment in `EmissionsData`, where the biogenic figure is likewise held apart from the
-GWP total.
+Offsets never mutate `EmissionsAmount`. They appear separately in formal inventory totals, and
+only when their immutable parent emission is an explicit member of that inventory. Unassigned
+or other same-year records cannot reduce the inventory's net figure.
 
 ## Scope boundary
 
-Per `CLAUDE.md`, MRV here means **Verra / Gold Standard credit validation** only. There is
-deliberately no SBTi target validation, no CDP questionnaire export, and no NDC tagging —
-if a spec document describes those, the document is stale, not a backlog item.
+MRV here means Verra / Gold Standard registry validation for the implemented product mandate.
+There is no implied SBTi target validation, CDP export, NDC tagging, or RE100 workflow.
 
 ---
-*Source: `backend/apps/emissions/models.py`, `backend/tasks/integrations/verra.py`,
-`backend/tasks/integrations/gold_standard.py`, `backend/config/celery.py`*
+*Source: `frontend/src/app/(app)/offsets/page.tsx`,
+`backend/apps/emissions/models.py`, `backend/apps/emissions/serializers.py`,
+`backend/apps/emissions/views.py`, `backend/tasks/integrations/verra.py`,
+`backend/tasks/integrations/gold_standard.py`, `backend/tasks/emissions.py`*

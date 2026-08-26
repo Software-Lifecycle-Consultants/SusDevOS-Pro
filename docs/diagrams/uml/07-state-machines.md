@@ -4,12 +4,16 @@ Every lifecycle in the system that is driven by a status column, and the transit
 that are legal between states.
 
 
-**Related user stories** — [Inventory & assurance — SDO-INV-06…10](../../stories/03-inventory-assurance.md) · [Reporting — SDO-REP-03](../../stories/05-reporting-notifications.md) · [Billing — SDO-BIL-06, 07](../../stories/06-billing-platform.md)
+**Related user stories** — [Inventory & assurance — SDO-INV-05…10, 14](../../stories/03-inventory-assurance.md) · [Nature & MRV — SDO-NAT-11…13](../../stories/04-nature-mrv.md) · [Reporting — SDO-REP-03](../../stories/05-reporting-notifications.md) · [Billing — SDO-BIL-06, 07](../../stories/06-billing-platform.md)
+
+**Linear traceability** — [SUS-24 · inventory verification](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · [SUS-32 · offset validation ownership](https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets) · [SUS-33 · verification over exact members](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory)
+
+<a id="inventory-verification-state"></a>
 
 ## 7.1 GHG inventory verification
 
-`GHGInventories.VerificationStatus` — the immutability rule that governs the whole
-compliance story.
+`GHGInventories.VerificationStatus` is server-managed. The public first-party workflow has
+only two forward transitions and one privileged correction path.
 
 ```mermaid
 stateDiagram-v2
@@ -21,23 +25,33 @@ stateDiagram-v2
     VerifiedFirst: 3 — Verified, First Party
     VerifiedThird: 4 — Verified, Third Party
 
-    Unverified --> Pending: submit for review
-    Pending --> Unverified: reject / send back
-    Pending --> VerifiedFirst: internal sign-off
-    Pending --> VerifiedThird: external assurance
-    VerifiedFirst --> VerifiedThird: escalate to third-party
-    VerifiedThird --> Unverified: SuperAdmin unlock
-    VerifiedFirst --> Unverified: SuperAdmin unlock
+    Unverified --> Pending: POST /submit/; reconcile + recompute + audit
+    Pending --> VerifiedFirst: Entity Admin POST /verify/; recompute + provenance + audit
+    VerifiedFirst --> Unverified: SuperAdmin POST /unlock/; mandatory reason + audit
+    VerifiedThird --> Unverified: SuperAdmin POST /unlock/ for legacy/admin state
 
     note right of VerifiedFirst
-        Status >= 3 is IMMUTABLE.
-        PATCH and DELETE return 403.
-        Enforced in the view, not the serializer.
+        Status >= 3 is immutable.
+        Inventory, member, detail, and offset
+        writes return 403 until unlock.
+    end note
+
+    note right of VerifiedThird
+        Model-reserved compatibility state.
+        No public endpoint or UI transition
+        can claim third-party assurance.
+    end note
+
+    note left of Unverified
+        Normal POST/PATCH cannot set status,
+        verifier, notes, timestamp, or totals;
+        serializer returns HTTP 400.
     end note
 ```
 
-The `>= 3` threshold is what makes the check work: both verified states are locked by a
-single comparison, so adding a state 5 would automatically inherit immutability.
+There is no implemented Pending → Unverified rejection route and no inbound transition to
+third-party status `4`. Documentation must not imply either exists. Both retained verified
+states still inherit the `>= 3` immutability guard.
 
 ## 7.2 Emissions record verification
 
@@ -122,10 +136,12 @@ stateDiagram-v2
 `tasks.reports.purge_expired_reports` (04:00 daily) deletes expired jobs and their S3
 objects via `_delete_s3_objects()`.
 
+<a id="offset-registry-state"></a>
+
 ## 7.4 Carbon credit registry validation
 
-`EmissionsOffsets.RegistryValidationStatus` — the MRV assurance state, driven by the
-nightly registry sync tasks.
+`EmissionsOffsets.RegistryValidationStatus` is a server-owned result. Users supply identity
+evidence; nightly registry tasks supply the validation outcome.
 
 ```mermaid
 stateDiagram-v2
@@ -133,25 +149,36 @@ stateDiagram-v2
     [*] --> Unverified
 
     Unverified: unverified — default on create
-    Pending: pending — awaiting next sync
+    Pending: pending — accepted legacy/system queue state
     Valid: valid — serial found in registry
     Invalid: invalid — serial absent
 
-    Unverified --> Pending: CreditSerialNumber +<br/>CreditRegistry supplied
-    Pending --> Valid: serial matched<br/>RegistryValidatedAt set
-    Pending --> Invalid: no match in registry CSV
-    Invalid --> Pending: serial corrected, re-queued
-    Valid --> Pending: re-validated on next sync
+    Unverified --> Valid: registry task finds a conclusive match
+    Unverified --> Invalid: usable registry response has no match
+    Pending --> Valid: registry task finds a conclusive match
+    Pending --> Invalid: usable registry response has no match
+    Valid --> Unverified: identity evidence changed; results cleared
+    Invalid --> Unverified: identity evidence changed; results cleared
+    Unverified --> Unverified: identity evidence edited before validation
 
     note right of Valid
-        Sync also backfills RegistryProjectName,
-        RegistryProjectType, RegistryVintageYear,
-        RegistryRetirementBeneficiary.
+        Integration may backfill project, vintage,
+        and beneficiary evidence. API clients
+        cannot write any result field.
+    end note
+
+    note left of Invalid
+        Network/server failure or an empty Verra
+        CSV writes no downgrade. Only a usable,
+        conclusive lookup can set invalid.
     end note
 ```
 
 Registries: `verra` (VCS) and `gold_standard`, synced at 03:00 and 03:30 daily onto the
-`integrations` queue. The Verra CSV is ~500 MB and is streamed, not buffered.
+`integrations` queue. The Verra CSV is streamed, not buffered. Valid/invalid rows are not
+automatically revalidated by the current task query; editing identity evidence deliberately
+clears stale proof and returns the row to `unverified`. Gold Standard claim-depth hardening and
+coverage remain tracked by SUS-32.
 
 ## 7.5 Blog post
 
