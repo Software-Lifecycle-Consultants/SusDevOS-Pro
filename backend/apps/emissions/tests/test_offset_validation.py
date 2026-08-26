@@ -36,20 +36,29 @@ DIESEL_EF = "2.63900000"
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 
-def _post_record(client, gwp_id, year=2024):
+def _post_record(client, gwp_id, year=2024, inventory_id=None):
+    payload = {
+        "Title": "Diesel",
+        "Scope": 1,
+        "QuantityOrCost": "1000.0000",
+        "Unit": "litres",
+        "EmissionFactor": DIESEL_EF,
+        "EmissionFactorSource": "DEFRA 2024",
+        "Gas": "CO2",
+        "GwpDatasetId": gwp_id,
+        "ReportingYear": year,
+    }
+    if inventory_id is not None:
+        payload.update(
+            {
+                "InventoryId": inventory_id,
+                "ReportingPeriodFrom": f"{year}-01-01",
+                "ReportingPeriodTo": f"{year}-12-31",
+            }
+        )
     resp = client.post(
         EMISSIONS_URL,
-        {
-            "Title": "Diesel",
-            "Scope": 1,
-            "QuantityOrCost": "1000.0000",
-            "Unit": "litres",
-            "EmissionFactor": DIESEL_EF,
-            "EmissionFactorSource": "DEFRA 2024",
-            "Gas": "CO2",
-            "GwpDatasetId": gwp_id,
-            "ReportingYear": year,
-        },
+        payload,
         format="json",
     )
     assert resp.status_code == status.HTTP_201_CREATED, resp.data
@@ -176,8 +185,12 @@ class TestOffsetNetTotalRule:
                      = 2.639 - 1.0 = 1.639 tCO2e (approximately)
         The other 3 × 1.0 tCO2e of unvalidated credits must NOT be subtracted.
         """
-        eid = _post_record(auth_client, gwp_dataset.GwpDatasetId)
         inventory = _create_inventory(entity, gwp_dataset)
+        eid = _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            inventory_id=inventory.InventoryId,
+        )
 
         for vs in ("unverified", "invalid", "pending"):
             _add_offset(entity, eid, "1.000000", vs)
@@ -198,8 +211,12 @@ class TestOffsetNetTotalRule:
         assert inventory.NetEmissionsTonnes == expected_net
 
     def test_all_invalid_offsets_result_in_zero_deduction(self, auth_client, gwp_dataset, entity):
-        eid = _post_record(auth_client, gwp_dataset.GwpDatasetId)
         inventory = _create_inventory(entity, gwp_dataset)
+        eid = _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            inventory_id=inventory.InventoryId,
+        )
 
         for vs in ("unverified", "invalid", "pending"):
             _add_offset(entity, eid, "5.000000", vs)
@@ -214,8 +231,12 @@ class TestOffsetNetTotalRule:
         assert inventory.NetEmissionsTonnes == inventory.TotalScope1Tonnes
 
     def test_valid_offset_is_fully_deducted(self, auth_client, gwp_dataset, entity):
-        eid = _post_record(auth_client, gwp_dataset.GwpDatasetId)
         inventory = _create_inventory(entity, gwp_dataset)
+        eid = _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            inventory_id=inventory.InventoryId,
+        )
 
         _add_offset(entity, eid, "1.000000", "valid")
 
@@ -228,8 +249,12 @@ class TestOffsetNetTotalRule:
         assert inventory.NetEmissionsTonnes == inventory.TotalScope1Tonnes - Decimal("1.000000")
 
     def test_multiple_valid_offsets_all_deducted(self, auth_client, gwp_dataset, entity):
-        eid = _post_record(auth_client, gwp_dataset.GwpDatasetId)
         inventory = _create_inventory(entity, gwp_dataset)
+        eid = _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            inventory_id=inventory.InventoryId,
+        )
 
         for _ in range(3):
             _add_offset(entity, eid, "0.500000", "valid")
@@ -247,14 +272,18 @@ class TestOffsetNetTotalRule:
         self, auth_client, gwp_dataset, entity
     ):
         """
-        A valid offset attached to a 2023 emissions record must NOT reduce the
-        2024 inventory's net total.  Offsets are scoped to the inventory's
-        ReportingYear via their linked emissions record, so credits cannot leak
-        across years.  Regression test for the entity-wide offset sum bug.
+        A valid offset attached to an unassigned 2023 emissions record must NOT
+        reduce the 2024 inventory's net total. Offsets inherit explicit
+        inventory membership from their linked emissions record.
         """
         # 2024 inventory with a 2024 record but no 2024 offsets.
-        _post_record(auth_client, gwp_dataset.GwpDatasetId, year=2024)
         inv_2024 = _create_inventory(entity, gwp_dataset, year=2024)
+        _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            year=2024,
+            inventory_id=inv_2024.InventoryId,
+        )
 
         # A valid credit, but attached to a 2023 record.
         eid_2023 = _post_record(auth_client, gwp_dataset.GwpDatasetId, year=2023)
@@ -268,6 +297,35 @@ class TestOffsetNetTotalRule:
         # The 2023 credit must not touch 2024's totals.
         assert inv_2024.TotalOffsetsTonnes == Decimal("0.000000")
         assert inv_2024.NetEmissionsTonnes == inv_2024.TotalScope1Tonnes
+
+    def test_same_year_inventories_and_unassigned_work_do_not_cross_contaminate(
+        self, auth_client, gwp_dataset, entity
+    ):
+        inv_a = _create_inventory(entity, gwp_dataset, year=2024)
+        inv_b = _create_inventory(entity, gwp_dataset, year=2024)
+        record_a = _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            year=2024,
+            inventory_id=inv_a.InventoryId,
+        )
+        _post_record(
+            auth_client,
+            gwp_dataset.GwpDatasetId,
+            year=2024,
+            inventory_id=inv_b.InventoryId,
+        )
+        _post_record(auth_client, gwp_dataset.GwpDatasetId, year=2024)
+        _add_offset(entity, record_a, "0.500000", "valid")
+
+        from tasks.emissions import _compute_inventory_totals
+
+        _compute_inventory_totals(inv_a)
+        inv_a.refresh_from_db()
+
+        assert inv_a.TotalScope1Tonnes == Decimal("2.639000")
+        assert inv_a.TotalOffsetsTonnes == Decimal("0.500000")
+        assert inv_a.NetEmissionsTonnes == Decimal("2.139000")
 
 
 # ── Verified-record immutability on the standalone offsets endpoint ────────────

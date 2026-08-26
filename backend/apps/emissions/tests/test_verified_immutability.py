@@ -75,6 +75,8 @@ def _post_record(client, gwp_id, inventory_id=None, year=2024):
         "Gas": "CO2",
         "GwpDatasetId": gwp_id,
         "ReportingYear": year,
+        "ReportingPeriodFrom": f"{year}-01-01",
+        "ReportingPeriodTo": f"{year}-12-31",
     }
     if inventory_id is not None:
         payload["InventoryId"] = inventory_id
@@ -91,6 +93,14 @@ def _create_inventory(entity, gwp_dataset, year=2024):
         ReportingPeriodTo=f"{year}-12-31",
         GwpDatasetId=gwp_dataset,
     )
+
+
+def _verify_inventory(client, inventory_id):
+    submitted = client.post(f"{INV_URL}{inventory_id}/submit/", {}, format="json")
+    assert submitted.status_code == status.HTTP_200_OK, submitted.data
+    verified = client.post(f"{INV_URL}{inventory_id}/verify/", {}, format="json")
+    assert verified.status_code == status.HTTP_200_OK, verified.data
+    return verified
 
 
 # ── F1: standalone offsets viewset honours the parent record's verified lock ──
@@ -168,10 +178,7 @@ class TestVerifiedInventoryChildRows:
     def _verified_inventory(self, auth_client, entity, gwp_dataset):
         _enable_feature(entity, "ghg_inventory_formal")
         inv = _create_inventory(entity, gwp_dataset)
-        patch = auth_client.patch(
-            f"{INV_URL}{inv.InventoryId}/", {"VerificationStatus": VERIFIED}, format="json"
-        )
-        assert patch.status_code == status.HTTP_200_OK, patch.data
+        _verify_inventory(auth_client, inv.InventoryId)
         return inv
 
     def test_edit_row_in_verified_inventory_returns_403(self, auth_client, gwp_dataset, entity):
@@ -182,9 +189,7 @@ class TestVerifiedInventoryChildRows:
             auth_client, gwp_dataset.GwpDatasetId, inventory_id=inv.InventoryId
         ).data["EmissionsId"]
 
-        auth_client.patch(
-            f"{INV_URL}{inv.InventoryId}/", {"VerificationStatus": VERIFIED}, format="json"
-        )
+        _verify_inventory(auth_client, inv.InventoryId)
 
         resp = auth_client.patch(f"{EMISSIONS_URL}{rec_id}/", {"Title": "Tampered"}, format="json")
         assert resp.status_code == status.HTTP_403_FORBIDDEN
@@ -197,9 +202,7 @@ class TestVerifiedInventoryChildRows:
             auth_client, gwp_dataset.GwpDatasetId, inventory_id=inv.InventoryId
         ).data["EmissionsId"]
 
-        auth_client.patch(
-            f"{INV_URL}{inv.InventoryId}/", {"VerificationStatus": VERIFIED}, format="json"
-        )
+        _verify_inventory(auth_client, inv.InventoryId)
 
         resp = auth_client.delete(f"{EMISSIONS_URL}{rec_id}/")
         assert resp.status_code == status.HTTP_403_FORBIDDEN
@@ -296,10 +299,7 @@ class TestVerifiedInventoryLineItemLock:
         offset_id = offset_resp.data["OffsetId"]
 
         # Verify the INVENTORY (not the row) — the row keeps VerificationStatus < 3.
-        patch = auth_client.patch(
-            f"{INV_URL}{inv.InventoryId}/", {"VerificationStatus": VERIFIED}, format="json"
-        )
-        assert patch.status_code == status.HTTP_200_OK, patch.data
+        _verify_inventory(auth_client, inv.InventoryId)
         return rec_id, offset_id
 
     def test_nested_add_detail_to_row_in_verified_inventory_returns_403(
