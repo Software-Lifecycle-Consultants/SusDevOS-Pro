@@ -52,7 +52,7 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
     Title: "", OffsetType: "Voluntary Carbon Unit (VCU)", Provider: "",
     CertificateNumber: "", OffsetAmountTonnes: "",
     ValidFrom: "", ValidTo: "",
-    CreditSerialNumber: "", RegistryVintageYear: "",
+    CreditSerialNumber: "", CreditRegistry: "verra",
     Remarks: "",
   });
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,7 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
 
   const mutation = useMutation({
     mutationFn: () => axiosInstance.post("/api/emissions-offsets/", {
-      EmissionsId:          form.EmissionsId ? Number(form.EmissionsId) : null,
+      EmissionsId:          Number(form.EmissionsId),
       Title:                form.Title,
       OffsetType:           form.OffsetType,
       Provider:             form.Provider,
@@ -69,7 +69,7 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
       ValidFrom:            form.ValidFrom             || null,
       ValidTo:              form.ValidTo               || null,
       CreditSerialNumber:   form.CreditSerialNumber    || null,
-      RegistryVintageYear:  form.RegistryVintageYear ? Number(form.RegistryVintageYear) : null,
+      CreditRegistry:       form.CreditRegistry,
       Remarks:              form.Remarks               || null,
     }, { headers }),
     onSuccess: () => {
@@ -96,9 +96,9 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
 
         <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }} className="space-y-4">
           <div>
-            <label className="label mb-1">Link to emissions record <span className="font-normal text-surface-400">optional</span></label>
-            <select className="input" value={form.EmissionsId} onChange={(e) => set("EmissionsId", e.target.value)}>
-              <option value="">— none —</option>
+            <label className="label mb-1">Link to emissions record</label>
+            <select className="input" required value={form.EmissionsId} onChange={(e) => set("EmissionsId", e.target.value)}>
+              <option value="">Select an emissions record</option>
               {emissionsRecords.map((r) => (
                 <option key={r.EmissionsId} value={r.EmissionsId}>
                   {r.Title}{r.ReportingYear ? ` (${r.ReportingYear})` : ""}
@@ -134,10 +134,12 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
                 value={form.OffsetAmountTonnes} onChange={(e) => set("OffsetAmountTonnes", e.target.value)} />
             </div>
             <div>
-              <label className="label mb-1">Vintage year</label>
-              <input className="input" type="number" min={2000} max={2100}
-                placeholder="e.g. 2023"
-                value={form.RegistryVintageYear} onChange={(e) => set("RegistryVintageYear", e.target.value)} />
+              <label className="label mb-1">Credit registry</label>
+              <select className="input" value={form.CreditRegistry}
+                onChange={(e) => set("CreditRegistry", e.target.value)}>
+                <option value="verra">Verra (VCS)</option>
+                <option value="gold_standard">Gold Standard</option>
+              </select>
             </div>
           </div>
 
