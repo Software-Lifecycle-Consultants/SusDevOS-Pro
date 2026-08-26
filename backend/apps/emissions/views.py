@@ -7,6 +7,7 @@ Critical rules enforced here:
   3. Biogenic CO2 excluded from GWP total (enforced in model.save()).
   4. Scope 2 always computes both location-based and market-based.
 """
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -17,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from apps.billing.mixins import FeatureGateMixin
-from apps.shared.permissions import IsManagerOrAbove, IsSuperAdmin
+from apps.shared.permissions import IsEntityAdmin, IsManagerOrAbove, IsSuperAdmin
 from apps.shared.views import TenantViewSetMixin
 
 from .models import (
@@ -39,6 +40,7 @@ from .serializers import (
     EmissionsOffsetsSerializer,
     GHGInventoriesSerializer,
     GwpDatasetsSerializer,
+    StandaloneEmissionsOffsetsSerializer,
     TargetMilestonesSerializer,
     TargetsSerializer,
 )
@@ -340,13 +342,14 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
     """
     required_feature = "carbon_offsets"
     queryset         = EmissionsOffsets.objects.all()
-    serializer_class = EmissionsOffsetsSerializer
+    serializer_class = StandaloneEmissionsOffsetsSerializer
     permission_classes = [IsAuthenticated]
     lookup_field     = "OffsetId"
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
-    def _parent_verified_response(self, instance):
-        """Return a 403 if the offset's parent emissions record is locked.
+    @staticmethod
+    def _record_verified_response(record):
+        """Return a 403 if an offset's parent emissions record is locked.
 
         Offsets feed the recomputed net emissions total, so editing or deleting
         one attached to a locked record would mutate the audit-locked figure
@@ -357,7 +360,6 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
         The record is locked when either its own VerificationStatus is verified
         or its parent GHG inventory is verified (a verified inventory freezes its
         member rows even when the row itself was never individually verified)."""
-        record = instance.EmissionsId
         if record is None:
             return None
         if record.VerificationStatus >= VERIFIED:
@@ -374,6 +376,19 @@ class EmissionsOffsetsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet
                 status=status.HTTP_403_FORBIDDEN,
             )
         return None
+
+    def _parent_verified_response(self, instance):
+        return self._record_verified_response(instance.EmissionsId)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        err = self._record_verified_response(serializer.validated_data["EmissionsId"])
+        if err:
+            return err
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
         err = self._parent_verified_response(self.get_object())
@@ -412,6 +427,31 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
     serializer_class = GHGInventoriesSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_permissions(self):
+        if self.action == "verify":
+            return [IsAuthenticated(), IsEntityAdmin()]
+        if self.action == "unlock":
+            return [IsAuthenticated(), IsSuperAdmin()]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        gwp_dataset = serializer.validated_data.get("GwpDatasetId")
+        if gwp_dataset is None:
+            gwp_dataset = GwpDatasets.objects.filter(Status=1, IsDefault=True).first()
+        if gwp_dataset is None:
+            from rest_framework.exceptions import ValidationError
+
+            raise ValidationError(
+                {"GwpDatasetId": "No active default GWP dataset is configured."}
+            )
+        instance = serializer.save(
+            EntityId_id=self.request.entity_id,
+            GwpDatasetId=gwp_dataset,
+            CreatedBy=self.request.user.UserId,
+        )
+        self._audit("Create", instance)
+        return instance
+
     def _check_not_verified(self, instance):
         if instance.VerificationStatus >= VERIFIED:
             return Response({"code": "verified_immutable",
@@ -432,20 +472,142 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     def perform_update(self, serializer):
-        """Record who verified the inventory and when, on the transition to
-        Verified (VerificationStatus >= 3).  Without this an inventory could
-        become verified with no provenance — unacceptable for MRV/audit."""
-        extra = {}
-        new_status = serializer.validated_data.get("VerificationStatus")
-        if (
-            new_status is not None
-            and new_status >= VERIFIED
-            and serializer.instance.VerificationStatus < VERIFIED
-        ):
-            extra = {"VerifiedBy": self.request.user, "VerifiedAt": timezone.now()}
-        instance = serializer.save(UpdatedBy=self.request.user.UserId, **extra)
+        instance = serializer.save(UpdatedBy=self.request.user.UserId)
         self._audit("Update", instance)
         return instance
+
+    @staticmethod
+    def _unassigned_querysets(inventory):
+        base = EmissionsData.objects.filter(
+            EntityId=inventory.EntityId,
+            InventoryId__isnull=True,
+            ReportingYear=inventory.ReportingYear,
+            Status__lt=4,
+        )
+        candidates = base.filter(
+            ReportingPeriodFrom__gte=inventory.ReportingPeriodFrom,
+            ReportingPeriodTo__lte=inventory.ReportingPeriodTo,
+        )
+        incomplete = base.filter(
+            Q(ReportingPeriodFrom__isnull=True) | Q(ReportingPeriodTo__isnull=True)
+        )
+        return candidates, incomplete
+
+    @classmethod
+    def _unassigned_review_response(cls, inventory, acknowledged):
+        candidates, incomplete = cls._unassigned_querysets(inventory)
+        candidate_count = candidates.count()
+        incomplete_count = incomplete.count()
+        if (candidate_count or incomplete_count) and not acknowledged:
+            return Response(
+                {
+                    "code": "unassigned_records_require_review",
+                    "detail": (
+                        "Review records that may belong to this inventory before continuing."
+                    ),
+                    "candidate_count": candidate_count,
+                    "incomplete_count": incomplete_count,
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        return None
+
+    @action(detail=True, methods=["post"], url_path="submit")
+    def submit(self, request, pk=None):
+        inventory = self.get_object()
+        if inventory.VerificationStatus != 1:
+            return Response(
+                {
+                    "code": "invalid_transition",
+                    "detail": "Only an unverified inventory can be submitted for review.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        acknowledged = request.data.get("acknowledge_unassigned") is True
+        review = self._unassigned_review_response(inventory, acknowledged)
+        if review:
+            return review
+
+        from tasks.emissions import _compute_inventory_totals
+
+        _compute_inventory_totals(inventory)
+        inventory.VerificationStatus = 2
+        inventory.UpdatedBy = request.user.UserId
+        inventory.save(update_fields=["VerificationStatus", "UpdatedBy", "UpdatedAt"])
+
+        from apps.shared.audit import audit_log
+
+        audit_log(
+            action="Update",
+            table_name="ghg_inventories",
+            record_id=inventory.InventoryId,
+            description=(
+                "Submitted GHG inventory for verification"
+                + (" after acknowledging unassigned-record review." if acknowledged else ".")
+            ),
+            request=request,
+            new_values={"VerificationStatus": 2},
+            retention_tier=3,
+        )
+        return Response(self.get_serializer(inventory).data)
+
+    @action(detail=True, methods=["post"], url_path="verify")
+    def verify(self, request, pk=None):
+        inventory = self.get_object()
+        if inventory.VerificationStatus != 2:
+            return Response(
+                {
+                    "code": "invalid_transition",
+                    "detail": "Only a pending inventory can be verified.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        acknowledged = request.data.get("acknowledge_unassigned") is True
+        review = self._unassigned_review_response(inventory, acknowledged)
+        if review:
+            return review
+
+        from tasks.emissions import _compute_inventory_totals
+
+        _compute_inventory_totals(inventory)
+        inventory.VerificationStatus = 3
+        inventory.VerifiedBy = request.user
+        inventory.VerifiedAt = timezone.now()
+        inventory.VerificationNotes = request.data.get("notes") or None
+        inventory.UpdatedBy = request.user.UserId
+        inventory.save(
+            update_fields=[
+                "VerificationStatus",
+                "VerifiedBy",
+                "VerifiedAt",
+                "VerificationNotes",
+                "UpdatedBy",
+                "UpdatedAt",
+            ]
+        )
+        self._audit("Verify", inventory)
+        return Response(self.get_serializer(inventory).data)
+
+    @action(detail=True, methods=["get"], url_path="unassigned-emissions")
+    def unassigned_emissions(self, request, pk=None):
+        """Show working records that may need explicit inventory assignment.
+
+        This endpoint is deliberately read-only. A candidate can appear for
+        more than one overlapping inventory, so silently backfilling by entity
+        and year would recreate the ambiguity this reconciliation view exposes.
+        Users review and assign each record through the normal emissions edit
+        path, where boundary and GWP consistency are enforced.
+        """
+        inventory = self.get_object()
+        candidates, incomplete = self._unassigned_querysets(inventory)
+        return Response(
+            {
+                "candidate_count": candidates.count(),
+                "incomplete_count": incomplete.count(),
+                "candidates": EmissionsDataListSerializer(candidates, many=True).data,
+                "incomplete": EmissionsDataListSerializer(incomplete, many=True).data,
+            }
+        )
 
     @action(detail=True, methods=["post"], url_path="unlock")
     def unlock(self, request, pk=None):
