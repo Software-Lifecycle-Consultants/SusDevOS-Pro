@@ -145,6 +145,11 @@ class GHGInventories(BaseAuditMixin):
     ConsolidationApproach = models.PositiveSmallIntegerField(
         null=True, blank=True, choices=CONSOLIDATION_APPROACH_CHOICES
     )
+    BoundaryNotes = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Included/excluded operations and rationale for the inventory boundary.",
+    )
     VerificationStatus = models.PositiveSmallIntegerField(default=1, choices=VERIFICATION_STATUS_CHOICES)
     VerifiedBy = models.ForeignKey(
         "users.Users", on_delete=models.SET_NULL, null=True, blank=True, related_name="verified_inventories"
@@ -210,6 +215,12 @@ class EmissionsData(BaseAuditMixin):
     Scope = models.PositiveSmallIntegerField()
     Scope3Category = models.PositiveSmallIntegerField(null=True, blank=True)
     ActivityDescription = models.TextField(blank=True, null=True)
+    SupplierName = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Supplier shown on the bill, contract, or source evidence.",
+    )
     QuantityOrCost = models.DecimalField(max_digits=18, decimal_places=4)
     InputUnitId = models.ForeignKey(
         Units, on_delete=models.PROTECT, null=True, blank=True, related_name="emissions_data"
