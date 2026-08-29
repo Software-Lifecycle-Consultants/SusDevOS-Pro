@@ -342,6 +342,8 @@ that didn't happen.
 
 ---
 
+<a id="sdo-nat-11"></a>
+
 ### SDO-NAT-11 · Record a carbon credit offset against an emissions record, with a serial number and registry
 
 **As a** Manager or ESG consultant
@@ -351,11 +353,11 @@ that didn't happen.
 | | |
 |---|---|
 | **Status** | ✅ Built |
-| **Role** | Staff and above (no billing feature required on the nested route) |
+| **Role** | Staff and above (standalone route is feature-gated; nested route is not) |
 | **Diagram** | [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) · [BPMN 04 §Offset capture](../diagrams/bpmn/04-carbon-credit-mrv.md) |
-| **Code** | `backend/apps/emissions/models.py` · `EmissionsOffsets.CreditSerialNumber`/`CreditRegistry` · `backend/apps/emissions/views.py` · `EmissionsDataViewSet.offsets()` |
-| **Tests** | `backend/apps/emissions/tests/test_offset_validation.py` (`TestOffsetAPI`) |
-| **Linear** | `area:nat` · `type:spec` |
+| **Code** | `frontend/src/app/(app)/offsets/page.tsx` · `backend/apps/emissions/serializers.py` · `StandaloneEmissionsOffsetsSerializer` · `backend/apps/emissions/views.py` |
+| **Tests** | `backend/apps/emissions/tests/test_offset_validation.py` · `backend/apps/emissions/tests/test_relationship_integrity.py` (`TestStandaloneOffsetIntegrity`) |
+| **Linear** | [SUS-31 · CFI-013](https://linear.app/susdevos/issue/SUS-31/cfi-013-make-standalone-offset-creation-preserve-its-parent-emission) · [SUS-22 · CFI-006](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) |
 
 **Acceptance criteria**
 
@@ -371,8 +373,17 @@ that didn't happen.
 3. **Given** a `POST` targeting another entity's emissions record, **then** the response is
    `404`, not `403` — the record lookup itself is tenant-scoped
    (`test_offset_for_other_entity_record_returns_404`).
+4. **Given** the standalone offsets page, **when** a user creates a credit, **then**
+   `EmissionsId` is required and persisted as the same-tenant parent; a missing parent gives
+   field-specific HTTP 400, a foreign parent is rejected, and a verified parent returns
+   `403 verified_immutable` without writing an offset.
+5. **Given** an existing offset, **when** a client tries to move it to another emissions
+   record, **then** validation rejects the reparenting. Inventory membership and lock status
+   always flow from the immutable parent relationship.
 
 ---
+
+<a id="sdo-nat-12"></a>
 
 ### SDO-NAT-12 · Offsets are validated nightly against the Verra or Gold Standard registry; only a registry match sets valid
 
@@ -387,8 +398,8 @@ entered it
 | **Role** | System (Celery: Verra 03:00, Gold Standard 03:30 daily) |
 | **Diagram** | [UML 07 §7.4](../diagrams/uml/07-state-machines.md) · [BPMN 04 §Offset capture and validation](../diagrams/bpmn/04-carbon-credit-mrv.md) |
 | **Code** | `backend/tasks/integrations/verra.py` · `sync_verra_registry()` · `backend/tasks/integrations/gold_standard.py` · `sync_gold_standard_registry()`, `_validate_one()` |
-| **Tests** | `backend/tasks/tests/test_verra.py` (Verra only) |
-| **Linear** | `area:nat` · `type:spec` |
+| **Tests** | `backend/tasks/tests/test_verra.py` (Verra only) · `backend/apps/emissions/tests/test_relationship_integrity.py` (client-forgery/reset guards) |
+| **Linear** | [SUS-32 · CFI-014](https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets) · `area:nat` · `risk:security` |
 
 **Acceptance criteria**
 
@@ -405,11 +416,22 @@ entered it
    per-project registry and gets a `200` with a project payload, **then**
    `RegistryValidationStatus == "valid"` and `RegistryProjectName`/`Type`/`VintageYear` are
    backfilled from the response; a `404` sets `"invalid"`.
+4. **Given** any authenticated API client, **when** it supplies or patches
+   `RegistryValidationStatus`, `RegistryValidatedAt`, registry project metadata, vintage, or
+   retirement beneficiary, **then** serializer validation returns HTTP 400 naming the
+   server-managed fields; a client cannot make an offset deductible.
+5. **Given** a user changes credit identity evidence (`CreditSerialNumber`, registry,
+   certificate, amount, or validity dates), **when** the edit saves, **then** all prior
+   registry result fields are cleared and status resets to `unverified` pending fresh
+   external validation.
 
-*Note: only the Verra path has a test. `sync_gold_standard_registry()` and `_validate_one()`
-have zero test coverage — item 3 is read directly from the task body.*
+*Note: client forgery and reset semantics are tested, as is the positive Verra path.
+Gold Standard and claim-depth validation remain incomplete under SUS-32, so this story stays
+🟡 Partial.*
 
 ---
+
+<a id="sdo-nat-13"></a>
 
 ### SDO-NAT-13 · A registry that is unreachable must not downgrade offsets to invalid
 
@@ -424,7 +446,7 @@ have zero test coverage — item 3 is read directly from the task body.*
 | **Diagram** | [BPMN 04 §Failure semantics](../diagrams/bpmn/04-carbon-credit-mrv.md) |
 | **Code** | `backend/tasks/integrations/verra.py` (retries on `RequestException`; aborts on an empty/truncated CSV) · `backend/tasks/integrations/gold_standard.py::_validate_one()` (returns `"pending"` on `RequestException`) |
 | **Tests** | `backend/tasks/tests/test_verra.py` (`test_empty_csv_does_not_invalidate_pending_offsets`) |
-| **Linear** | `area:nat` · `type:spec` |
+| **Linear** | [SUS-32 · CFI-014](https://linear.app/susdevos/issue/SUS-32/cfi-014-prevent-clients-from-self-validating-carbon-offsets) · `area:nat` · `type:spec` |
 
 **Acceptance criteria**
 
@@ -447,6 +469,8 @@ Verra, and the Gold Standard path (item 3) has no test at all — confirmed by r
 
 ---
 
+<a id="sdo-nat-14"></a>
+
 ### SDO-NAT-14 · Offsets are reported separately from gross emissions and never netted into EmissionsAmount
 
 **As a** sustainability lead
@@ -460,7 +484,7 @@ Verra, and the Gold Standard path (item 3) has no test at all — confirmed by r
 | **Diagram** | [BPMN 04 §Where offsets sit relative to gross emissions](../diagrams/bpmn/04-carbon-credit-mrv.md) |
 | **Code** | `backend/apps/emissions/services.py` · `compute_emissions()` (no offset lookup) · `backend/tasks/emissions.py` · `_compute_inventory_totals()` (`NetEmissionsTonnes` as a distinct field) |
 | **Tests** | `backend/apps/emissions/tests/test_offset_validation.py` (`TestOffsetNetTotalRule`) |
-| **Linear** | `area:nat` · `type:spec` |
+| **Linear** | [SUS-31 · CFI-013](https://linear.app/susdevos/issue/SUS-31/cfi-013-make-standalone-offset-creation-preserve-its-parent-emission) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) |
 
 **Acceptance criteria**
 
@@ -468,15 +492,19 @@ Verra, and the Gold Standard path (item 3) has no test at all — confirmed by r
    runs on any save, **then** `EmissionsAmount`/`EmissionsAmountTonnes` are computed purely
    from `QuantityCanonical × EmissionFactor × GWP` — there is no offset lookup anywhere in
    `apps/emissions/services.py`.
-2. **Given** only `RegistryValidationStatus == "valid"` offsets reduce
-   `GHGInventories.NetEmissionsTonnes` (a separate, inventory-level field computed
-   nightly), **when** a record has `unverified`/`pending`/`invalid` offsets attached,
+2. **Given** only server-validated `RegistryValidationStatus == "valid"` offsets reduce
+   `GHGInventories.NetEmissionsTonnes` (a separate, inventory-level field recomputed on
+   submit/verify and by the nightly refresh), **when** a record has
+   `unverified`/`pending`/`invalid` offsets attached,
    **then** its own `EmissionsAmountTonnes` is unaffected, and those offsets are excluded
    from the inventory's net figure too (`test_all_invalid_offsets_result_in_zero_deduction`).
 3. **Given** the gross-vs-net distinction, **when** the inventory is inspected, **then**
    `TotalScope1/2/3Tonnes` (gross) and `TotalOffsetsTonnes`/`NetEmissionsTonnes` (net) are
    stored as separate columns on `GHGInventories`, never by mutating the gross figure in
    place — mirroring how biogenic CO2 is held apart from the GWP total (CLAUDE.md rule #2).
+4. **Given** an offset attached to an emissions record, **when** formal inventory totals are
+   computed, **then** it follows that parent's explicit `InventoryId`; offsets on unassigned
+   records or another same-year inventory do not reduce this inventory's net result.
 
 ---
 

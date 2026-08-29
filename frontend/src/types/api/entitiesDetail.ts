@@ -76,7 +76,7 @@ export interface EntitiesDetail {
   /** @maxLength 3 */
   BaseCurrency?: string;
   /**
-   * Month number (1ΓÇô12) when the entity's fiscal year ends
+   * Month number (1–12) when the entity's fiscal year ends
    * @minimum 0
    * @maximum 32767
    */

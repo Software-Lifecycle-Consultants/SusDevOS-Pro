@@ -53,12 +53,18 @@ def recompute_stale_inventory_totals():
 
 
 def _compute_inventory_totals(inventory):
-    """Aggregate EmissionsData records for the inventory's entity + year."""
+    """Aggregate records explicitly assigned to this inventory.
+
+    Reporting year is descriptive metadata, not membership.  An entity may
+    legitimately hold more than one inventory for the same year (for example a
+    corrected version or a different boundary), so entity+year aggregation can
+    contaminate both inventories and include unassigned working records.
+    """
     from apps.emissions.models import EmissionsData, EmissionsOffsets
 
     base_qs = EmissionsData.objects.filter(
         EntityId=inventory.EntityId,
-        ReportingYear=inventory.ReportingYear,
+        InventoryId=inventory,
         Status__lt=4,
     )
 
@@ -73,12 +79,10 @@ def _compute_inventory_totals(inventory):
 
     # Only 'valid' credits reduce the net total — CLAUDE.md critical rule.
     # 'unverified', 'pending', and 'invalid' offsets must never be deducted.
-    # Offsets are scoped to the inventory's ReportingYear via their linked
-    # emissions record, so a credit for one year cannot deduct from another
-    # year's net total — see spec/ghg_calculation_spec.md §8.1.
+    # Offsets inherit inventory membership from their linked emissions record.
     offsets = EmissionsOffsets.objects.filter(
         EntityId=inventory.EntityId,
-        EmissionsId__ReportingYear=inventory.ReportingYear,
+        EmissionsId__InventoryId=inventory,
         Status__lt=4,
         RegistryValidationStatus="valid",
     ).aggregate(t=models.Sum("OffsetAmountTonnes"))["t"]

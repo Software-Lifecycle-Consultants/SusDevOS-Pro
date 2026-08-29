@@ -12,11 +12,13 @@ into a Built story.
 
 ---
 
-### SDO-INV-01 · Open an annual GHG inventory choosing a GWP dataset and consolidation approach
+<a id="sdo-inv-01"></a>
+
+### SDO-INV-01 · Open an annual GHG inventory with an explicit boundary and recorded GWP basis
 
 **As a** sustainability lead
-**I want** to open a formal inventory for a reporting year with a chosen GWP dataset and
-consolidation approach
+**I want** to open a formal inventory for a reporting year with an explicit period, boundary,
+baseline, consolidation approach, and recorded GWP dataset
 **so that** all emissions recorded against it use a consistent basis for the year.
 
 | | |
@@ -24,22 +26,28 @@ consolidation approach
 | **Status** | ✅ Built |
 | **Role** | Staff and above (no Manager-level gate on creation) |
 | **Diagram** | [BPMN 03 §Annual inventory process](../diagrams/bpmn/03-inventory-verification.md) · [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
-| **Code** | `backend/apps/emissions/models.py` · `GHGInventories` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet` |
-| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryCreate`, `TestInventoryFeatureGate`) |
-| **Linear** | `area:inv` · `type:spec` |
+| **Code** | `frontend/src/app/(app)/inventories/page.tsx` · `backend/apps/emissions/models.py` · `backend/apps/emissions/serializers.py` · `backend/apps/emissions/views.py` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryCreate`, `TestInventoryEdit`, `TestInventoryFeatureGate`) |
+| **Linear** | [SUS-19 · CFI-002](https://linear.app/susdevos/issue/SUS-19/cfi-002-make-ghg-inventory-creation-satisfy-its-data-contract) · `area:inv` · `risk:data-loss` |
 
 **Acceptance criteria**
 
 1. **Given** an authenticated user whose entity has the `ghg_inventory_formal` feature
-   enabled, **when** they `POST /api/ghg-inventories/` with `ReportingYear`,
-   `ReportingPeriodFrom`/`ReportingPeriodTo`, `GwpDatasetId` and `ConsolidationApproach`
-   (1 Equity Share / 2 Financial Control / 3 Operational Control),
-   **then** the response is `201` with `VerificationStatus == 1` (Unverified) and `EntityId`
-   set from `request.entity_id`, never from the request body.
-2. **Given** an entity without the `ghg_inventory_formal` feature, **when** it `GET`s or
+   enabled, **when** they use the first-party form to submit `ReportingYear`,
+   `ReportingPeriodFrom`/`ReportingPeriodTo`, optional `BaselineYear` and `BoundaryNotes`,
+   and `ConsolidationApproach`, **then** the response is `201`, all supplied boundary fields
+   round-trip, and `VerificationStatus == 1` with `EntityId` taken only from the request.
+2. **Given** the user selects “Use calendar year,” **when** the form updates, **then** the
+   period becomes January 1 through December 31 of `ReportingYear`; custom periods remain
+   supported but cannot exceed 366 days or end in a different reporting year.
+3. **Given** `GwpDatasetId` is omitted by the first-party form, **when** the inventory is
+   created, **then** the active default dataset is persisted on the inventory. If no active
+   default exists, creation returns a field-specific HTTP 400 rather than storing an
+   untraceable calculation basis.
+4. **Given** an entity without the `ghg_inventory_formal` feature, **when** it `GET`s or
    `POST`s `/api/ghg-inventories/`, **then** the response is `402` with
    `code == "feature_gated"` and `feature == "ghg_inventory_formal"`.
-3. **Given** a SuperAdmin user, **when** they access `/api/ghg-inventories/` on any entity,
+5. **Given** a SuperAdmin user, **when** they access `/api/ghg-inventories/` on any entity,
    **then** the feature gate is bypassed (`test_superadmin_bypasses_feature_gate`).
 
 ---
@@ -78,6 +86,8 @@ reason when excluded
 
 ---
 
+<a id="sdo-inv-03"></a>
+
 ### SDO-INV-03 · Assign emissions records to an inventory
 
 **As a** contributor
@@ -89,10 +99,10 @@ once verified.
 |---|---|
 | **Status** | ✅ Built |
 | **Role** | Staff and above |
-| **Diagram** | [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
-| **Code** | `backend/apps/emissions/models.py` · `EmissionsData.InventoryId` (FK, `SET_NULL`) · `backend/apps/emissions/views.py` · `EmissionsDataViewSet._inventory_locked_response()` |
-| **Tests** | `backend/apps/emissions/tests/test_verified_immutability.py` (`TestVerifiedInventoryChildRows`) |
-| **Linear** | `area:inv` · `type:spec` |
+| **Diagram** | [BPMN 03 §Assignment and reconciliation](../diagrams/bpmn/03-inventory-verification.md) · [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) |
+| **Code** | `frontend/src/app/(app)/emissions/page.tsx` · `backend/apps/emissions/serializers.py` · `backend/apps/emissions/views.py` |
+| **Tests** | `backend/apps/emissions/tests/test_relationship_integrity.py` · `backend/apps/emissions/tests/test_verified_immutability.py` |
+| **Linear** | [SUS-25 · CFI-008](https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · [SUS-22 · CFI-006](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) |
 
 **Acceptance criteria**
 
@@ -107,46 +117,63 @@ once verified.
    with `InventoryId` pointing at a *verified* inventory, **then** the response is `403` —
    closing the bypass where `create()` checked the target inventory but a re-point via
    `update()` did not (`test_reassign_row_into_verified_inventory_returns_403`).
+4. **Given** an inventory assignment from the first-party create or detail flow, **when** it
+   is saved, **then** the selected `InventoryId` round-trips and the API requires the same
+   tenant, a record period inside the inventory period, the same `ReportingYear`, and the
+   inventory's GWP dataset. Mismatches return HTTP 400 and create no record.
+5. **Given** a record intentionally left outside a formal inventory, **when** it is saved,
+   **then** it remains an explicit unassigned working record and is excluded from all formal
+   inventory totals until a user assigns it.
 
 ---
 
-### SDO-INV-04 · Inventory scope totals are recomputed nightly
+<a id="sdo-inv-04"></a>
+
+### SDO-INV-04 · Inventory totals use explicit membership and are recomputed before assurance
 
 **As a** sustainability lead
-**I want** an inventory's Scope 1/2/3 totals to stay current without manual recalculation
-**so that** the figures I review always reflect the latest recorded emissions.
+**I want** an inventory's Scope 1/2/3 totals to include only records deliberately assigned to it
+**so that** parallel or corrected inventories cannot contaminate one another's assurance boundary.
 
 | | |
 |---|---|
 | **Status** | 🟡 Partial |
-| **Role** | System (Celery, 01:00 daily) |
-| **Diagram** | [BPMN 03 §Annual inventory process (L4)](../diagrams/bpmn/03-inventory-verification.md) |
+| **Role** | System (on submit, on verify, and Celery at 01:00 daily while editable) |
+| **Diagram** | [BPMN 03 §Exact-boundary totals](../diagrams/bpmn/03-inventory-verification.md) |
 | **Code** | `backend/tasks/emissions.py` · `recompute_stale_inventory_totals()`, `_compute_inventory_totals()` |
 | **Tests** | `backend/apps/emissions/tests/test_offset_validation.py` (calls `_compute_inventory_totals()` directly) |
-| **Linear** | `area:inv` · `type:spec` |
+| **Linear** | [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · `area:inv` · `risk:data-loss` |
 
 **Acceptance criteria**
 
-1. **Given** `EmissionsData` rows for an entity + `ReportingYear` with `Status < 4`,
+1. **Given** active `EmissionsData` rows with `InventoryId` equal to the exact inventory,
    **when** `_compute_inventory_totals(inventory)` runs, **then** `TotalScope1Tonnes`,
    `TotalScope2LocationTonnes`/`TotalScope2MarketTonnes`, and `TotalScope3Tonnes` are the
-   summed `EmissionsAmountTonnes` (Scope 2 from `EmissionsAmountLocationBased`/
-   `MarketBased` ÷ 1000).
-2. **Given** offsets scoped to the inventory's `ReportingYear` via their linked
-   `EmissionsId`, **when** totals are recomputed, **then** only
+   sums of those explicit members. Unassigned rows and rows in another inventory—even one
+   for the same entity and year—are excluded.
+2. **Given** offsets whose parent emission is an explicit member, **when** totals are
+   recomputed, **then** only
    `RegistryValidationStatus == "valid"` offsets are summed into `TotalOffsetsTonnes` and
-   subtracted into `NetEmissionsTonnes` — `unverified`/`pending`/`invalid` offsets, and valid
-   offsets from a *different* reporting year, are excluded
-   (`test_only_valid_offsets_reduce_net_total`, `test_valid_offset_in_other_year_does_not_reduce_this_years_net`).
-3. **Given** `recompute_stale_inventory_totals()` selects inventories where
+   subtracted into `NetEmissionsTonnes`; result status cannot be supplied by an API client.
+3. **Given** two same-year inventories plus unassigned working records, **when** either total
+   is recomputed, **then** each assigned record and its valid offsets contribute exactly once
+   to its selected inventory only
+   (`test_same_year_inventories_and_unassigned_work_do_not_cross_contaminate`).
+4. **Given** an inventory is submitted or verified, **when** the transition runs, **then**
+   totals are recomputed synchronously before the status changes, so assurance never freezes
+   a stale nightly snapshot.
+5. **Given** `recompute_stale_inventory_totals()` selects inventories where
    `TotalsLastComputedAt` is `NULL` or older than 24h and `VerificationStatus < 3`,
    **then** verified inventories are never touched by the nightly sweep.
 
-*Note: only `_compute_inventory_totals()` — the totals formula — is directly tested. The
-staleness-selection query and the scheduled task itself (`recompute_stale_inventory_totals`,
-01:00 daily) have no test exercising them end to end.*
+*Why Partial:* the exact-membership formula and assurance-time recomputation are tested, but
+the scheduled stale-selection path has no direct test and SUS-33 remains in review until
+production year-only records have a dry-run reconciliation and deliberate assignment/backfill
+plan. Runtime calculation no longer infers membership from year.
 
 ---
+
+<a id="sdo-inv-05"></a>
 
 ### SDO-INV-05 · Submit an inventory for verification
 
@@ -156,29 +183,30 @@ staleness-selection query and the scheduled task itself (`recompute_stale_invent
 
 | | |
 |---|---|
-| **Status** | 🟡 Partial |
-| **Role** | Staff and above — **no** `IsManagerOrAbove` gate on this transition |
+| **Status** | ✅ Built |
+| **Role** | Staff and above (submit); Manager and above (verify, see SDO-INV-14) |
 | **Diagram** | [UML 07 §7.1 GHG inventory verification](../diagrams/uml/07-state-machines.md) · [BPMN 03](../diagrams/bpmn/03-inventory-verification.md) |
-| **Code** | `backend/apps/emissions/views.py` · `GHGInventoriesViewSet` (no dedicated `/submit/` action) |
-| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryEdit` — edits while unverified only) |
-| **Linear** | `area:inv` · `type:spec` · `risk:security` |
+| **Code** | `frontend/src/app/(app)/inventories/page.tsx` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.submit()` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryVerification`) |
+| **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · `risk:security` |
 
 **Acceptance criteria**
 
-1. **Given** an inventory at `VerificationStatus == 1`, **when** a client `PATCH`es
-   `/api/ghg-inventories/{id}/` with `{"VerificationStatus": 2}`, **then** the response is
-   `200` and the inventory remains editable — `2` is below the `>= 3` lock threshold in
-   `_check_not_verified()`.
-2. **Given** `VerificationStatus` is not in `GHGInventoriesSerializer.read_only_fields`,
-   **when** *any* authenticated tenant member (not only Manager+) submits this `PATCH`,
-   **then** the request succeeds — unlike `EmissionsData.verify()` (F10), there is no
-   `IsManagerOrAbove` restriction on `GHGInventoriesViewSet`'s update path.
-3. **Given** the same or a later `PATCH` advances `VerificationStatus` to `>= 3`,
-   **when** `perform_update()` runs, **then** `VerifiedBy`/`VerifiedAt` are stamped only at
-   that transition, not at the Pending (2) step.
-
-*Note: no test currently exercises the `VerificationStatus == 2` transition specifically —
-existing tests jump directly from 1 to 3 (`test_verify_stamps_verifier_identity`).*
+1. **Given** an inventory at `VerificationStatus == 1`, **when** a user calls
+   `POST /api/ghg-inventories/{id}/submit/`, **then** the server recomputes exact-member
+   totals, writes a seven-year-retention audit event, and moves it to Pending (`2`).
+2. **Given** matching unassigned or period-incomplete working records, **when** submission is
+   attempted without `acknowledge_unassigned: true`, **then** it returns
+   `409 unassigned_records_require_review` with candidate and incomplete counts. The UI opens
+   the reconciliation list rather than silently absorbing or ignoring those records.
+3. **Given** the user reviewed the reconciliation list and records intentionally remain
+   outside the inventory, **when** they resubmit with `acknowledge_unassigned: true`, **then**
+   the transition succeeds and the audit description records the acknowledgement.
+4. **Given** a client tries to set `VerificationStatus`, `VerifiedBy`, `VerifiedAt`,
+   `VerificationNotes`, or any inventory total in normal POST/PATCH data, **when** serializer
+   validation runs, **then** it returns HTTP 400 naming the server-managed field.
+5. **Given** any state other than Unverified, **when** `/submit/` is called, **then** it
+   returns `409 invalid_transition` and preserves the current state and provenance.
 
 ---
 
@@ -242,6 +270,8 @@ Link: [F3](../diagrams/FINDINGS.md#f3).
 
 ---
 
+<a id="sdo-inv-08"></a>
+
 ### SDO-INV-08 · Verified records and inventories are immutable — PATCH/DELETE return 403
 
 **As a** compliance owner
@@ -255,7 +285,7 @@ Link: [F3](../diagrams/FINDINGS.md#f3).
 | **Diagram** | [UML 07 §7.1 / §7.2](../diagrams/uml/07-state-machines.md) · [BPMN 03](../diagrams/bpmn/03-inventory-verification.md) |
 | **Code** | `backend/apps/emissions/views.py` · `EmissionsDataViewSet.update()`/`.destroy()`, `GHGInventoriesViewSet._check_not_verified()` |
 | **Tests** | `backend/apps/emissions/tests/test_verified_immutability.py`, `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryVerification`) |
-| **Linear** | `area:inv` · `type:spec` · `risk:security` |
+| **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · `risk:security` |
 
 **Acceptance criteria**
 
@@ -313,39 +343,37 @@ Link: [F9](../diagrams/FINDINGS.md#f9).
 
 ---
 
+<a id="sdo-inv-10"></a>
+
 ### SDO-INV-10 · First-party versus third-party assurance status
 
-**As a** verifier
-**I want** to record whether verification was internal sign-off or external assurance
-**so that** the inventory's provenance is distinguishable in reporting.
+**As a** compliance owner
+**I want** the product to claim only the assurance level its implemented workflow can prove
+**so that** a stored status cannot imply unsupported third-party assurance.
 
 | | |
 |---|---|
 | **Status** | 🟡 Partial |
-| **Role** | Staff and above (no role distinction between who may set 3 vs 4) |
-| **Diagram** | [UML 07 §7.1](../diagrams/uml/07-state-machines.md) · [BPMN 03 §L6](../diagrams/bpmn/03-inventory-verification.md) |
-| **Code** | `backend/apps/emissions/models.py` · `GHGInventories.VERIFICATION_STATUS_CHOICES` (3 = Verified - First Party, 4 = Verified - Third Party) |
-| **Tests** | none distinguish 3 from 4 |
-| **Linear** | `area:inv` · `type:spec` |
+| **Role** | Manager and above (first-party); third-party workflow not exposed |
+| **Diagram** | [UML 07 §7.1](../diagrams/uml/07-state-machines.md) · [BPMN 03 §Controlled assurance transition](../diagrams/bpmn/03-inventory-verification.md) |
+| **Code** | `backend/apps/emissions/models.py` · `GHGInventories.VERIFICATION_STATUS_CHOICES` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.verify()` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryVerification`) |
+| **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · `area:inv` · `risk:security` |
 
 **Acceptance criteria**
 
-1. **Given** `VerificationStatus` choices include `3` ("Verified - First Party") and `4`
-   ("Verified - Third Party"), **when** either value is `PATCH`ed onto an inventory,
-   **then** both satisfy the same `>= 3` immutability comparison identically — a single
-   guard locks both states (UML 07 §7.1's note: "adding a state 5 would automatically
-   inherit immutability").
-2. **Given** no dedicated "assurance type" selector or workflow exists, **when** a client
-   chooses between first-party and third-party, **then** the choice is made purely by which
-   numeric value the `PATCH` body sets — there is no server-side restriction on *who* may set
-   `4` versus `3` (both are reachable by any authenticated tenant member, per SDO-INV-05).
-3. **Given** `Pending → VerifiedThird` is a legal direct transition in UML 07 §7.1, **when**
-   an inventory jumps straight from `2` to `4` without ever passing through `3`, **then**
-   nothing in the code prevents it — the state machine diagram documents this as legal, but
-   no test exercises it.
-
-*Note: no test asserts a transition specifically to `VerificationStatus == 4`, or that
-`VerifiedBy`/`VerifiedAt` are stamped the same way for third-party as for first-party.*
+1. **Given** the model retains status `4` ("Verified - Third Party") for future schema
+   compatibility, **when** a first-party API client submits normal POST/PATCH data, **then**
+   it cannot set status `3` or `4`; `VerificationStatus` is server-managed.
+2. **Given** a Pending inventory, **when** a Manager or above calls the implemented `/verify/`
+   action, **then** it moves only to status `3` ("Verified - First Party") and records the
+   platform user's identity, timestamp, notes, and audit event.
+3. **Given** status `4`, **when** the public first-party routes are inspected, **then** there
+   is no legal transition into it and no UI control that claims external assurance. A future
+   third-party evidence/attestation workflow must be specified and tested before that state
+   becomes reachable.
+4. **Given** either verified state exists through legacy/admin data, **then** the shared
+   `VerificationStatus >= 3` guard still freezes the inventory and all member write paths.
 
 ---
 
@@ -448,3 +476,39 @@ story is transcribable into tests but currently unverified.*
 
 *Note: `link_milestone_actuals` (scheduled 01:30 daily) has no test of its own anywhere in
 the test suite — the behaviour above is read directly from the task body.*
+
+---
+
+<a id="sdo-inv-14"></a>
+
+### SDO-INV-14 · A sustainability manager verifies the exact inventory boundary
+
+**As a** sustainability manager
+**I want** a single authorised verification action over the inventory's exact members
+**so that** the frozen totals, verifier identity, and audit trail describe the same boundary.
+
+| | |
+|---|---|
+| **Status** | ✅ Built |
+| **Role** | Manager and above (`IsManagerOrAbove`) |
+| **Diagram** | [BPMN 03 §Controlled assurance transition](../diagrams/bpmn/03-inventory-verification.md) · [UML 07 §7.1](../diagrams/uml/07-state-machines.md) |
+| **Code** | `frontend/src/app/(app)/inventories/page.tsx` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.verify()` · `backend/tasks/emissions.py` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`test_manager_can_verify`, `test_staff_cannot_verify`, `test_verify_is_audited`, `test_verify_stamps_verifier_identity`) · `backend/apps/emissions/tests/test_offset_validation.py` |
+| **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · `risk:security` |
+
+**Acceptance criteria**
+
+1. **Given** a non-admin tenant member, **when** they call
+   `POST /api/ghg-inventories/{id}/verify/`, **then** permission is denied and state,
+   totals, and provenance remain unchanged.
+2. **Given** a Manager or above and a Pending inventory, **when** `/verify/` runs, **then** the
+   server repeats the unassigned-record review, recomputes totals from active records whose
+   `InventoryId` equals this inventory, and moves only to first-party verified status `3`.
+3. **Given** a successful verification, **then** `VerifiedBy`, `VerifiedAt`, optional
+   `VerificationNotes`, and an audit event are stored together; normal PATCH cannot forge any
+   of those values.
+4. **Given** an Unverified or already-verified inventory, **when** `/verify/` is called,
+   **then** it returns `409 invalid_transition` and cannot overwrite prior provenance.
+5. **Given** a verified inventory, **when** any member emission, nested detail, offset, or
+   inventory mutation is attempted, **then** it returns `403 verified_immutable` until a
+   SuperAdmin unlocks it with a mandatory audited reason.

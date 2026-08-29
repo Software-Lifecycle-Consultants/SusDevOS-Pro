@@ -344,7 +344,7 @@ behaviour. The diagram set and these stories are.
 
 <a id="sdo-gap-11"></a>
 
-### SDO-GAP-11 · Inventory verification has no dedicated endpoint
+### SDO-GAP-11 · Resolved — inventory verification uses dedicated authorised transitions
 
 **As an** assurance reviewer
 **I want** verifying an inventory to be an explicit action
@@ -352,30 +352,31 @@ behaviour. The diagram set and these stories are.
 
 | | |
 |---|---|
-| **Status** | 🟡 Partial |
+| **Status** | ✅ Built / retired gap |
 | **Diagram** | [BPMN 03](../diagrams/bpmn/03-inventory-verification.md) · [UML 07](../diagrams/uml/07-state-machines.md) |
-| **Code** | `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.perform_update` |
-| **Linear** | `area:inv` · `type:feature` |
+| **Code** | `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.submit()`, `.verify()` · `backend/apps/emissions/serializers.py` · `INVENTORY_SERVER_MANAGED_FIELDS` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` · `TestInventoryVerification` |
+| **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · `area:inv` · `risk:security` |
 
-`EmissionsData` has explicit `/verify/` and `/unlock/` actions, now permissioned per F10.
-`GHGInventories` has neither — an inventory is verified by PATCHing `VerificationStatus` to 3
-or 4, with provenance captured in `perform_update` and re-verification blocked only as a side
-effect of the general immutability check.
-
-It works, but it means inventory verification cannot be permissioned separately from ordinary
-editing, and F10's segregation-of-duties restriction does not apply to it.
+This gap is retained under its stable ID for history, but its former claims are no longer true.
+Normal POST/PATCH rejects status, verifier, notes, timestamps, and totals. `/submit/` performs
+the Unverified → Pending transition with reconciliation and total recomputation; `/verify/` is
+restricted to Entity Admin, accepts only Pending inventory, recomputes the exact boundary,
+records provenance, and writes an audit event. See SDO-INV-05 and SDO-INV-14.
 
 **Acceptance criteria**
 
 1. **Given** an inventory in Pending,
-   **when** a Manager or above POSTs to `/ghg-inventories/{id}/verify/`,
+   **when** an Entity Admin POSTs to `/ghg-inventories/{id}/verify/`,
    **then** status advances, `VerifiedBy` and `VerifiedAt` are recorded, and an audit row is written.
-2. **Given** a Staff user,
+2. **Given** a non-admin tenant member,
    **when** they attempt the same,
    **then** the response is 403.
 3. **Given** an already-verified inventory,
    **when** verification is attempted again,
-   **then** it is refused without altering the original verifier.
+   **then** it is refused with `409 invalid_transition` without altering the original verifier.
+4. **Given** any normal mutation containing a verification or total field,
+   **then** the serializer rejects it with HTTP 400 rather than accepting a direct state jump.
 
 <a id="sdo-gap-12"></a>
 

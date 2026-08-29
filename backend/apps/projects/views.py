@@ -63,6 +63,14 @@ class DevelopmentProjectsViewSet(TenantViewSetMixin, ModelViewSet):
             s.is_valid(raise_exception=True)
             s.save(UpdatedBy=request.user.UserId)
             return Response(ProjectPhaseSerializer(phase).data)
+        if phase.emissions_records.filter(Status__lt=4).exists():
+            return Response(
+                {
+                    "code": "phase_in_use",
+                    "detail": "This phase is assigned to emissions records and cannot be removed.",
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
         phase.Status = 4
         phase.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,14 +1,27 @@
 ﻿from rest_framework import serializers
 
+from apps.shared.serializers import RejectUnknownFieldsMixin
+
 from .models import DevelopmentProjectPartners, DevelopmentProjects, ProjectPhases
 
 
-class ProjectPhaseSerializer(serializers.ModelSerializer):
+class ProjectPhaseSerializer(RejectUnknownFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = ProjectPhases
         fields = ("PhaseId", "PhaseName", "PhaseNumber", "Description",
                   "StartDate", "EndDate", "TargetEmissionsTonnes", "Status")
         read_only_fields = ("PhaseId",)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        instance = self.instance
+        start = attrs.get("StartDate", getattr(instance, "StartDate", None))
+        end = attrs.get("EndDate", getattr(instance, "EndDate", None))
+        if start and end and start > end:
+            raise serializers.ValidationError(
+                {"EndDate": "Phase end must be on or after its start."}
+            )
+        return attrs
 
 
 class DevelopmentProjectsListSerializer(serializers.ModelSerializer):

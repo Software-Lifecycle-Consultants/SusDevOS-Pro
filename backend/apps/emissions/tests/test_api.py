@@ -165,6 +165,100 @@ class TestGHGCalculation:
         # Must be bound to the real entity, not the attacker's value
         assert resp.data["EntityId"] == entity.EntityId
 
+    def test_source_context_and_period_round_trip(self, auth_client, gwp_dataset):
+        payload = _payload(
+            scope=1,
+            quantity="100.0000",
+            ef=DIESEL_EF,
+            gwp_id=gwp_dataset.GwpDatasetId,
+            SupplierName="Example Energy Ltd",
+            ActivityDescription="Meter M-12; invoice INV-204; estimated reading.",
+            ReportingPeriodFrom="2025-01-01",
+            ReportingPeriodTo="2025-12-31",
+            ReportingYear=2025,
+        )
+
+        created = auth_client.post(BASE_URL, payload, format="json")
+        assert created.status_code == status.HTTP_201_CREATED, created.data
+        detail = auth_client.get(f"{BASE_URL}{created.data['EmissionsId']}/")
+
+        assert detail.data["SupplierName"] == payload["SupplierName"]
+        assert detail.data["ActivityDescription"] == payload["ActivityDescription"]
+        assert detail.data["ReportingPeriodFrom"] == "2025-01-01"
+        assert detail.data["ReportingPeriodTo"] == "2025-12-31"
+        assert detail.data["ReportingYear"] == 2025
+
+    def test_default_gwp_dataset_is_recorded_when_omitted(
+        self, auth_client, gwp_dataset
+    ):
+        payload = _payload(
+            scope=1,
+            quantity="100.0000",
+            ef=DIESEL_EF,
+            gwp_id=gwp_dataset.GwpDatasetId,
+        )
+        payload.pop("GwpDatasetId")
+
+        response = auth_client.post(BASE_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED, response.data
+        assert response.data["GwpDatasetId"] == gwp_dataset.GwpDatasetId
+
+    @pytest.mark.parametrize(
+        "legacy_field",
+        ["DateFrom", "DateTo", "Supplier", "SupplierCategory", "Remarks"],
+    )
+    def test_unknown_legacy_form_fields_are_rejected(
+        self, legacy_field, auth_client, gwp_dataset
+    ):
+        payload = _payload(
+            scope=1,
+            quantity="100.0000",
+            ef=DIESEL_EF,
+            gwp_id=gwp_dataset.GwpDatasetId,
+        )
+        payload[legacy_field] = "legacy value"
+
+        response = auth_client.post(BASE_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert legacy_field in response.data["errors"]
+
+    @pytest.mark.parametrize(
+        "changes,error_field",
+        [
+            ({"ReportingPeriodFrom": "2025-01-01"}, "ReportingPeriodTo"),
+            ({"ReportingPeriodTo": "2025-12-31"}, "ReportingPeriodFrom"),
+            (
+                {"ReportingPeriodFrom": "2025-12-31", "ReportingPeriodTo": "2025-01-01"},
+                "ReportingPeriodTo",
+            ),
+            (
+                {
+                    "ReportingPeriodFrom": "2025-01-01",
+                    "ReportingPeriodTo": "2025-12-31",
+                    "ReportingYear": 2024,
+                },
+                "ReportingYear",
+            ),
+        ],
+    )
+    def test_invalid_reporting_period_is_rejected(
+        self, changes, error_field, auth_client, gwp_dataset
+    ):
+        payload = _payload(
+            scope=1,
+            quantity="100.0000",
+            ef=DIESEL_EF,
+            gwp_id=gwp_dataset.GwpDatasetId,
+        )
+        payload.update(changes)
+
+        response = auth_client.post(BASE_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert error_field in response.data["errors"]
+
 
 @pytest.mark.django_db
 class TestVerificationImmutability:

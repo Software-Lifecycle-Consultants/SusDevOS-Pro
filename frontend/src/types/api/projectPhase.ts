@@ -6,6 +6,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Return field-specific errors for payload keys outside the API contract.
+ */
 export interface ProjectPhase {
   readonly PhaseId: number;
   /** @maxLength 200 */

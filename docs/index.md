@@ -30,6 +30,12 @@ Role-specific guides covering the core workflows for each user type.
 |----------|--------|
 | [Deployment Guide](deployment.md) | Hetzner VPS setup, Docker Compose prod config, SSL, GitHub Actions deploy, backups, monitoring |
 
+## Active Audits
+
+| Document | Covers |
+|----------|--------|
+| [Core Feature Integrity Audit](audits/core-feature-integrity-audit.md) | End-to-end user flows, field lineage, confirmed defects, execution order, and closure evidence |
+
 ## Developer Setup
 
 See the main [README](../README.md) for Docker-based local setup, seed commands, and running tests.

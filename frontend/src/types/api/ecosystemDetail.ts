@@ -28,8 +28,6 @@ export interface EcosystemDetail {
   readonly CreatedBy: number | null;
   /** @nullable */
   readonly UpdatedBy: number | null;
-  /** FK to entities.Entities */
-  readonly EntityId: number;
   /** @maxLength 200 */
   EcosystemName: string;
   /**
@@ -44,4 +42,5 @@ export interface EcosystemDetail {
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$
    */
   AreaHectares?: string | null;
+  readonly EntityId: number;
 }

@@ -1,141 +1,179 @@
 # BPMN 02 — Emissions Data Lifecycle
 
-From activity data capture to a locked, verified record — including the correction path.
+From source activity capture to a calculated, attributable, and optionally verified record.
 
+**Related user stories** — [GHG accounting — SDO-GHG-01…14](../../stories/02-ghg-accounting.md) · [Inventory & assurance — SDO-INV-03, 06…09](../../stories/03-inventory-assurance.md)
 
-**Related user stories** — [GHG accounting — SDO-GHG-01…05](../../stories/02-ghg-accounting.md) · [Inventory & assurance — SDO-INV-06…09](../../stories/03-inventory-assurance.md)
+**Linear traceability** — [SUS-21 · source-field preservation](https://linear.app/susdevos/issue/SUS-21/cfi-001-stop-silently-discarding-emission-form-fields) · [SUS-22 · tenant-owned relationships](https://linear.app/susdevos/issue/SUS-22/cfi-006-enforce-tenant-ownership-on-every-critical-relationship) · [SUS-25 · project/phase/inventory assignment](https://linear.app/susdevos/issue/SUS-25/cfi-008-connect-project-phases-and-inventory-assignment-end-to-end) · [SUS-33 · explicit inventory membership](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory)
+
+Open capture gaps are shown in the process rather than hidden: [SUS-20 · canonical unit/factor contract](https://linear.app/susdevos/issue/SUS-20/cfi-003-define-and-enforce-the-canonical-emission-unitfactor-contract) and [SUS-23 · evidenced Scope 2 methods](https://linear.app/susdevos/issue/SUS-23/cfi-004-capture-evidenced-scope-2-location-and-market-methods).
+
+<a id="emissions-main-process"></a>
 
 ## Main process
 
 ```mermaid
 flowchart TB
     subgraph L1["👤 Staff — data contributor"]
-        A([Activity data available<br/>fuel, electricity, travel, spend]) --> B[Open /emissions — new record]
-        B --> C[Enter Scope, quantity,<br/>input unit, activity description]
-        C --> D{"Scope?"}
-        D -->|"Scope 1"| E[Select emission factor]
-        D -->|"Scope 2"| F[Supply EFLocationBased<br/>AND EFMarketBased]
-        D -->|"Scope 3"| G[Select category 1-15<br/>+ factor]
-        E --> H[Submit POST /api/emissions/]
-        F --> H
-        G --> H
+        A([Source activity available<br/>bill, meter, fuel, travel, spend]) --> B[Open new emission]
+        B --> C[Select optional formal inventory,<br/>project, and project phase]
+        C --> D[Enter reporting period,<br/>supplier, and activity context]
+        D --> E[Select scope, factor, quantity,<br/>and factor-labelled free-text unit]
+        E --> F{"Scope?"}
+        F -->|"1"| G[Use selected factor]
+        F -->|"2"| H[Use selected generic factor<br/>⚠ distinct method evidence not yet in UI — SUS-23]
+        F -->|"3"| I[Select category 1–15<br/>and factor]
+        G --> J[POST /api/emissions/]
+        H --> J
+        I --> J
     end
 
-    subgraph L2["⚙️ System — server-side only"]
-        H --> I{"Feature gate<br/>is_feature_enabled()"}
-        I -->|"Denied"| J([402 feature_gated<br/>upgrade modal])
-        I -->|"Allowed"| K[/"Force EntityId = request.entity_id<br/>CreatedBy = request.user"/]
-        K --> L[/"EmissionsData.save()<br/>compute_emissions()"/]
-        L --> M[/"Unit conversion<br/>QuantityCanonical"/]
-        M --> N[/"GWP lookup<br/>GwpValues by gas"/]
-        N --> O[/"kg CO2e = qty x EF x GWP100"/]
-        O --> P{"Biogenic factor<br/>present?"}
-        P -->|"Yes"| Q[/"BiogenicCO2AmountTonnes<br/>EXCLUDED from total"/]
-        P -->|"No"| R
-        Q --> R{"Scope 2?"}
-        R -->|"Yes"| S[/"Compute BOTH location-based<br/>and market-based amounts"/]
-        R -->|"No"| T
-        S --> T[("INSERT emissions_data")]
-        T --> U[("AuditLog: Create")]
-        U --> V[/"Client-submitted EmissionsAmount<br/>is discarded"/]
+    subgraph L2["⚙️ API — reject or establish boundary"]
+        J --> K{"Known request keys?"}
+        K -->|"No"| K1([400 names unknown fields])
+        K -->|"Yes"| L{"Scope feature enabled?"}
+        L -->|"No"| LDenied([402 feature_gated])
+        L -->|"Yes"| M[Force EntityId from request context]
+        M --> N{"Project, phase, inventory<br/>belong to entity?"}
+        N -->|"No"| N1([400 relationship error<br/>no write])
+        N -->|"Yes"| O{"Phase belongs to project?<br/>Inventory period/year/GWP match?"}
+        O -->|"No"| O1([400 field-specific boundary error])
+        O -->|"Yes"| P[Adopt inventory GWP dataset<br/>or active system default]
     end
 
-    subgraph L3["👤 Manager — verifier"]
-        V -.-> W[Reviews record on /emissions/id]
-        W --> X{"Data<br/>defensible?"}
-        X -->|"No"| Y[Request correction]
-        X -->|"Yes"| Z[POST /emissions/id/verify/]
+    subgraph L3["⚙️ Model/service — calculate and persist"]
+        P --> Q[Persist source fields and relationship IDs]
+        Q --> R[EmissionsData.save → compute_emissions]
+        R --> S[QuantityCanonical from InputUnitId<br/>⚠ UI still omits this ID — SUS-20]
+        S --> T[GWP lookup by dataset, gas, subtype]
+        T --> U[kg CO2e = canonical quantity × factor × GWP]
+        U --> V{"Biogenic factor?"}
+        V -->|"Yes"| W[Compute separate biogenic tonnes<br/>excluded from GWP total]
+        V -->|"No"| X
+        W --> X{"Scope 2?"}
+        X -->|"Yes"| Y[Compute both result columns;<br/>missing method factor uses documented fallback]
+        X -->|"No"| Z
+        Y --> Z[(INSERT emissions_data)]
+        Z --> AA[(AuditLog Create)]
+        AA --> AB([Calculated detail returned;<br/>source inputs round-trip])
     end
 
-    subgraph L4["⚙️ System — verification"]
-        Z --> AA[/"verify_record()<br/>VerificationStatus = 3"/]
-        AA --> AB[("VerifiedBy, VerifiedAt,<br/>VerificationNotes")]
-        AB --> AC[("Notification:<br/>emissions_verified")]
-        AC --> AD([🔒 Record locked<br/>PATCH/DELETE now 403])
+    subgraph L4["👤 Manager — individual-record review"]
+        AB -.-> AC[Review record and evidence]
+        AC --> AD{"Defensible?"}
+        AD -->|"No"| AE[Request correction]
+        AD -->|"Yes"| AF[POST /emissions/id/verify/]
     end
 
-    Y -.-> C
+    subgraph L5["⚙️ Verification"]
+        AF --> AG[verify_record → status 3]
+        AG --> AH[(VerifiedBy, VerifiedAt,<br/>VerificationNotes)]
+        AH --> AI[(Notification emissions_verified)]
+        AI --> AJ([🔒 Record locked<br/>PATCH/DELETE return 403])
+    end
 
-    style J fill:#ffebee,stroke:#b71c1c,color:#000
-    style V fill:#fff3e0,stroke:#e65100,color:#000
-    style AD fill:#e8f5e9,stroke:#1b5e20,color:#000
+    AE -.-> D
+
+    style K1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style LDenied fill:#ffebee,stroke:#b71c1c,color:#000
+    style N1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style O1 fill:#ffebee,stroke:#b71c1c,color:#000
+    style H fill:#fff3e0,stroke:#e65100,color:#000
+    style S fill:#fff3e0,stroke:#e65100,color:#000
+    style AJ fill:#e8f5e9,stroke:#1b5e20,color:#000
 ```
 
-**The controlling rule:** emissions are never computed on the client. `EmissionsAmount`,
-`EmissionsAmountTonnes`, `QuantityCanonical`, `BiogenicCO2AmountTonnes`, and both Scope 2
-amounts are populated by `compute_emissions()` inside `EmissionsData.save()`. Whatever the
-client sends for those fields is overwritten.
+The raw source context and the derived result have different ownership. Reporting dates,
+supplier/context, quantity, factor reference, and operational relationships are user inputs and
+must persist or fail explicitly. `QuantityCanonical`, emissions amounts, biogenic totals, and
+Scope 2 result columns are server-owned and recomputed on every save.
+
+<a id="emissions-lineage"></a>
+
+## Capture and lineage integrity
+
+```mermaid
+flowchart LR
+    A["UI inputs<br/>period · supplier · context<br/>quantity · factor<br/>project · phase · inventory"] --> B["Serializer<br/>unknown-field rejection<br/>tenant + boundary validation"]
+    B --> C[("Persisted observations<br/>and exact relationship FKs")]
+    C --> D["Deterministic transform<br/>unit → factor → GWP"]
+    D --> E[("Server-owned result<br/>gross kg and tonnes CO2e")]
+    C --> F{"InventoryId assigned?"}
+    F -->|"Yes"| G[("Exact formal inventory member")]
+    F -->|"No"| H[("Unassigned working record<br/>visible in reconciliation")]
+    G --> I["Submit/verify recomputation"]
+    H -.-> J["User deliberately assigns<br/>or acknowledges exclusion"]
+
+    style B fill:#e3f2fd,stroke:#0d47a1,color:#000
+    style E fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style H fill:#fff3e0,stroke:#e65100,color:#000
+```
+
+This is the audit invariant: a visible user value is persisted, deliberately transformed with
+traceable provenance, or rejected with a field-specific error. Reporting year alone never
+implies formal inventory membership.
 
 ## Correction path — unlocking a verified record
 
 ```mermaid
 flowchart TB
     subgraph U1["👤 Staff / Manager"]
-        A([Error found in a<br/>verified record]) --> B[Attempt edit]
+        A([Error found in a verified record]) --> B[Attempt edit]
         B --> C([403 — record is locked])
         C --> D[Escalate to SuperAdmin<br/>with justification]
     end
 
     subgraph U2["🛡️ SuperAdmin"]
-        D -.-> E{"Correction<br/>justified?"}
+        D -.-> E{"Correction justified?"}
         E -->|"No"| F([Refuse — record stands])
         E -->|"Yes"| G[POST /emissions/id/unlock/<br/>with mandatory reason]
     end
 
     subgraph U3["⚙️ System"]
-        G --> H{"✅ F9 — IsSuperAdmin?<br/>enforced in the VIEW<br/>AND in unlock_record()"}
+        G --> H{"IsSuperAdmin?<br/>view and service guard"}
         H -->|"No"| I([403 denied])
-        H -->|"Yes"| J[/"unlock_record()<br/>VerificationStatus = 1"/]
-        J --> K[("AuditLog<br/>Action = Unlock_Verified<br/>RetentionTier = 3 → 7 years")]
-        K --> L[("Notification:<br/>emissions_unlocked")]
+        H -->|"Yes"| J[unlock_record → status 1]
+        J --> K[(AuditLog<br/>Action = Unlock_Verified<br/>RetentionTier = 3)]
+        K --> L[(Notification emissions_unlocked)]
         L --> M([Record editable again])
     end
 
-    M -.-> N[Re-enter the main process<br/>at correction + re-verification]
+    M -.-> N[Re-enter correction and re-verification]
 
     style C fill:#ffebee,stroke:#b71c1c,color:#000
     style I fill:#ffebee,stroke:#b71c1c,color:#000
     style K fill:#fff3e0,stroke:#e65100,color:#000
 ```
 
-The 7-year audit entry is the compliance artefact: every unlock is permanently attributable
-to a named SuperAdmin with a stated reason.
+The seven-year audit entry attributes every unlock to a named SuperAdmin and a stated reason.
+The service guard prevents non-view callers from bypassing authorisation.
 
-> **✅ F9 · Authorization — guard moved into the service — fixed 2026-08-21.**
-> `unlock_record()` (`apps/emissions/services.py:169`) performed the privileged state change
-> but checked nothing itself — its own docstring said *"Only callable by SuperAdmin — the view
-> enforces that guard."* A management command, admin action or bulk-correction task could have
-> unlocked verified records with no authorization check; the audit row would still be written,
-> so the action stayed traceable, but it was never authorized.
-> **Now:** `unlock_record()` raises `PermissionDenied` when `unlocked_by` is not a SuperAdmin,
-> before any mutation or audit write, so a rejected unlock leaves no trace. The view's inline
-> check is retained for its specific response body — the guard now lives in both places.
-> See [F9 in the findings register](../FINDINGS.md#f9).
+<a id="scope-2-dual-method"></a>
 
 ## Scope 2 dual-method detail
 
-GHG Protocol Scope 2 Guidance requires both methods to be reported. The platform always
-populates both columns, even when only one factor was supplied.
+The calculation service supports distinct location- and market-based factors and always
+populates both result columns. The first-party capture flow does **not yet** collect both
+evidence sets; that product gap remains SUS-23.
 
 ```mermaid
 flowchart LR
-    A([Scope 2 record saved]) --> B{"EFLocationBased<br/>supplied?"}
-    B -->|"Yes"| C[/"LocationBased =<br/>qty x EFLocationBased"/]
-    B -->|"No"| D[/"LocationBased =<br/>generic fallback result"/]
-    C --> E{"EFMarketBased<br/>supplied?"}
+    A([Scope 2 record saved]) --> B{"EFLocationBased supplied?"}
+    B -->|"Yes"| C[Location result = quantity × location factor]
+    B -->|"No"| D[Location result = generic fallback]
+    C --> E{"EFMarketBased supplied?"}
     D --> E
-    E -->|"Yes"| F[/"MarketBased =<br/>qty x EFMarketBased"/]
-    E -->|"No"| G[/"MarketBased =<br/>LocationBased"/]
-    F --> H[/"Primary EmissionsAmount<br/>= market-based"/]
+    E -->|"Yes"| F[Market result = quantity × market factor]
+    E -->|"No"| G[Market result = location result]
+    F --> H[Primary EmissionsAmount = market result]
     G --> H
-    H --> I([Both columns always populated])
+    H --> I([Both result columns populated])
 
+    style G fill:#fff3e0,stroke:#e65100,color:#000
     style I fill:#e8f5e9,stroke:#1b5e20,color:#000
 ```
 
-Both branches recompute on **every** save rather than only when the column is null — that
-keeps re-saves idempotent instead of preserving a stale value from a previous save.
-
 ---
-*Source: `backend/apps/emissions/views.py`, `backend/apps/emissions/services.py`,
-`backend/apps/emissions/models.py`, `backend/apps/billing/mixins.py`*
+*Source: `frontend/src/app/(app)/emissions/page.tsx`,
+`backend/apps/emissions/serializers.py`, `backend/apps/emissions/views.py`,
+`backend/apps/emissions/services.py`, `backend/apps/emissions/models.py`*

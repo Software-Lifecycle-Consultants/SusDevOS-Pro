@@ -1,5 +1,7 @@
 ﻿from rest_framework import serializers
 
+from apps.shared.serializers import TenantOwnedRelationshipsMixin
+
 from .models import (
     Restorations,
     RestorationSpecies,
@@ -16,7 +18,9 @@ class TreeRemovalsListSerializer(serializers.ModelSerializer):
                   "TotalTreesRemoved", "TotalBiomassCarbon", "Status")
 
 
-class TreeRemovalsDetailSerializer(serializers.ModelSerializer):
+class TreeRemovalsDetailSerializer(TenantOwnedRelationshipsMixin, serializers.ModelSerializer):
+    tenant_owned_relationships = {"ProjectId": "EntityId_id"}
+
     class Meta:
         model = TreeRemovals
         fields = "__all__"
@@ -25,7 +29,9 @@ class TreeRemovalsDetailSerializer(serializers.ModelSerializer):
                             "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
 
 
-class TreeRemovalSpeciesSerializer(serializers.ModelSerializer):
+class TreeRemovalSpeciesSerializer(TenantOwnedRelationshipsMixin, serializers.ModelSerializer):
+    tenant_owned_relationships = {"SpeciesId": "EntityId_id"}
+
     class Meta:
         model = TreeRemovalRemovedSpecies
         fields = (
@@ -43,7 +49,9 @@ class TreeRemovalSpeciesSerializer(serializers.ModelSerializer):
         )
 
 
-class TreeRemovalAffectedSpeciesSerializer(serializers.ModelSerializer):
+class TreeRemovalAffectedSpeciesSerializer(TenantOwnedRelationshipsMixin, serializers.ModelSerializer):
+    tenant_owned_relationships = {"SpeciesId": "EntityId_id"}
+
     class Meta:
         model = TreeRemovalAffectedSpecies
         fields = ("id", "SpeciesId", "Notes")
@@ -65,7 +73,9 @@ class RestorationsDetailSerializer(serializers.ModelSerializer):
                             "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
 
 
-class RestorationSpeciesSerializer(serializers.ModelSerializer):
+class RestorationSpeciesSerializer(TenantOwnedRelationshipsMixin, serializers.ModelSerializer):
+    tenant_owned_relationships = {"SpeciesId": "EntityId_id"}
+
     class Meta:
         model = RestorationSpecies
         fields = (

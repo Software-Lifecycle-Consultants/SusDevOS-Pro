@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, Upload } from "lucide-react";
+import { X } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import axiosInstance from "@/lib/axios-instance";
 import { EmptyState } from "@/components/EmptyState";
@@ -27,6 +27,20 @@ interface Project {
   ProjectName: string;
 }
 
+interface ProjectPhase {
+  PhaseId: number;
+  PhaseName: string;
+  PhaseNumber: number | null;
+}
+
+interface Inventory {
+  InventoryId: number;
+  ReportingYear: number;
+  ReportingPeriodFrom: string;
+  ReportingPeriodTo: string;
+  VerificationStatus: number;
+}
+
 const SCOPE_LABELS: Record<number, string> = { 1: "Scope 1", 2: "Scope 2", 3: "Scope 3" };
 const VERIF_LABELS: Record<number, { label: string; cls: string }> = {
   1: { label: "Unverified", cls: "badge-slate" },
@@ -35,12 +49,26 @@ const VERIF_LABELS: Record<number, { label: string; cls: string }> = {
   4: { label: "3rd Party",  cls: "badge-green" },
 };
 
-const SUPPLIER_CATEGORIES = [
-  "Energy", "Transport", "Waste", "Water", "Materials",
-  "Purchased Goods", "Capital Goods", "Business Travel", "Other",
-];
-
-const GWP_DATASET_ID = 1;
+interface CreateEmissionPayload {
+  Title: string;
+  Scope: number;
+  QuantityOrCost: string;
+  Unit: string;
+  EmissionFactor: string;
+  EmissionFactorSource: string;
+  EmissionFactorId: number;
+  Gas: string;
+  GasSubtype: string | null;
+  Scope3Category: number | null;
+  ReportingPeriodFrom: string;
+  ReportingPeriodTo: string;
+  ReportingYear: number;
+  ProjectId: number | null;
+  PhaseId: number | null;
+  InventoryId: number | null;
+  SupplierName: string | null;
+  ActivityDescription: string | null;
+}
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -53,15 +81,17 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; entityId: number }) {
   const queryClient = useQueryClient();
   const headers = { "X-Entity-ID": String(entityId) };
+  const currentYear = new Date().getFullYear();
 
   const [form, setForm] = useState({
     Title: "", Scope: "1", QuantityOrCost: "", Unit: "",
-    Gas: "CO2", GasSubtype: "", Scope3Category: "", ReportingYear: String(new Date().getFullYear()),
-    ProjectId: "", DateFrom: "", DateTo: "", Supplier: "", SupplierCategory: "", Remarks: "",
+    Gas: "CO2", GasSubtype: "", Scope3Category: "",
+    ProjectId: "", PhaseId: "", InventoryId: "",
+    ReportingPeriodFrom: `${currentYear}-01-01`, ReportingPeriodTo: `${currentYear}-12-31`,
+    SupplierName: "", ActivityDescription: "",
   });
   const [selectedEF, setSelectedEF] = useState<EmissionFactor | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   const { data: projectsData } = useQuery<{ results: Project[] }>({
     queryKey: ["projects-dropdown", entityId],
@@ -69,8 +99,27 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
   });
   const projects = projectsData?.results ?? [];
 
+  const { data: inventoriesData } = useQuery<{ results: Inventory[] }>({
+    queryKey: ["inventories-dropdown", entityId],
+    queryFn: () =>
+      axiosInstance.get("/api/ghg-inventories/", { headers }).then((r) => r.data),
+    retry: false,
+  });
+  const inventories = (inventoriesData?.results ?? []).filter(
+    (inventory) => inventory.VerificationStatus < 3,
+  );
+
+  const { data: phases = [] } = useQuery<ProjectPhase[]>({
+    queryKey: ["project-phases-dropdown", entityId, form.ProjectId],
+    queryFn: () =>
+      axiosInstance
+        .get(`/api/projects/${form.ProjectId}/phases/`, { headers })
+        .then((r) => r.data),
+    enabled: Boolean(form.ProjectId),
+  });
+
   const mutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
+    mutationFn: (data: CreateEmissionPayload) =>
       axiosInstance.post("/api/emissions/", data, { headers }).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emissions", entityId] });
@@ -88,7 +137,19 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
     },
   });
 
-  function set(k: string, v: string) { setForm((f) => ({ ...f, [k]: v })); }
+  function set(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })); }
+
+  function selectInventory(inventoryId: string) {
+    const inventory = inventories.find(
+      (candidate) => String(candidate.InventoryId) === inventoryId,
+    );
+    setForm((current) => ({
+      ...current,
+      InventoryId: inventoryId,
+      ReportingPeriodFrom: inventory?.ReportingPeriodFrom ?? current.ReportingPeriodFrom,
+      ReportingPeriodTo: inventory?.ReportingPeriodTo ?? current.ReportingPeriodTo,
+    }));
+  }
 
   function handleEFSelect(ef: EmissionFactor | null) {
     setSelectedEF(ef);
@@ -108,6 +169,7 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
     e.preventDefault();
     setError(null);
     if (!selectedEF) { setError("Please select an emission factor from the library."); return; }
+    const reportingYear = new Date(`${form.ReportingPeriodTo}T00:00:00Z`).getUTCFullYear();
     mutation.mutate({
       Title:                form.Title,
       Scope:                Number(form.Scope),
@@ -119,20 +181,16 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
       Gas:                  form.Gas,
       GasSubtype:           form.GasSubtype || null,
       Scope3Category:       form.Scope === "3" && form.Scope3Category ? Number(form.Scope3Category) : null,
-      ReportingYear:        form.ReportingYear ? Number(form.ReportingYear) : null,
-      GwpDatasetId:         GWP_DATASET_ID,
+      ReportingPeriodFrom:  form.ReportingPeriodFrom,
+      ReportingPeriodTo:    form.ReportingPeriodTo,
+      ReportingYear:        reportingYear,
       ProjectId:            form.ProjectId ? Number(form.ProjectId) : null,
-      DateFrom:             form.DateFrom || null,
-      DateTo:               form.DateTo   || null,
-      Supplier:             form.Supplier || null,
-      SupplierCategory:     form.SupplierCategory || null,
-      Remarks:              form.Remarks || null,
+      PhaseId:              form.PhaseId ? Number(form.PhaseId) : null,
+      InventoryId:          form.InventoryId ? Number(form.InventoryId) : null,
+      SupplierName:         form.SupplierName || null,
+      ActivityDescription:  form.ActivityDescription || null,
     });
   }
-
-  const estTonnes = selectedEF && form.QuantityOrCost
-    ? (parseFloat(form.QuantityOrCost) * parseFloat(selectedEF.FactorValue) / 1000).toFixed(4)
-    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-end bg-black/40 p-0">
@@ -162,10 +220,40 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
                   <input className="input" required placeholder="e.g. Natural gas — boiler room"
                     value={form.Title} onChange={(e) => set("Title", e.target.value)} />
                 </div>
+                <div>
+                  <label className="label mb-1">
+                    Formal inventory <span className="font-normal text-surface-400">optional</span>
+                  </label>
+                  <select
+                    className="input"
+                    value={form.InventoryId}
+                    onChange={(e) => selectInventory(e.target.value)}
+                  >
+                    <option value="">— unassigned working record —</option>
+                    {inventories.map((inventory) => (
+                      <option key={inventory.InventoryId} value={inventory.InventoryId}>
+                        {inventory.ReportingYear} · {inventory.ReportingPeriodFrom} to {inventory.ReportingPeriodTo}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-surface-400">
+                    Assigned records contribute only to this inventory. Selecting one aligns the reporting period and GWP dataset.
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="label mb-1">Project <span className="font-normal text-surface-400">optional</span></label>
-                    <select className="input" value={form.ProjectId} onChange={(e) => set("ProjectId", e.target.value)}>
+                    <select
+                      className="input"
+                      value={form.ProjectId}
+                      onChange={(e) =>
+                        setForm((current) => ({
+                          ...current,
+                          ProjectId: e.target.value,
+                          PhaseId: "",
+                        }))
+                      }
+                    >
                       <option value="">— no project —</option>
                       {projects.map((p) => (
                         <option key={p.ProjectId} value={p.ProjectId}>{p.ProjectName}</option>
@@ -173,21 +261,35 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
                     </select>
                   </div>
                   <div>
-                    <label className="label mb-1">Reporting year</label>
-                    <input className="input" type="number" min={2000} max={2100}
-                      value={form.ReportingYear} onChange={(e) => set("ReportingYear", e.target.value)} />
+                    <label className="label mb-1">Phase <span className="font-normal text-surface-400">optional</span></label>
+                    <select
+                      className="input"
+                      value={form.PhaseId}
+                      disabled={!form.ProjectId}
+                      onChange={(e) => set("PhaseId", e.target.value)}
+                    >
+                      <option value="">— no phase —</option>
+                      {phases.map((phase) => (
+                        <option key={phase.PhaseId} value={phase.PhaseId}>
+                          {phase.PhaseNumber ? `${phase.PhaseNumber}. ` : ""}{phase.PhaseName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="label mb-1">Date from <span className="font-normal text-surface-400">optional</span></label>
-                    <input className="input" type="date" value={form.DateFrom} onChange={(e) => set("DateFrom", e.target.value)} />
+                    <label className="label mb-1">Period from <span className="text-red-400">*</span></label>
+                    <input className="input" required type="date" value={form.ReportingPeriodFrom} onChange={(e) => set("ReportingPeriodFrom", e.target.value)} />
                   </div>
                   <div>
-                    <label className="label mb-1">Date to <span className="font-normal text-surface-400">optional</span></label>
-                    <input className="input" type="date" value={form.DateTo} onChange={(e) => set("DateTo", e.target.value)} />
+                    <label className="label mb-1">Period to <span className="text-red-400">*</span></label>
+                    <input className="input" required type="date" value={form.ReportingPeriodTo} onChange={(e) => set("ReportingPeriodTo", e.target.value)} />
                   </div>
                 </div>
+                <p className="text-xs text-surface-400">
+                  Reporting year is derived from the period end date.
+                </p>
               </div>
             </div>
 
@@ -216,20 +318,8 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
             {/* Supplier */}
             <div>
               <SectionHeading>Supplier <span className="font-normal normal-case text-surface-400">— optional</span></SectionHeading>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="label mb-1">Supplier name</label>
-                  <input className="input" placeholder="e.g. National Grid"
-                    value={form.Supplier} onChange={(e) => set("Supplier", e.target.value)} />
-                </div>
-                <div>
-                  <label className="label mb-1">Supplier category</label>
-                  <select className="input" value={form.SupplierCategory} onChange={(e) => set("SupplierCategory", e.target.value)}>
-                    <option value="">— select —</option>
-                    {SUPPLIER_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
+              <input className="input" placeholder="e.g. National Grid"
+                value={form.SupplierName} onChange={(e) => set("SupplierName", e.target.value)} />
             </div>
 
             {/* Emission Factor */}
@@ -268,14 +358,9 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
                   </div>
                 </div>
 
-                {/* Live estimate */}
-                {estTonnes && (
-                  <div className="flex items-center gap-2 rounded-md bg-brand-50 border border-brand-100 px-3 py-2">
-                    <span className="text-xs text-brand-700">Estimated emissions:</span>
-                    <span className="text-sm font-semibold font-mono text-brand-800">{estTonnes} tCO₂e</span>
-                    <span className="text-xs text-brand-500 ml-1">(server will recalculate on save)</span>
-                  </div>
-                )}
+                <p className="text-xs text-surface-400">
+                  The server applies the recorded factor, unit conversion, and GWP dataset on save.
+                </p>
               </div>
             </div>
 
@@ -283,24 +368,14 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
             <div>
               <SectionHeading>Notes</SectionHeading>
               <textarea className="input resize-y min-h-[72px]" rows={3} placeholder="Additional context, data source, assumptions…"
-                value={form.Remarks} onChange={(e) => set("Remarks", e.target.value)} />
+                value={form.ActivityDescription} onChange={(e) => set("ActivityDescription", e.target.value)} />
             </div>
           </form>
         </div>
 
         {/* Footer */}
         <div className="shrink-0 border-t border-surface-200 bg-surface-50 px-6 py-4">
-          <div className="flex items-center justify-between">
-            {/* Bulk upload stub */}
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-surface-500 hover:text-surface-700">
-              <Upload className="h-4 w-4" />
-              <span>Upload Excel</span>
-              <input type="file" accept=".xlsx,.xls,.csv" className="sr-only"
-                onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)} />
-            </label>
-            {uploadFile && (
-              <span className="text-xs text-brand-600 truncate max-w-[140px]">{uploadFile.name}</span>
-            )}
+          <div className="flex items-center justify-end">
             <div className="flex gap-2">
               <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
               <button form="emission-form" type="submit" disabled={mutation.isPending} className="btn-primary">

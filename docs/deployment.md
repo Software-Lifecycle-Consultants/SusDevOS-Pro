@@ -452,6 +452,46 @@ docker compose -f docker-compose.prod.yml exec api python manage.py seed_superad
 docker compose -f docker-compose.prod.yml exec api python manage.py collectstatic --no-input
 ```
 
+### If something 500s after §4
+
+Three failures hit on the first real deploy. All are fixed in the repo, but they are worth
+recognising because each looks like something else.
+
+**`relation "users" does not exist` / `relation "plans" does not exist`.** Migrations were never
+run. The marketing pages still render, so the site looks alive while every page that touches the
+database returns 500 — a signup form that loads fine and then fails on submit. Count what is
+applied:
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T api \
+  python manage.py showmigrations --plan | grep -c '^\[X\]'
+```
+
+Zero means §4 was skipped. Re-run `migrate`, the four seeds, then `collectstatic`.
+
+**`PermissionError: [Errno 13] Permission denied: '/app/staticfiles/admin'` during
+collectstatic.** The named volume was created root-owned while the container runs as non-root
+`appuser`. Fixed in `backend/Dockerfile` for volumes created from now on; an existing volume
+needs a one-off chown:
+
+```bash
+docker compose -f docker-compose.prod.yml run --rm --user root api \
+  chown -R appuser:appuser /app/staticfiles
+```
+
+**502 from nginx after recreating containers.** `--force-recreate` gives `api` a new IP, and
+nginx resolves upstreams once at config load, so it keeps dialling the old address. The CI
+deploy script reloads nginx for this reason; manual restarts need it too:
+
+```bash
+docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+```
+
+A related one to know about: `Invalid HTTP_HOST header: 'api:8000'` in the API log, with a
+`node` user agent. Next.js server-side rendering calls the API over the compose network, so
+Django sees `Host: api:8000`. `api` must be in `ALLOWED_HOSTS` or the blog, sitemap and RSS
+routes 400 while every browser-facing page looks perfectly healthy.
+
 **Verify the deployment:**
 
 | URL | Expected |

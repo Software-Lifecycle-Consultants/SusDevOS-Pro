@@ -6,7 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Return field-specific errors for payload keys outside the API contract.
+ */
 export interface EmissionsDataRequest {
+  GwpDatasetId?: number;
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted
    * @minimum 0
@@ -39,6 +43,12 @@ export interface EmissionsDataRequest {
   Scope3Category?: number | null;
   /** @nullable */
   ActivityDescription?: string | null;
+  /**
+   * Supplier shown on the bill, contract, or source evidence.
+   * @maxLength 200
+   * @nullable
+   */
+  SupplierName?: string | null;
   /** @pattern ^-?\d{0,14}(?:\.\d{0,4})?$ */
   QuantityOrCost: string;
   /**
@@ -129,5 +139,4 @@ export interface EmissionsDataRequest {
   InputUnitId?: number | null;
   /** @nullable */
   EmissionFactorId?: number | null;
-  GwpDatasetId: number;
 }

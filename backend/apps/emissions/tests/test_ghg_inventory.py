@@ -15,10 +15,15 @@ so tests that use auth_client must have the feature enabled on the entity's plan
 SuperAdmin (sa_client) bypasses the gate automatically.
 """
 
+from decimal import Decimal
+
 from rest_framework import status
 from rest_framework.test import APIClient
 
 import pytest
+
+from apps.emissions.models import EmissionsData
+from apps.shared.models import AuditLog
 
 INV_URL = "/api/ghg-inventories/"
 VERIFIED = 3  # VerificationStatus >= VERIFIED → immutable
@@ -96,6 +101,70 @@ class TestInventoryCreate:
         resp = api_client.post(INV_URL, _inv_payload(gwp_dataset.GwpDatasetId), format="json")
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_first_party_contract_round_trips_boundary_and_baseline(
+        self, auth_client, gwp_dataset
+    ):
+        payload = _inv_payload(gwp_dataset.GwpDatasetId)
+        payload["BoundaryNotes"] = "UK operations included; leased assets excluded."
+
+        created = auth_client.post(INV_URL, payload, format="json")
+        assert created.status_code == status.HTTP_201_CREATED, created.data
+        detail = auth_client.get(f"{INV_URL}{created.data['InventoryId']}/")
+
+        assert detail.data["ReportingPeriodFrom"] == "2024-01-01"
+        assert detail.data["ReportingPeriodTo"] == "2024-12-31"
+        assert detail.data["BaselineYear"] == 2019
+        assert detail.data["BoundaryNotes"] == payload["BoundaryNotes"]
+        assert detail.data["GwpDatasetId"] == gwp_dataset.GwpDatasetId
+        assert detail.data["GwpDatasetName"] == gwp_dataset.Name
+
+    def test_active_default_gwp_dataset_is_recorded_when_omitted(
+        self, auth_client, gwp_dataset
+    ):
+        payload = _inv_payload(gwp_dataset.GwpDatasetId)
+        payload.pop("GwpDatasetId")
+
+        response = auth_client.post(INV_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED, response.data
+        assert response.data["GwpDatasetId"] == gwp_dataset.GwpDatasetId
+        assert response.data["GwpDatasetName"] == gwp_dataset.Name
+
+    def test_unknown_legacy_base_year_key_is_rejected(self, auth_client, gwp_dataset):
+        payload = _inv_payload(gwp_dataset.GwpDatasetId)
+        payload["BaseYear"] = payload.pop("BaselineYear")
+
+        response = auth_client.post(INV_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "BaseYear" in response.data["errors"]
+
+    @pytest.mark.parametrize(
+        "changes,error_field",
+        [
+            (
+                {"ReportingPeriodFrom": "2024-12-31", "ReportingPeriodTo": "2024-01-01"},
+                "ReportingPeriodTo",
+            ),
+            (
+                {"ReportingPeriodFrom": "2023-01-01", "ReportingPeriodTo": "2024-12-31"},
+                "ReportingPeriodTo",
+            ),
+            ({"ReportingYear": 2023}, "ReportingYear"),
+            ({"BaselineYear": 2025}, "BaselineYear"),
+        ],
+    )
+    def test_invalid_inventory_boundary_is_rejected(
+        self, changes, error_field, auth_client, gwp_dataset
+    ):
+        payload = _inv_payload(gwp_dataset.GwpDatasetId)
+        payload.update(changes)
+
+        response = auth_client.post(INV_URL, payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert error_field in response.data["errors"]
+
 
 class TestInventoryEdit:
     def test_can_edit_unverified_inventory(self, auth_client, gwp_dataset):
@@ -106,6 +175,101 @@ class TestInventoryEdit:
         patch = auth_client.patch(f"{INV_URL}{inv_id}/", {"BaselineYear": 2020}, format="json")
         assert patch.status_code == status.HTTP_200_OK
         assert patch.data["BaselineYear"] == 2020
+
+    @pytest.mark.parametrize(
+        "field,value",
+        [
+            ("VerificationStatus", 3),
+            ("TotalScope1Tonnes", "999.000000"),
+            ("TotalsLastComputedAt", "2026-08-25T12:00:00Z"),
+        ],
+    )
+    def test_server_managed_fields_are_rejected(
+        self, field, value, auth_client, gwp_dataset
+    ):
+        inv_id = auth_client.post(
+            INV_URL, _inv_payload(gwp_dataset.GwpDatasetId), format="json"
+        ).data["InventoryId"]
+
+        response = auth_client.patch(
+            f"{INV_URL}{inv_id}/", {field: value}, format="json"
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert field in response.data["errors"]
+
+    def test_boundary_cannot_change_after_records_are_assigned(
+        self, auth_client, entity, gwp_dataset
+    ):
+        inv_id = auth_client.post(
+            INV_URL, _inv_payload(gwp_dataset.GwpDatasetId), format="json"
+        ).data["InventoryId"]
+        from apps.emissions.models import GHGInventories
+
+        inventory = GHGInventories.objects.get(InventoryId=inv_id)
+        EmissionsData.objects.create(
+            EntityId=entity,
+            InventoryId=inventory,
+            Title="Assigned fuel",
+            Scope=1,
+            QuantityOrCost=Decimal("10.0000"),
+            Unit="litres",
+            EmissionFactor=Decimal("2.63900000"),
+            EmissionFactorSource="Test factor",
+            Gas="CO2",
+            GwpDatasetId=gwp_dataset,
+            ReportingYear=2024,
+            ReportingPeriodFrom="2024-01-01",
+            ReportingPeriodTo="2024-01-31",
+        )
+
+        response = auth_client.patch(
+            f"{INV_URL}{inv_id}/",
+            {"ReportingPeriodFrom": "2024-02-01"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "ReportingPeriodFrom" in response.data["errors"]
+
+    def test_unassigned_reconciliation_lists_candidates_and_incomplete_records(
+        self, auth_client, entity, gwp_dataset
+    ):
+        inv_id = auth_client.post(
+            INV_URL, _inv_payload(gwp_dataset.GwpDatasetId), format="json"
+        ).data["InventoryId"]
+        common = {
+            "EntityId": entity,
+            "Scope": 1,
+            "QuantityOrCost": Decimal("1.0000"),
+            "Unit": "litres",
+            "EmissionFactor": Decimal("2.63900000"),
+            "EmissionFactorSource": "Test factor",
+            "Gas": "CO2",
+            "GwpDatasetId": gwp_dataset,
+            "ReportingYear": 2024,
+        }
+        candidate = EmissionsData.objects.create(
+            **common,
+            Title="Candidate",
+            ReportingPeriodFrom="2024-02-01",
+            ReportingPeriodTo="2024-02-29",
+        )
+        incomplete = EmissionsData.objects.create(**common, Title="Needs dates")
+        EmissionsData.objects.create(
+            **{**common, "ReportingYear": 2023},
+            Title="Different year",
+        )
+
+        response = auth_client.get(
+            f"{INV_URL}{inv_id}/unassigned-emissions/"
+        )
+
+        assert response.status_code == status.HTTP_200_OK, response.data
+        assert response.data["candidate_count"] == 1
+        assert response.data["incomplete_count"] == 1
+        assert response.data["candidates"][0]["EmissionsId"] == candidate.EmissionsId
+        assert response.data["incomplete"][0]["EmissionsId"] == incomplete.EmissionsId
 
 
 # ── Verification workflow ──────────────────────────────────────────────────────
@@ -118,22 +282,160 @@ class TestInventoryVerification:
         return resp.data["InventoryId"]
 
     def _verify(self, auth_client, inv_id):
-        """Advance to Verified by patching VerificationStatus directly."""
-        resp = auth_client.patch(
-            f"{INV_URL}{inv_id}/", {"VerificationStatus": VERIFIED}, format="json"
-        )
+        submitted = auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        assert submitted.status_code == status.HTTP_200_OK, submitted.data
+        resp = auth_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
         assert resp.status_code == status.HTTP_200_OK
         assert resp.data["VerificationStatus"] == VERIFIED
+
+    def test_direct_status_patch_is_rejected(self, auth_client, gwp_dataset):
+        inv_id = self._create(auth_client, gwp_dataset)
+
+        response = auth_client.patch(
+            f"{INV_URL}{inv_id}/", {"VerificationStatus": VERIFIED}, format="json"
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "VerificationStatus" in response.data["errors"]
+
+    def test_submit_moves_unverified_inventory_to_pending(self, auth_client, gwp_dataset):
+        inv_id = self._create(auth_client, gwp_dataset)
+
+        response = auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+
+        assert response.status_code == status.HTTP_200_OK, response.data
+        assert response.data["VerificationStatus"] == 2
+
+    def test_verify_requires_pending_state(self, auth_client, gwp_dataset):
+        inv_id = self._create(auth_client, gwp_dataset)
+
+        response = auth_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.data["code"] == "invalid_transition"
+
+    @staticmethod
+    def _client_for(entity, *, role_key, email, username):
+        """Authenticated client for a user holding exactly one role."""
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        from apps.users.models import Roles, UserRoles
+        from apps.users.tests.factories import UsersFactory
+
+        user = UsersFactory(EntityId=entity, email=email, username=username)
+        if role_key is not None:
+            role, _ = Roles.objects.get_or_create(
+                RoleKey=role_key, defaults={"RoleName": role_key.title()}
+            )
+            UserRoles.objects.create(UserId=user, RoleId=role, Status=1)
+        client = APIClient()
+        client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(user).access_token}",
+            HTTP_X_ENTITY_ID=str(entity.EntityId),
+        )
+        return client
+
+    def test_roleless_member_cannot_verify(self, auth_client, entity, gwp_dataset):
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        member_client = self._client_for(
+            entity,
+            role_key=None,
+            email="inventory-member@testcorp.com",
+            username="inventory_member",
+        )
+
+        response = member_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_cannot_verify(self, auth_client, entity, gwp_dataset):
+        """Whoever enters the figures must not be the one who signs them off."""
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        staff_client = self._client_for(
+            entity,
+            role_key="staff",
+            email="inventory-staff@testcorp.com",
+            username="inventory_staff",
+        )
+
+        response = staff_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_manager_can_verify(self, auth_client, entity, gwp_dataset):
+        """Verification is a sustainability-manager task, not an Admin one."""
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        manager_client = self._client_for(
+            entity,
+            role_key="manager",
+            email="inventory-manager@testcorp.com",
+            username="inventory_manager",
+        )
+
+        response = manager_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["VerificationStatus"] == 3
+
+    def test_submit_requires_review_of_matching_unassigned_records(
+        self, auth_client, entity, gwp_dataset
+    ):
+        inv_id = self._create(auth_client, gwp_dataset)
+        EmissionsData.objects.create(
+            EntityId=entity,
+            Title="Unassigned electricity",
+            Scope=2,
+            QuantityOrCost=Decimal("100.0000"),
+            Unit="kWh",
+            EmissionFactor=Decimal("0.20000000"),
+            EmissionFactorSource="Test grid factor",
+            Gas="CO2",
+            GwpDatasetId=gwp_dataset,
+            ReportingYear=2024,
+            ReportingPeriodFrom="2024-01-01",
+            ReportingPeriodTo="2024-12-31",
+        )
+
+        blocked = auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        acknowledged = auth_client.post(
+            f"{INV_URL}{inv_id}/submit/",
+            {"acknowledge_unassigned": True},
+            format="json",
+        )
+
+        assert blocked.status_code == status.HTTP_409_CONFLICT
+        assert blocked.data["code"] == "unassigned_records_require_review"
+        assert blocked.data["candidate_count"] == 1
+        assert acknowledged.status_code == status.HTTP_200_OK, acknowledged.data
+        assert acknowledged.data["VerificationStatus"] == 2
+
+    def test_verify_is_audited(self, auth_client, gwp_dataset):
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+
+        response = auth_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_200_OK, response.data
+        assert AuditLog.objects.filter(
+            Action="Verify",
+            TableName="ghg_inventories",
+            RecordId=inv_id,
+        ).exists()
 
     def test_verify_stamps_verifier_identity(self, auth_client, admin_user, gwp_dataset):
         """Verifying an inventory must record who verified it and when."""
         inv_id = self._create(auth_client, gwp_dataset)
-        resp = auth_client.patch(
-            f"{INV_URL}{inv_id}/", {"VerificationStatus": VERIFIED}, format="json"
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        resp = auth_client.post(
+            f"{INV_URL}{inv_id}/verify/", {"notes": "Reviewed source evidence"}, format="json"
         )
         assert resp.status_code == status.HTTP_200_OK
         assert resp.data["VerifiedBy"] == admin_user.UserId
         assert resp.data["VerifiedAt"] is not None
+        assert resp.data["VerificationNotes"] == "Reviewed source evidence"
 
     def test_patch_verified_inventory_returns_403(self, auth_client, gwp_dataset):
         inv_id = self._create(auth_client, gwp_dataset)
@@ -164,7 +466,8 @@ class TestInventoryUnlock:
     def _create_and_verify(self, auth_client, gwp_dataset):
         resp = auth_client.post(INV_URL, _inv_payload(gwp_dataset.GwpDatasetId), format="json")
         inv_id = resp.data["InventoryId"]
-        auth_client.patch(f"{INV_URL}{inv_id}/", {"VerificationStatus": VERIFIED}, format="json")
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        auth_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
         return inv_id
 
     def test_non_sa_cannot_unlock(self, auth_client, gwp_dataset):

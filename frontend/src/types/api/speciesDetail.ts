@@ -30,8 +30,6 @@ export interface SpeciesDetail {
   readonly CreatedBy: number | null;
   /** @nullable */
   readonly UpdatedBy: number | null;
-  /** FK to entities.Entities */
-  readonly EntityId: number;
   /** @maxLength 200 */
   CommonName: string;
   /**
@@ -67,25 +65,25 @@ export interface SpeciesDetail {
    */
   IPCCForestType?: SpeciesDetailIPCCForestType;
   /**
-   * D ΓÇö tonnes dry matter per m┬│ fresh volume (IPCC Table 4.13)
+   * D — tonnes dry matter per m³ fresh volume (IPCC Table 4.13)
    * @nullable
    * @pattern ^-?\d{0,4}(?:\.\d{0,4})?$
    */
   BasicWoodDensity?: string | null;
   /**
-   * BEF ΓÇö merchantable volume ΓåÆ total AGB (IPCC Table 4.5)
+   * BEF — merchantable volume → total AGB (IPCC Table 4.5)
    * @nullable
    * @pattern ^-?\d{0,4}(?:\.\d{0,4})?$
    */
   BiomassExpansionFactor?: string | null;
   /**
-   * R ΓÇö below-ground/above-ground biomass ratio (IPCC Table 4.4)
+   * R — below-ground/above-ground biomass ratio (IPCC Table 4.4)
    * @nullable
    * @pattern ^-?\d{0,4}(?:\.\d{0,4})?$
    */
   RootToShootRatio?: string | null;
   /**
-   * CF ΓÇö carbon content of dry biomass (IPCC default 0.47)
+   * CF — carbon content of dry biomass (IPCC default 0.47)
    * @nullable
    * @pattern ^-?\d{0,2}(?:\.\d{0,4})?$
    */
@@ -102,4 +100,5 @@ export interface SpeciesDetail {
    * @nullable
    */
   BiomassDataSource?: string | null;
+  readonly EntityId: number;
 }

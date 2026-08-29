@@ -47,8 +47,20 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY . .
 
-# Non-root user for security
-RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+# Non-root user for security.
+#
+# staticfiles/ and media/ are created here, before the chown, because
+# docker-compose.prod.yml mounts a named volume over /app/staticfiles. Docker
+# seeds an empty named volume from the image path — including its ownership —
+# but only if that path exists in the image. Without this mkdir the volume is
+# created root-owned, and collectstatic fails as appuser:
+#
+#   PermissionError: [Errno 13] Permission denied: '/app/staticfiles/admin'
+#
+# (STATIC_ROOT / MEDIA_ROOT — see config/settings/base.py.)
+RUN adduser --disabled-password --gecos "" appuser \
+    && mkdir -p /app/staticfiles /app/media \
+    && chown -R appuser /app
 USER appuser
 
 EXPOSE 8000
