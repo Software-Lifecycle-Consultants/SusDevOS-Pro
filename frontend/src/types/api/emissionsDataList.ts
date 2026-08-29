@@ -35,6 +35,14 @@ export interface EmissionsDataList {
   VerificationStatus?: number;
   /** @nullable */
   ProjectId?: number | null;
+  /** @nullable */
+  PhaseId?: number | null;
+  /** @nullable */
+  InventoryId?: number | null;
+  /** @nullable */
+  ReportingPeriodFrom?: string | null;
+  /** @nullable */
+  ReportingPeriodTo?: string | null;
   /**
    * @minimum 0
    * @maximum 32767

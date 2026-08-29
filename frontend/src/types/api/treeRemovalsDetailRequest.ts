@@ -6,6 +6,18 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Restrict related-object inputs to the request's active entity.
+
+Tenant-scoping a viewset's top-level queryset does not protect writes: DRF
+related fields otherwise resolve primary keys from their model's global
+queryset. Serializers opt in with ``tenant_owned_relationships`` mapping
+input field names to the related model's entity lookup.
+
+Input validation fails closed when the active entity context is missing.
+This is intentional: silently accepting an unscoped relationship is a
+tenant-isolation defect, not a recoverable serializer condition.
+ */
 export interface TreeRemovalsDetailRequest {
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted

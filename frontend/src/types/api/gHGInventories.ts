@@ -8,8 +8,13 @@
 import type { GHGInventoriesConsolidationApproach } from './gHGInventoriesConsolidationApproach';
 import type { VerificationStatusEnum } from './verificationStatusEnum';
 
+/**
+ * Return field-specific errors for payload keys outside the API contract.
+ */
 export interface GHGInventories {
   readonly InventoryId: number;
+  GwpDatasetId?: number;
+  readonly GwpDatasetName: string;
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted
    * @minimum 0
@@ -58,6 +63,11 @@ export interface GHGInventories {
    */
   ConsolidationApproach?: GHGInventoriesConsolidationApproach;
   /**
+   * Included/excluded operations and rationale for the inventory boundary.
+   * @nullable
+   */
+  BoundaryNotes?: string | null;
+  /**
    * @minimum 0
    * @maximum 32767
    */
@@ -100,9 +110,8 @@ export interface GHGInventories {
    * Timestamp of last scope-total recompute. NULL or >24h old => stale (see tasks.emissions).
    * @nullable
    */
-  TotalsLastComputedAt?: string | null;
+  readonly TotalsLastComputedAt: string | null;
   readonly EntityId: number;
-  GwpDatasetId: number;
   /** @nullable */
   readonly VerifiedBy: number | null;
 }
