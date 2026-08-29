@@ -26,7 +26,7 @@ stateDiagram-v2
     VerifiedThird: 4 — Verified, Third Party
 
     Unverified --> Pending: POST /submit/; reconcile + recompute + audit
-    Pending --> VerifiedFirst: Entity Admin POST /verify/; recompute + provenance + audit
+    Pending --> VerifiedFirst: Manager+ POST /verify/; recompute + provenance + audit
     VerifiedFirst --> Unverified: SuperAdmin POST /unlock/; mandatory reason + audit
     VerifiedThird --> Unverified: SuperAdmin POST /unlock/ for legacy/admin state
 

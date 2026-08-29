@@ -184,7 +184,7 @@ plan. Runtime calculation no longer infers membership from year.
 | | |
 |---|---|
 | **Status** | ✅ Built |
-| **Role** | Staff and above (submit); Entity Admin (verify, see SDO-INV-14) |
+| **Role** | Staff and above (submit); Manager and above (verify, see SDO-INV-14) |
 | **Diagram** | [UML 07 §7.1 GHG inventory verification](../diagrams/uml/07-state-machines.md) · [BPMN 03](../diagrams/bpmn/03-inventory-verification.md) |
 | **Code** | `frontend/src/app/(app)/inventories/page.tsx` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.submit()` |
 | **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryVerification`) |
@@ -354,7 +354,7 @@ Link: [F9](../diagrams/FINDINGS.md#f9).
 | | |
 |---|---|
 | **Status** | 🟡 Partial |
-| **Role** | Entity Admin (first-party); third-party workflow not exposed |
+| **Role** | Manager and above (first-party); third-party workflow not exposed |
 | **Diagram** | [UML 07 §7.1](../diagrams/uml/07-state-machines.md) · [BPMN 03 §Controlled assurance transition](../diagrams/bpmn/03-inventory-verification.md) |
 | **Code** | `backend/apps/emissions/models.py` · `GHGInventories.VERIFICATION_STATUS_CHOICES` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.verify()` |
 | **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`TestInventoryVerification`) |
@@ -365,7 +365,7 @@ Link: [F9](../diagrams/FINDINGS.md#f9).
 1. **Given** the model retains status `4` ("Verified - Third Party") for future schema
    compatibility, **when** a first-party API client submits normal POST/PATCH data, **then**
    it cannot set status `3` or `4`; `VerificationStatus` is server-managed.
-2. **Given** a Pending inventory, **when** an Entity Admin calls the implemented `/verify/`
+2. **Given** a Pending inventory, **when** a Manager or above calls the implemented `/verify/`
    action, **then** it moves only to status `3` ("Verified - First Party") and records the
    platform user's identity, timestamp, notes, and audit event.
 3. **Given** status `4`, **when** the public first-party routes are inspected, **then** there
@@ -481,19 +481,19 @@ the test suite — the behaviour above is read directly from the task body.*
 
 <a id="sdo-inv-14"></a>
 
-### SDO-INV-14 · An Entity Admin verifies the exact inventory boundary
+### SDO-INV-14 · A sustainability manager verifies the exact inventory boundary
 
-**As an** Entity Admin
+**As a** sustainability manager
 **I want** a single authorised verification action over the inventory's exact members
 **so that** the frozen totals, verifier identity, and audit trail describe the same boundary.
 
 | | |
 |---|---|
 | **Status** | ✅ Built |
-| **Role** | Entity Admin (`IsEntityAdmin`) |
+| **Role** | Manager and above (`IsManagerOrAbove`) |
 | **Diagram** | [BPMN 03 §Controlled assurance transition](../diagrams/bpmn/03-inventory-verification.md) · [UML 07 §7.1](../diagrams/uml/07-state-machines.md) |
 | **Code** | `frontend/src/app/(app)/inventories/page.tsx` · `backend/apps/emissions/views.py` · `GHGInventoriesViewSet.verify()` · `backend/tasks/emissions.py` |
-| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`test_non_admin_cannot_verify`, `test_verify_is_audited`, `test_verify_stamps_verifier_identity`) · `backend/apps/emissions/tests/test_offset_validation.py` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` (`test_manager_can_verify`, `test_staff_cannot_verify`, `test_verify_is_audited`, `test_verify_stamps_verifier_identity`) · `backend/apps/emissions/tests/test_offset_validation.py` |
 | **Linear** | [SUS-24 · CFI-005](https://linear.app/susdevos/issue/SUS-24/cfi-005-put-inventory-verification-behind-an-authorised-transition) · [SUS-33 · CFI-015](https://linear.app/susdevos/issue/SUS-33/cfi-015-compute-formal-inventory-totals-from-explicit-inventory) · `risk:security` |
 
 **Acceptance criteria**
@@ -501,7 +501,7 @@ the test suite — the behaviour above is read directly from the task body.*
 1. **Given** a non-admin tenant member, **when** they call
    `POST /api/ghg-inventories/{id}/verify/`, **then** permission is denied and state,
    totals, and provenance remain unchanged.
-2. **Given** an Entity Admin and a Pending inventory, **when** `/verify/` runs, **then** the
+2. **Given** a Manager or above and a Pending inventory, **when** `/verify/` runs, **then** the
    server repeats the unassigned-record review, recomputes totals from active records whose
    `InventoryId` equals this inventory, and moves only to first-party verified status `3`.
 3. **Given** a successful verification, **then** `VerifiedBy`, `VerifiedAt`, optional

@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from apps.billing.mixins import FeatureGateMixin
-from apps.shared.permissions import IsEntityAdmin, IsManagerOrAbove, IsSuperAdmin
+from apps.shared.permissions import IsManagerOrAbove, IsSuperAdmin
 from apps.shared.views import TenantViewSetMixin
 
 from .models import (
@@ -428,8 +428,13 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
+        # Manager and above, matching EmissionsDataViewSet.verify. Admin is the
+        # role that provisions an entity and its users, not the role that signs
+        # off reported figures — sustainability managers do that. Requiring
+        # Admin here would either stall verification behind whoever holds the
+        # account, or push entities to hand out Admin for a reporting task.
         if self.action == "verify":
-            return [IsAuthenticated(), IsEntityAdmin()]
+            return [IsAuthenticated(), IsManagerOrAbove()]
         if self.action == "unlock":
             return [IsAuthenticated(), IsSuperAdmin()]
         return super().get_permissions()

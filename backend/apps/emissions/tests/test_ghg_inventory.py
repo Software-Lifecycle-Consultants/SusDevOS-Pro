@@ -314,29 +314,71 @@ class TestInventoryVerification:
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.data["code"] == "invalid_transition"
 
-    def test_non_admin_cannot_verify(
-        self, auth_client, entity, gwp_dataset
-    ):
+    @staticmethod
+    def _client_for(entity, *, role_key, email, username):
+        """Authenticated client for a user holding exactly one role."""
         from rest_framework_simplejwt.tokens import RefreshToken
 
+        from apps.users.models import Roles, UserRoles
         from apps.users.tests.factories import UsersFactory
 
+        user = UsersFactory(EntityId=entity, email=email, username=username)
+        if role_key is not None:
+            role, _ = Roles.objects.get_or_create(
+                RoleKey=role_key, defaults={"RoleName": role_key.title()}
+            )
+            UserRoles.objects.create(UserId=user, RoleId=role, Status=1)
+        client = APIClient()
+        client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(user).access_token}",
+            HTTP_X_ENTITY_ID=str(entity.EntityId),
+        )
+        return client
+
+    def test_roleless_member_cannot_verify(self, auth_client, entity, gwp_dataset):
         inv_id = self._create(auth_client, gwp_dataset)
         auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
-        member = UsersFactory(
-            EntityId=entity,
+        member_client = self._client_for(
+            entity,
+            role_key=None,
             email="inventory-member@testcorp.com",
             username="inventory_member",
-        )
-        member_client = APIClient()
-        member_client.credentials(
-            HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(member).access_token}",
-            HTTP_X_ENTITY_ID=str(entity.EntityId),
         )
 
         response = member_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_staff_cannot_verify(self, auth_client, entity, gwp_dataset):
+        """Whoever enters the figures must not be the one who signs them off."""
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        staff_client = self._client_for(
+            entity,
+            role_key="staff",
+            email="inventory-staff@testcorp.com",
+            username="inventory_staff",
+        )
+
+        response = staff_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_manager_can_verify(self, auth_client, entity, gwp_dataset):
+        """Verification is a sustainability-manager task, not an Admin one."""
+        inv_id = self._create(auth_client, gwp_dataset)
+        auth_client.post(f"{INV_URL}{inv_id}/submit/", {}, format="json")
+        manager_client = self._client_for(
+            entity,
+            role_key="manager",
+            email="inventory-manager@testcorp.com",
+            username="inventory_manager",
+        )
+
+        response = manager_client.post(f"{INV_URL}{inv_id}/verify/", {}, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["VerificationStatus"] == 3
 
     def test_submit_requires_review_of_matching_unassigned_records(
         self, auth_client, entity, gwp_dataset

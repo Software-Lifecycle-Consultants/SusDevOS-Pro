@@ -59,13 +59,13 @@ flowchart TB
         W --> X[(Audit acknowledgement and status 2 Pending)]
     end
 
-    subgraph L7["🛡️ Entity Admin — first-party assurance"]
+    subgraph L7["🛡️ Manager+ — first-party assurance"]
         X -.-> Y[Review boundary, evidence, and totals]
         Y --> Z[POST /ghg-inventories/id/verify/<br/>notes + optional acknowledgement]
     end
 
     subgraph L8["⚙️ System — verify and lock"]
-        Z --> AA{"Entity Admin and status 2?"}
+        Z --> AA{"Manager+ and status 2?"}
         AA -->|"No"| AA1([403 permission or<br/>409 invalid_transition])
         AA -->|"Yes"| AB[Repeat reconciliation gate]
         AB --> AC[Recompute exact-member totals again]
@@ -126,7 +126,7 @@ flowchart TB
 
     E([Status 1 Unverified]) --> F[POST /submit/]
     F --> G([Status 2 Pending])
-    G --> H[Entity Admin POST /verify/]
+    G --> H[Manager+ POST /verify/]
     H --> I([Status 3 First-party verified and locked])
     I --> J[SuperAdmin POST /unlock/<br/>mandatory reason]
     J --> E
