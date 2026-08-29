@@ -457,6 +457,9 @@ implementation tickets:
 
 - The canonical denominator contract for emission factors and migration strategy
   for factors whose current unit is missing or inconsistent.
-- Whether Entity Admin self-verification is permitted by product policy, and the
+- Whether self-verification is permitted by product policy — a verifier signing off an
+  inventory whose records they entered themselves. Partly settled: verification now requires
+  Manager and above, so Staff who enter figures cannot sign them off. What remains open is
+  whether a Manager may verify their own work (tracked as SDO-GAP-03 / SUS-14), and the
   evidence/actor model required before third-party assurance status can be exposed.
 - The durable delivery mechanism for contact/demo requests.
