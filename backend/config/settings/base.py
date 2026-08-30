@@ -274,8 +274,12 @@ SITE_NAME = config("SITE_NAME", default="SusDevOS")
 SITE_URL  = config("SITE_URL",  default="http://localhost:3000")
 
 FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+# These must match real Next.js routes under frontend/src/app/(public)/.
+# A mismatch is invisible server-side: the email sends, the token is valid, and the
+# recipient lands on a 404 with no way to complete onboarding.
+# Covered by apps/users/tests/test_frontend_urls.py.
 PASSWORD_RESET_URL = f"{FRONTEND_URL}/reset-password"
-ONBOARDING_URL     = f"{FRONTEND_URL}/onboarding"
+ONBOARDING_URL     = f"{FRONTEND_URL}/onboard"
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 
