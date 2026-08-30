@@ -94,7 +94,7 @@ def search_places(query: str, limit: int = 5) -> list[dict]:
 
         bbox = row.get("boundingbox")
         # Nominatim gives boundingbox as four strings: [south, north, west, east].
-        if isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+        if isinstance(bbox, list | tuple) and len(bbox) == 4:
             try:
                 bbox = [float(v) for v in bbox]
             except (TypeError, ValueError):
