@@ -268,6 +268,21 @@ EPA_EGRID_URL               = config("EPA_EGRID_URL", default="")
 
 DEFAULT_GWP_DATASET_ID = config("DEFAULT_GWP_DATASET_ID", default=1, cast=int)
 
+# ── Billing entitlements ──────────────────────────────────────
+
+# Per-capability feature gating is OFF. Plans are sold on service and hosting
+# tiers — seats, entities, reporting years, support level — not on which product
+# capabilities unlock, so every authenticated tenant gets the full feature set.
+#
+# This switch disables only PlanFeatures/402 gating. The quantitative plan limits
+# (MaxEntities, MaxUsersPerEntity, MaxReportingYears, MaxApiCallsPerDay) are
+# enforced elsewhere — can_add_entity() and record_api_call() resolve through
+# get_active_plan(), not is_feature_enabled() — and stay in force regardless.
+#
+# The gate machinery (FeatureGateMixin, PlanFeatures, the 402 contract) is kept
+# intact and tested so gating can be reintroduced by flipping this to True.
+FEATURE_GATES_ENABLED = config("FEATURE_GATES_ENABLED", default=False, cast=bool)
+
 # ── Site ──────────────────────────────────────────────────────────────────────
 
 SITE_NAME = config("SITE_NAME", default="SusDevOS")
