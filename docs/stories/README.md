@@ -1,17 +1,22 @@
 # SusDevOS — User Stories
 
 The behavioural specification of the platform, written from the user's side and traceable to
-the code that implements it and the [diagram](../diagrams/README.md) that shows its mechanism.
+the code that implements it or, for proposed behavior, to the design that must be accepted
+before implementation.
 
-Two kinds of story live here:
+The status on each story distinguishes evidence from intent:
 
 - **Built** — behaviour that exists today, verified by a test. These are a regression spec:
   if a story stops being true, something broke.
+- **Partial** — some observable behavior exists, but a criterion or test is missing.
 - **Gap** — known missing or undecided behaviour, in [07-backlog-gaps.md](07-backlog-gaps.md).
   These are the backlog.
+- **Proposed** — target behavior in a design gate. It is not an implementation claim and is
+  not ready for delivery until the linked decision, UML, and BPMN are accepted.
 
-Every story was derived by reading the code, not the `spec/` documents. Where a `spec/` file
-describes something that does not exist, the story reflects the code and says so.
+Built, Partial, and Gap assessments were derived by reading the code, not the `spec/`
+documents. Proposed stories are deliberately labelled as such so target-state design cannot be
+mistaken for current behavior.
 
 ---
 
@@ -26,6 +31,7 @@ describes something that does not exist, the story reflects the code and says so
 | 05 | [Reporting & notifications](05-reporting-notifications.md) | `SDO-REP-*` | Async report jobs, downloads, notification inbox |
 | 06 | [Billing & platform](06-billing-platform.md) | `SDO-BIL-*` | Plans, feature gates, usage, CMS, API contract |
 | 07 | [Backlog & gaps](07-backlog-gaps.md) | `SDO-GAP-*` | Known gaps, undecided policy, drift risks |
+| 08 | [Project workspace](08-project-workspace.md) | `SDO-PRJ-*` | Project-centric navigation with inventory and parcel boundaries preserved |
 
 ---
 
@@ -36,7 +42,7 @@ describes something that does not exist, the story reflects the code and says so
 `SDO-<AREA>-<nn>` — stable once assigned. **Never renumber**: diagrams, commits and Linear
 issues reference these. Retire an ID rather than reusing it.
 
-Areas: `TEN` · `GHG` · `INV` · `NAT` · `REP` · `BIL` · `GAP`
+Areas: `TEN` · `GHG` · `INV` · `NAT` · `REP` · `BIL` · `GAP` · `PRJ`
 
 ### Status vocabulary
 
@@ -46,6 +52,7 @@ Areas: `TEN` · `GHG` · `INV` · `NAT` · `REP` · `BIL` · `GAP`
 | 🟡 **Partial** | Implemented, but an acceptance criterion is unmet or untested |
 | ⬜ **Gap** | Not implemented — a backlog item |
 | ❓ **Undecided** | Needs a product decision before it can be specified |
+| 🟣 **Proposed** | Target behavior awaiting design acceptance; not an implementation claim |
 
 ### Story shape
 
@@ -108,6 +115,7 @@ both directions.
 | 04 Nature & MRV | [UML 04](../diagrams/uml/04-domain-nature-mrv.md) · [BPMN 04](../diagrams/bpmn/04-carbon-credit-mrv.md) · [BPMN 06](../diagrams/bpmn/06-nature-tracking.md) |
 | 05 Reporting & notifications | [UML 06 §6.4](../diagrams/uml/06-sequences.md) · [UML 07](../diagrams/uml/07-state-machines.md) · [BPMN 05](../diagrams/bpmn/05-report-generation.md) |
 | 06 Billing & platform | [UML 05](../diagrams/uml/05-domain-platform.md) · [UML 01](../diagrams/uml/01-component-architecture.md) · [UML 08](../diagrams/uml/08-async-topology.md) |
+| 08 Project workspace | [Proposed UML 01](../diagrams/proposed/01-project-centric-workspace-uml.md) · [Proposed BPMN 02](../diagrams/proposed/02-project-centric-workspace-bpmn.md) · [ADR 0001](../decisions/0001-project-centric-workspace.md) |
 
 ---
 
@@ -135,10 +143,10 @@ Stories are written to map onto Linear issues without rewriting.
 | User statement + acceptance criteria | Description |
 | Epic | Project, or a `Parent` issue |
 | `Linear` row labels | Labels |
-| Status | ⬜ Gap → `Backlog`; 🟡 Partial → `Todo`; ✅ Built → `Done` |
+| Status | 🟣 Proposed → design review only; ⬜ Gap → `Backlog`; 🟡 Partial → `Todo`; ✅ Built → `Done` |
 | Diagram + Code links | Description footer |
 
-Suggested labels: `area:ten|ghg|inv|nat|rep|bil`, `type:spec|feature|bug|decision`,
+Suggested labels: `area:ten|ghg|inv|nat|rep|bil|prj`, `type:spec|feature|bug|decision`,
 `risk:schema|security|billing` where it applies.
 
 > **Connected.** Workspace [susdevos](https://linear.app/susdevos), team `Susdevos`.
@@ -152,3 +160,5 @@ Suggested labels: `area:ten|ghg|inv|nat|rep|bil`, `type:spec|feature|bug|decisio
 >
 > When a story becomes work — new behaviour, or a Partial that needs its test — create the
 > Linear issue then and add its ID to the story metadata row.
+> Proposed stories remain outside Linear until their design gate is accepted; acceptance turns
+> them into scoped delivery stories rather than a speculative backlog.

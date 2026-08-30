@@ -36,6 +36,23 @@ Role-specific guides covering the core workflows for each user type.
 |----------|--------|
 | [Core Feature Integrity Audit](audits/core-feature-integrity-audit.md) | End-to-end user flows, field lineage, confirmed defects, execution order, and closure evidence |
 
+## Architecture Decisions
+
+| Document | Status | Covers |
+|----------|--------|--------|
+| [ADR 0001 — Project-centric workspace](decisions/0001-project-centric-workspace.md) | Proposed | Project as the operational workspace while entity, inventory, and parcel remain authoritative boundaries |
+
+## Proposed Design Gates
+
+These documents describe target behavior and are **not** claims about the current application.
+They must be reviewed together before implementation starts.
+
+| Document | Covers |
+|----------|--------|
+| [Project workspace UML](diagrams/proposed/01-project-centric-workspace-uml.md) | Existing canonical relationships, read models, invariants, and deferred schema concepts |
+| [Project workspace BPMN](diagrams/proposed/02-project-centric-workspace-bpmn.md) | Project-, inventory-, and parcel-originated flows plus reporting and lifecycle exceptions |
+| [Project workspace user stories](stories/08-project-workspace.md) | Observable acceptance criteria for the migration-free first slice |
+
 ## Developer Setup
 
 See the main [README](../README.md) for Docker-based local setup, seed commands, and running tests.
