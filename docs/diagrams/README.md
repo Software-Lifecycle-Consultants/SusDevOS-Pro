@@ -1,9 +1,9 @@
 # SusDevOS — Architecture Diagram Set
 
-Technical-review diagrams for the SusDevOS platform. Every diagram on these pages was
-derived by reading the code in `backend/apps/`, `backend/tasks/`, `backend/config/` and
-`frontend/src/` — **not** from `spec/`. Where the code and a spec document disagree, these
-diagrams follow the code and the divergence is called out in a *Divergence* note.
+Technical-review diagrams for the SusDevOS platform. The numbered UML and BPMN sets describe
+the current implementation and were derived by reading `backend/apps/`, `backend/tasks/`,
+`backend/config/`, and `frontend/src/` — **not** from `spec/`. The `proposed/` directory is a
+separate design-gate area and is always labelled as target behavior that is not yet implemented.
 
 All diagrams are Mermaid, embedded in Markdown. They render natively in GitHub, in the
 VS Code Markdown preview, and in the published Artifact version. No tooling required.
@@ -12,9 +12,9 @@ VS Code Markdown preview, and in the published Artifact version. No tooling requ
 
 ## Companion: user stories
 
-[`docs/stories/`](../stories/README.md) is the behavioural specification — 98 stories covering
-what the system does, each linked to the diagram that shows its mechanism, plus a backlog of
-known gaps. Every diagram here carries a **Related user stories** line back to them.
+[`docs/stories/`](../stories/README.md) is the behavioural specification — 106 stories covering
+current behavior, known gaps, and explicitly proposed behavior. Each links to the current or
+target diagram that explains its mechanism.
 
 Diagrams answer *how it works*; stories answer *what it must do*.
 
@@ -70,6 +70,16 @@ see the [findings register](FINDINGS.md) for the full before/after detail on eac
 | 05 | [Report generation & delivery](bpmn/05-report-generation.md) | User, API, Celery worker, S3/MinIO |
 | 06 | [Nature tracking — removals & restoration](bpmn/06-nature-tracking.md) | Project Manager, System, GBIF |
 
+### Proposed design gates — not implemented
+
+| # | Document | What must be agreed before code changes |
+|---|----------|------------------------------------------|
+| 01 | [Project-centric workspace UML](proposed/01-project-centric-workspace-uml.md) | Canonical ownership, read-model boundary, deferred schema concepts |
+| 02 | [Project-centric workspace BPMN](proposed/02-project-centric-workspace-bpmn.md) | Project, inventory, parcel, report, and lifecycle user flows |
+
+These documents are excluded from the current-state atlas until the decision is accepted. Their
+source remains reviewable in GitHub and VS Code, and their Mermaid blocks are compiler-checked.
+
 ---
 
 ## Notation legend
@@ -119,8 +129,8 @@ support external frameworks (market-based Scope 2, for instance) are in scope an
 
 Two machine checks back this set, both re-run after every edit:
 
-- **Mermaid** — all 58 diagram definitions are parsed with the Mermaid compiler; a diagram that
-  would render as an error box fails the check.
+- **Mermaid** — all 58 current-state definitions and 7 proposed definitions are parsed with the
+  Mermaid compiler; a diagram that would render as an error box fails the check.
 - **Field names** — every attribute asserted in a `classDiagram` is cross-checked against the
   live Django model fields. This caught 38 invented or misnamed attributes on the first run;
   the set is now at 283 claims, 0 suspect.
@@ -134,10 +144,10 @@ These are hand-authored from source. When the domain model changes, the diagram 
 is the one whose *Source* footer names the file you touched — each diagram lists the exact
 files it was derived from.
 
-`atlas.html` in this folder is a generated single-page rendering of every document here —
-open it directly in a browser to read all 58 diagrams with no Mermaid tooling installed. It is
-built from the Markdown sources, so treat the `.md` files as authoritative and regenerate the
-page rather than editing it.
+`atlas.html` in this folder is a generated single-page rendering of the 58 current-state
+diagrams. Proposed design-gate diagrams are intentionally excluded until accepted, so the atlas
+cannot accidentally present a target model as live behavior. Treat the `.md` files as
+authoritative and regenerate the page rather than editing it.
 
 ## Viewing the diagrams
 
