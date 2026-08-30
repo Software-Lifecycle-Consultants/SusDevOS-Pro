@@ -259,7 +259,7 @@ export default function OffsetsPage() {
         ) : offsets.length === 0 ? (
           <EmptyState
             message="No carbon offsets yet."
-            action={{ label: "+ New offset", href: "#" }}
+            action={{ label: "+ New offset", onClick: () => setShowCreate(true) }}
           />
         ) : (
           <table className="table-auto w-full">

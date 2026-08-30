@@ -70,18 +70,28 @@ def test_ecosystem_not_visible_to_other_entity(auth_client, entity, enable_featu
     assert "Mangrove A" not in names
 
 
-# ── Feature gate (CLAUDE.md rule #6: server-enforced, not frontend-only) ───────
+# ── Feature gate (off by default; machinery kept and still exercised) ───────
 
 
-def test_ecosystem_create_denied_without_feature(auth_client, entity):
-    """Ecosystem tracking is Starter+ — a Free entity is denied at the API."""
+def test_ecosystem_create_allowed_without_any_plan(auth_client, entity):
+    """Ecosystem tracking ships on every plan under service-tier packaging."""
+    resp = auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
+    assert resp.status_code == status.HTTP_201_CREATED, resp.data
+
+
+def test_ecosystem_list_allowed_without_any_plan(auth_client, entity):
+    resp = auth_client.get(ECO_URL)
+    assert resp.status_code == status.HTTP_200_OK, resp.data
+
+
+def test_ecosystem_gate_still_denies_when_enforcement_is_switched_on(
+    auth_client, entity, settings
+):
+    """Gating is off by default; flipping the switch must still deny."""
+    settings.FEATURE_GATES_ENABLED = True
     resp = auth_client.post(ECO_URL, {"EcosystemName": "Mangrove A"}, format="json")
     assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
-
-
-def test_ecosystem_list_denied_without_feature(auth_client, entity):
-    resp = auth_client.get(ECO_URL)
-    assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED, resp.data
+    assert resp.data["feature"] == "ecosystem_basic"
 
 
 # ── Audit logging (TenantViewSetMixin behaviour gain) ───────────────────────

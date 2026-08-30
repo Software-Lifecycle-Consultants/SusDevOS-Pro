@@ -98,7 +98,7 @@ export default function ReportsPage() {
         ) : jobs.length === 0 ? (
           <EmptyState
             message="No reports yet. Generate your first GHG inventory report."
-            action={{ label: "+ Generate report", href: "#" }}
+            action={{ label: "+ Generate report", onClick: () => setShowQueue(true) }}
           />
         ) : (
           <table className="table-auto w-full">

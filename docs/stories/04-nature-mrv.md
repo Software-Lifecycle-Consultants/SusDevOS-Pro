@@ -21,30 +21,71 @@ in the codebase inspects `IUCNStatus` at all.
 
 | | |
 |---|---|
-| **Status** | 🟡 Partial |
-| **Role** | Staff and above (`land_parcel_gis` feature required) |
+| **Status** | ✅ Built |
+| **Role** | Staff and above |
 | **Diagram** | [UML 04 §Land & ecosystem](../diagrams/uml/04-domain-nature-mrv.md) · [BPMN 06](../diagrams/bpmn/06-nature-tracking.md) |
-| **Code** | `backend/apps/land/models.py` · `LandParcels.BoundaryGeoJSON` · `backend/apps/land/views.py` · `LandParcelsViewSet` |
-| **Tests** | `backend/apps/land/tests/test_feature_gate.py` |
+| **Code** | `backend/apps/land/models.py` · `backend/apps/land/geo.py` · `backend/apps/land/integrations.py` · `backend/apps/land/serializers.py` · `backend/apps/land/views.py` · `frontend/src/components/land/MapPicker.tsx` |
+| **Tests** | `backend/apps/land/tests/test_boundary_area.py` · `backend/apps/land/tests/test_geocode.py` · `backend/apps/land/tests/test_feature_gate.py` |
 | **Linear** | `area:nat` · `type:spec` |
 
 **Acceptance criteria**
 
-1. **Given** the `land_parcel_gis` feature is enabled on the entity's plan, **when**
+*Defining the parcel*
+
+1. **Given** any authenticated tenant — no plan feature required — **when**
    `POST /api/land-parcels/` is called with `ParcelName` (and optionally `BoundaryGeoJSON`,
    `AreaHectares`), **then** the response is `201` with `EntityId` set from
-   `request.entity_id` (`test_create_land_parcel_allowed_with_feature`).
-2. **Given** the feature is not enabled, **when** `POST` or `GET /api/land-parcels/` is
-   called, **then** the response is `402` with `code == "feature_gated"`
-   (`test_create_land_parcel_denied_without_feature`,
-   `test_list_land_parcels_denied_without_feature`).
-3. **Given** `BoundaryGeoJSON` is a plain `JSONField` storing a GeoJSON polygon — not a
-   PostGIS `GeometryField`, despite CLAUDE.md describing the stack as
-   "PostgreSQL/PostGIS 3.4" — **then** there is no server-side geometry validation, spatial
-   indexing, or spatial query support on this field today.
+   `request.entity_id` (`test_create_land_parcel_allowed_without_any_plan`).
+2. **Given** the user draws a boundary on the map, **when** they click corner by corner,
+   **then** each click adds a vertex, any vertex can be dragged to adjust it, and the
+   enclosed area updates live in hectares beside the map.
+3. **Given** a polygon boundary is submitted with no `AreaHectares`, **when** it is saved,
+   **then** the server derives `AreaHectares` from the geometry so the figure always matches
+   the shape (`test_polygon_without_an_area_derives_one`). A `null` area counts as absent,
+   because the create form always sends the key
+   (`test_null_area_alongside_a_polygon_still_derives`).
+4. **Given** a non-empty `AreaHectares` is submitted alongside the boundary, **when** it is
+   saved, **then** the supplied value wins — a legal title area may legitimately differ from
+   the mapped shape (`test_explicit_area_overrides_the_polygon`).
+5. **Given** the boundary is a `Point` pin or a line, **when** it is saved, **then**
+   `AreaHectares` is left untouched rather than zeroed — those shapes enclose no area
+   (`test_point_pin_leaves_area_empty`).
+6. **Given** an existing parcel is re-drawn, **when** only `BoundaryGeoJSON` is `PATCH`ed,
+   **then** the area is recomputed (`test_redrawing_the_boundary_updates_the_area`); editing
+   an unrelated field leaves it alone (`test_editing_an_unrelated_field_leaves_the_area_alone`).
+7. **Given** `BoundaryGeoJSON` is not a GeoJSON object, **when** it is submitted, **then**
+   the response is `400` naming the field rather than storing unrenderable JSON
+   (`test_non_geojson_boundary_is_rejected`).
 
-*Note: no test posts or asserts against `BoundaryGeoJSON` itself — only feature-gated
-parcel creation without a boundary is exercised.*
+*Finding the site*
+
+8. **Given** the user types at least three characters into the map search box, **when** the
+   debounce elapses, **then** `GET /api/land-parcels/geocode/?q=` returns candidate places
+   and selecting one fits the map to its bounding box, or centres on it when the provider
+   gives no box (`test_returns_matches`).
+9. **Given** the geocoding provider is down or slow, **when** a search runs, **then** the
+   response is `200` with an empty list rather than a `500` — a search box that finds nothing
+   beats a broken page (`test_provider_outage_is_an_empty_list_not_a_500`).
+10. **Given** the lookup proxies Nominatim, **when** it calls out, **then** it sends an
+    identifying `User-Agent` and caches results, so the tenant's browser never contacts the
+    provider directly and the 1 req/sec policy is respected
+    (`test_sends_an_identifying_user_agent`, `test_repeat_query_is_served_from_cache`). The
+    endpoint is throttled at `30/min` per user.
+11. **Given** the user clicks *My location*, **when** the browser grants permission, **then**
+    the map centres on their position; a denial shows a message pointing at the search box
+    instead of failing silently.
+
+*Known limits*
+
+12. **Given** `BoundaryGeoJSON` is a plain `JSONField` storing GeoJSON — not a PostGIS
+    `GeometryField`, despite CLAUDE.md describing the stack as "PostgreSQL/PostGIS 3.4" —
+    **then** there is no spatial indexing or spatial query support on this field. Area is
+    computed in Python (`apps/land/geo.py`) using the same spherical-excess formula the
+    browser uses, so the live readout and the stored value agree; validation is structural
+    (is it GeoJSON?) rather than geometric (is the ring simple and non-self-intersecting?).
+13. **Given** gating is switched back on (`FEATURE_GATES_ENABLED=True`) and the plan lacks
+    `land_parcel_gis`, **when** the API is called, **then** the response is `402`
+    (`test_gate_still_denies_when_enforcement_is_switched_on`).
 
 ---
 
@@ -353,7 +394,7 @@ that didn't happen.
 | | |
 |---|---|
 | **Status** | ✅ Built |
-| **Role** | Staff and above (standalone route is feature-gated; nested route is not) |
+| **Role** | Staff and above (neither route is gated; the standalone route declares an inert `carbon_offsets` gate) |
 | **Diagram** | [UML 03 §Inventory and emissions records](../diagrams/uml/03-domain-ghg.md) · [BPMN 04 §Offset capture](../diagrams/bpmn/04-carbon-credit-mrv.md) |
 | **Code** | `frontend/src/app/(app)/offsets/page.tsx` · `backend/apps/emissions/serializers.py` · `StandaloneEmissionsOffsetsSerializer` · `backend/apps/emissions/views.py` |
 | **Tests** | `backend/apps/emissions/tests/test_offset_validation.py` · `backend/apps/emissions/tests/test_relationship_integrity.py` (`TestStandaloneOffsetIntegrity`) |
@@ -367,7 +408,7 @@ that didn't happen.
    response is `201` with `RegistryValidationStatus == "unverified"` by default
    (`test_add_offset_to_record`).
 2. **Given** the nested offsets endpoint requires no billing feature — unlike the
-   standalone `/api/emissions-offsets/`, gated by `carbon_offsets` — **when** any
+   standalone `/api/emissions-offsets/`, which declares `carbon_offsets` but is inert while gating is off — **when** any
    authenticated tenant member with access to the parent record posts an offset, **then**
    it succeeds regardless of plan.
 3. **Given** a `POST` targeting another entity's emissions record, **then** the response is

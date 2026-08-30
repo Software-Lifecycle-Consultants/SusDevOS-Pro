@@ -109,7 +109,7 @@ function InviteModal({ onClose, entityId }: { onClose: () => void; entityId: num
               ))}
             </select>
             <p className="mt-1 text-xs text-surface-400">
-              They'll receive an email with a link to set their password.
+              They&apos;ll receive an email with a link to set their password.
             </p>
           </div>
           <div className="flex justify-end gap-2 pt-1">

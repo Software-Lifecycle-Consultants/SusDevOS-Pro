@@ -147,7 +147,7 @@ export default function ProjectsPage() {
         ) : projects.length === 0 ? (
           <EmptyState
             message="No projects yet. Create your first project to start tracking emissions."
-            action={{ label: "+ New project", href: "#" }}
+            action={{ label: "+ New project", onClick: () => setShowCreate(true) }}
           />
         ) : (
           <table className="table-auto w-full">

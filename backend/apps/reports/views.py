@@ -26,12 +26,15 @@ class ReportJobsViewSet(EntityScopeInitialMixin, ModelViewSet):
         return ReportJobCreateSerializer if self.action == "create" else ReportJobSerializer
 
     def _require_export_feature(self, fmt):
-        """CSV/JSON export is a Starter+ feature (``report_csv_json_export``).
+        """CSV/JSON export gate (``report_csv_json_export``) — disabled.
 
-        PDF reports stay available on all plans, so only the machine-readable
-        export formats are gated. The Celery renderer produces any requested
-        format regardless of the frontend, so the gate must live on the write
-        path (CLAUDE.md rule #6: gates are server-enforced, not frontend-only)."""
+        Only the machine-readable export formats were ever gated; PDF is on every
+        plan. The Celery renderer produces any requested format regardless of the
+        frontend, so the gate lives on the write path rather than the UI.
+        Inert by default: settings.FEATURE_GATES_ENABLED is False, so
+        is_feature_enabled() returns True for everyone. Kept wired up so
+        gating can be switched back on without re-plumbing the write path.
+        """
         if fmt not in ("csv", "json"):
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS

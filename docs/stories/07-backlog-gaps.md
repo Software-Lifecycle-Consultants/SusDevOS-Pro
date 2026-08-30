@@ -128,23 +128,42 @@ would stop them dead. Segregation of duties is a policy question, not a defect.
 
 <a id="sdo-gap-04"></a>
 
-### SDO-GAP-04 · Entity provisioning fails open where feature gates fail closed
+### SDO-GAP-04 · No plan limit is enforced anywhere
 
 **As a** platform owner
-**I want** one consistent answer to "what happens when no plan resolves"
-**so that** limits cannot be bypassed by putting an account into an unresolvable state.
+**I want** the limits I sell to actually bind
+**so that** a tier means something operationally, not just on the pricing page.
 
 | | |
 |---|---|
-| **Status** | ❓ Undecided — product decision |
+| **Status** | ⬜ Gap — nothing enforces plan limits |
 | **Diagram** | [UML 05 — gate enforcement](../diagrams/uml/05-domain-platform.md) |
-| **Code** | `backend/apps/billing/services.py` · `can_add_entity()` |
+| **Code** | `backend/apps/billing/services.py` · `can_add_entity()` · `record_api_call()` |
 | **Linear** | [SUS-15](https://linear.app/susdevos/issue/SUS-15) · `area:bil` · `type:decision` · `risk:billing` |
 
-`is_feature_enabled()` and `record_api_call()` deny when no entitled subscription resolves.
-`can_add_entity()` returns `True` in the same situation. The asymmetry is pre-existing,
-now routed through the shared `get_entitled_subscription()` helper and commented, but
-deliberately left unchanged because it is a commercial decision rather than a bug.
+Originally filed as an *asymmetry*: `is_feature_enabled()` and `record_api_call()` fail
+closed when no entitled subscription resolves, while `can_add_entity()` fails open.
+
+Re-checked when per-capability gating was switched off, and the finding is larger than the
+asymmetry. **`can_add_entity()` and `record_api_call()` have no callers anywhere in the
+codebase**, and `MaxUsersPerEntity` / `MaxReportingYears` are stored, seeded and serialized
+but never compared against anything. `record_api_call()` was wired to the API-key path,
+which went away when customer API access was disabled. So today:
+
+| Limit | Enforced? |
+|---|---|
+| `MaxEntities` | No — `can_add_entity()` is never called |
+| `MaxApiCallsPerDay` | No — `record_api_call()` is never called, and there is no customer API |
+| `MaxUsersPerEntity` | No — never compared |
+| `MaxReportingYears` | No — never compared |
+
+This matters more now, not less: with capability gating off, these quantitative limits are
+the *only* thing a service/hosting tier could be built on. The fail-open/fail-closed
+question is downstream of first giving the helpers a caller.
+
+The grace-period policy they resolve through (`get_entitled_subscription()`, FIX F8) is
+tested and correct — see `backend/apps/billing/tests/test_entitlement.py` — so the
+behaviour is pinned and ready for whenever the limits are wired in.
 
 **Acceptance criteria**
 

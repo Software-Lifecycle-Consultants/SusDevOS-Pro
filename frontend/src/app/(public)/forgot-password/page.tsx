@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
       <>
         <h1 className="mb-2 text-xl font-semibold text-surface-900">Check your email</h1>
         <p className="mb-6 text-sm text-surface-500">
-          If <strong>{email}</strong> has an account, you'll receive a reset link shortly.
+          If <strong>{email}</strong> has an account, you&apos;ll receive a reset link shortly.
           The link expires in 2 hours.
         </p>
         <Link href="/login" className="btn-primary w-full text-center block py-2">
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
     <>
       <h1 className="mb-2 text-xl font-semibold text-surface-900">Forgot password</h1>
       <p className="mb-6 text-sm text-surface-500">
-        Enter your account email and we'll send a reset link.
+        Enter your account email and we&apos;ll send a reset link.
       </p>
 
       {error && (

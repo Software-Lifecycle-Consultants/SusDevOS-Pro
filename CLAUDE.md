@@ -61,7 +61,13 @@ All design decisions are documented in `spec/`. Read the relevant spec before im
 
 **Calculations:** All GHG calculations are server-side only. `EmissionsData.save()` override triggers calculation. Client-submitted `EmissionsAmount` values are overwritten. See `spec/ghg_calculation_spec.md` §13.
 
-**Feature gates:** `FeatureGateMixin` on views checks `PlanFeatures` table. Returns HTTP 402 Payment Required with `{"code": "feature_gated", "feature": "...", "detail": "...", "upgrade_url": "/pricing"}` which the frontend renders as an upgrade modal.
+**Feature gates — currently OFF.** Plans are sold on **service and hosting tiers** (seats, entities, reporting years, support level), not on which capabilities unlock, so every authenticated tenant gets the full feature set. `settings.FEATURE_GATES_ENABLED` (default `False`) short-circuits `FeatureGateMixin` and `is_feature_enabled()`.
+
+The machinery is kept, not deleted: with the switch on, `FeatureGateMixin` checks `PlanFeatures` and returns HTTP 402 Payment Required with `{"code": "feature_gated", "feature": "...", "detail": "...", "upgrade_url": "/pricing"}`, which the frontend renders as an upgrade modal. Tests cover both states, so gating can be reintroduced by flipping the flag.
+
+**Plan limits are unaffected by the switch** — `MaxEntities`, `MaxUsersPerEntity`, `MaxReportingYears` and `MaxApiCallsPerDay` resolve through `get_active_plan()`, not `is_feature_enabled()`.
+
+**But no plan limit is enforced today.** `can_add_entity()` and `record_api_call()` exist in `apps/billing/services.py` with **no callers**; `MaxUsersPerEntity` and `MaxReportingYears` are stored and seeded but never compared. Wiring these up is outstanding work, not something the gate switch removed.
 
 **Migrations:** Numbered 0010–0028 in `backend/migrations/`. Each app's own migrations live in `apps/{app}/migrations/`. The numbered series in `backend/migrations/` are design-phase reference migrations — actual Django migrations belong in each app.
 
@@ -76,7 +82,7 @@ All design decisions are documented in `spec/`. Read the relevant spec before im
 3. **Verified inventories are immutable.** `GHGInventories.VerificationStatus >= 3` → reject edits with HTTP 403.
 4. **Biogenic CO2 is NOT in the GWP total.** It goes in `BiogenicCO2AmountTonnes` and is reported separately.
 5. **Scope 2 requires both methods.** Always compute both `EmissionsAmountLocationBased` and `EmissionsAmountMarketBased`.
-6. **Feature gates are server-enforced.** Never rely on frontend-only gating.
+6. **Do not add new per-capability feature gates.** Packaging is by service and hosting tier. If gating ever returns, it is server-enforced — never frontend-only — via `FeatureGateMixin`, which is kept but switched off.
 
 ## Running locally
 

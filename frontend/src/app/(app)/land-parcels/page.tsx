@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Map, List, X, MapPin, FileText } from "lucide-react";
@@ -66,6 +66,11 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
   });
   const [geoError, setGeoError] = useState<string | null>(null);
   const [error, setError]       = useState<string | null>(null);
+  // Once the user types an area, drawing must stop overwriting it: a legal title
+  // area can legitimately differ from the mapped shape. The server applies the
+  // same rule, deriving AreaHectares only when the payload carries none.
+  const [areaTouched, setAreaTouched] = useState(false);
+  const [derivedArea, setDerivedArea] = useState<number | null>(null);
   const headers = { "X-Entity-ID": String(entityId) };
 
   const mutation = useMutation({
@@ -110,6 +115,15 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
   function handleMapChange(geojson: string) {
     set("BoundaryGeoJSON", geojson);
   }
+
+  const handleAreaFromMap = useCallback((hectares: number | null) => {
+    setDerivedArea(hectares);
+    if (hectares === null) return;
+    setAreaTouched((touched) => {
+      if (!touched) setForm((f) => ({ ...f, AreaHectares: hectares.toFixed(4) }));
+      return touched;
+    });
+  }, []);
 
   const hasLocation = !!form.BoundaryGeoJSON.trim();
 
@@ -176,7 +190,20 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
                   <div>
                     <label className="label mb-1">Area (hectares)</label>
                     <input className="input" type="number" step="any" min="0" placeholder="0.00"
-                      value={form.AreaHectares} onChange={(e) => set("AreaHectares", e.target.value)} />
+                      value={form.AreaHectares}
+                      onChange={(e) => { setAreaTouched(true); set("AreaHectares", e.target.value); }} />
+                    {derivedArea !== null && !areaTouched && (
+                      <p className="mt-1 text-xs text-brand-600">Calculated from the boundary you drew.</p>
+                    )}
+                    {derivedArea !== null && areaTouched && (
+                      <p className="mt-1 text-xs text-surface-400">
+                        Drawn boundary measures {derivedArea.toFixed(2)} ha.{" "}
+                        <button type="button" className="underline hover:text-surface-600"
+                          onClick={() => { setAreaTouched(false); set("AreaHectares", derivedArea.toFixed(4)); }}>
+                          Use it
+                        </button>
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -217,10 +244,17 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
             {tab === "location" && (
               <div className="space-y-4">
                 <div>
-                  <label className="label mb-1.5">Click the map to pin this parcel&apos;s location</label>
-                  <MapPicker value={form.BoundaryGeoJSON} onChange={handleMapChange} />
+                  <label className="label mb-1.5">Find the site, then pin it or draw its boundary</label>
+                  <MapPicker
+                    value={form.BoundaryGeoJSON}
+                    onChange={handleMapChange}
+                    onAreaChange={handleAreaFromMap}
+                    entityId={entityId}
+                  />
                   <p className="mt-1.5 text-xs text-surface-400">
-                    Click anywhere on the map to drop a pin. For precise polygon boundaries, paste GeoJSON below.
+                    Search for a place or use your current location to get there. <strong>Pin</strong> drops a
+                    single marker; <strong>Draw area</strong> traces the boundary corner by corner and fills in
+                    the area for you. Already have the geometry? Paste it below.
                   </p>
                 </div>
 
@@ -349,7 +383,7 @@ export default function LandParcelsPage() {
           {isLoading ? (
             <div className="p-6 text-sm text-surface-500">Loading…</div>
           ) : parcels.length === 0 ? (
-            <EmptyState message="No land parcels yet." action={{ label: "+ New parcel", href: "#" }} />
+            <EmptyState message="No land parcels yet." action={{ label: "+ New parcel", onClick: () => setShowCreate(true) }} />
           ) : (
             <table className="table-auto w-full">
               <thead>

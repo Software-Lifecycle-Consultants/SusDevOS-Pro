@@ -8,11 +8,13 @@ Covers the full workflow for GHGInventories:
   - PATCH after verification → 403 verified_immutable
   - DELETE after verification → 403 verified_immutable
   - POST  /api/ghg-inventories/{id}/unlock/ (SuperAdmin only, reason required)
-  - Feature gate: entity without plan → HTTP 402 feature_gated
+  - Feature gate: off by default, still contract-tested when switched on
 
-The inventory API uses FeatureGateMixin (required_feature="ghg_inventory_formal"),
-so tests that use auth_client must have the feature enabled on the entity's plan.
-SuperAdmin (sa_client) bypasses the gate automatically.
+The inventory API still declares FeatureGateMixin (required_feature=
+"ghg_inventory_formal"), but per-capability gating is disabled platform-wide
+(settings.FEATURE_GATES_ENABLED, default False) now that plans are sold on
+service and hosting tiers. No feature grant is needed to reach the API; the
+tests that flip the switch keep the 402 contract from rotting.
 """
 
 from decimal import Decimal
@@ -528,27 +530,40 @@ class TestInventoryUnlock:
 
 
 class TestInventoryFeatureGate:
-    def test_entity_without_plan_gets_402(self, gwp_dataset):
-        """
-        An entity that has no active subscription with 'ghg_inventory_formal'
-        must receive HTTP 402 with code='feature_gated', not a silent pass.
-        """
+    @staticmethod
+    def _client_for_a_planless_entity():
+        """A brand-new entity with no subscription and no PlanFeatures rows."""
         from rest_framework_simplejwt.tokens import RefreshToken
 
         from apps.entities.tests.factories import EntitiesFactory
         from apps.users.tests.factories import UsersFactory
 
-        ungated_entity = EntitiesFactory(EntityName="Free Tier Corp")
+        planless = EntitiesFactory(EntityName="Free Tier Corp")
         user = UsersFactory(
-            EntityId=ungated_entity, email="free@freetier.com", username="free_user"
+            EntityId=planless, email="free@freetier.com", username="free_user"
         )
         client = APIClient()
         client.credentials(
             HTTP_AUTHORIZATION=f"Bearer {RefreshToken.for_user(user).access_token}",
-            HTTP_X_ENTITY_ID=str(ungated_entity.EntityId),
+            HTTP_X_ENTITY_ID=str(planless.EntityId),
         )
+        return client
 
-        resp = client.get(INV_URL)
+    def test_entity_without_plan_can_use_inventories(self, gwp_dataset):
+        """No subscription is needed to reach the inventory API.
+
+        Formal inventories were gated behind ``ghg_inventory_formal`` until
+        packaging moved to service and hosting tiers.
+        """
+        resp = self._client_for_a_planless_entity().get(INV_URL)
+        assert resp.status_code == status.HTTP_200_OK, resp.data
+
+    def test_gate_still_returns_the_402_contract_when_switched_on(
+        self, gwp_dataset, settings
+    ):
+        """The 402 payload the frontend upgrade modal reads must survive intact."""
+        settings.FEATURE_GATES_ENABLED = True
+        resp = self._client_for_a_planless_entity().get(INV_URL)
         assert resp.status_code == status.HTTP_402_PAYMENT_REQUIRED
         assert resp.data.get("code") == "feature_gated"
         assert resp.data.get("feature") == "ghg_inventory_formal"

@@ -137,11 +137,19 @@ is created, because `EntityCreateSerializer` attaches the free plan on creation.
 
 ### Gate enforcement path
 
+> **⚪ Currently switched off.** `settings.FEATURE_GATES_ENABLED` defaults to `False`, so
+> every request takes the `OFF` branch below and no capability is gated. Packaging moved to
+> service and hosting tiers. The path is kept and still tested from both positions of the
+> switch (`apps/billing/tests/test_entitlement.py`), so re-enabling gating is a settings
+> flip. See [SDO-BIL-03](../../stories/06-billing-platform.md#sdo-bil-03).
+
 ```mermaid
 flowchart LR
     REQ["Request to a gated view<br/>required_feature = scope_3"] --> INIT["FeatureGateMixin.initial()"]
     INIT --> SUPER["super().initial()<br/>auth + permissions first"]
-    SUPER --> SA{"IsSuperAdmin?"}
+    SUPER --> SW{"settings.<br/>FEATURE_GATES_ENABLED?"}
+    SW -->|"False (default)"| OFFP["Gating disabled<br/>proceed"]
+    SW -->|"True"| SA{"IsSuperAdmin?"}
     SA -->|"Yes"| PASS["SUPERADMIN_BYPASS<br/>proceed"]
     SA -->|"No"| EID{"request.entity_id<br/>present?"}
     EID -->|"No"| DENY
@@ -153,7 +161,14 @@ flowchart LR
 
     style DENY fill:#ffebee,stroke:#b71c1c,color:#000
     style PASS fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style OFFP fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style SW fill:#fff8e1,stroke:#f57f17,color:#000
 ```
+
+> The switch is read inside `is_feature_enabled()` **and** at the top of
+> `FeatureGateMixin._check_feature_gate()`. Both are needed: the `entity_id`-missing branch
+> denies without ever reaching `is_feature_enabled()`, so short-circuiting only the service
+> function would still have 402'd a request that arrived without an entity header.
 
 > **✅ F5 · Documentation drift — gate status code documented — fixed 2026-08-21.**
 > `CLAUDE.md` documented the gate's response body (`{"code": "feature_gated", ...}`) but not

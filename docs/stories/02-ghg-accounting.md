@@ -163,35 +163,40 @@ The core formula: `kg CO2e = quantity × emission_factor × GWP100`, `tonnes = k
 
 ---
 
-### SDO-GHG-06 · Scope 3 records carry a category 1–15 and are feature-gated
+### SDO-GHG-06 · Scope 3 records carry a category 1–15
 
-**As a** sustainability contributor on a paid plan
+**As a** sustainability contributor
 **I want** to record Scope 3 (value-chain) emissions with a GHG Protocol category
-**so that** the inventory can cover indirect emissions — while Free-plan tenants are prompted to upgrade rather than silently blocked.
+**so that** the inventory can cover indirect emissions.
 
 | | |
 |---|---|
-| **Status** | ✅ Built |
-| **Role** | Staff and above; requires the `scope_3` plan feature |
+| **Status** | ✅ Built — no longer gated |
+| **Role** | Staff and above |
 | **Diagram** | [BPMN 02 — Feature gate](../diagrams/bpmn/02-emissions-lifecycle.md) |
 | **Code** | `backend/apps/emissions/views.py` · `EmissionsDataViewSet._require_scope3_feature()` |
-| **Tests** | `backend/apps/emissions/tests/test_api.py::TestScope3FeatureGate` |
+| **Tests** | `backend/apps/emissions/tests/test_api.py::TestScope3UnderServiceTierPackaging` |
 | **Linear** | `area:ghg` · `type:billing` |
 
 **Acceptance criteria**
 
-1. **Given** an entity without the `scope_3` feature enabled,
+1. **Given** an entity with no subscription at all,
    **when** `POST /api/emissions/` is submitted with `Scope=3`,
-   **then** it is rejected `402` with `{"code": "feature_gated", "feature": "scope_3", ...}` (`test_create_scope3_denied_without_feature`) — per finding [F5](../diagrams/FINDINGS.md#f5), `CLAUDE.md` now documents this as `402`, not `403`.
-2. **Given** the same entity without `scope_3` enabled,
+   **then** it succeeds `201` (`test_create_scope3_allowed_without_any_plan`). Gating a whole
+   GHG Protocol scope sat badly with the product premise — a Scope 1/2-only inventory is not a
+   corporate footprint — so Scope 3 ships on every plan.
+2. **Given** the same entity,
    **when** `POST /api/emissions/` is submitted with `Scope=1` or `Scope=2`,
-   **then** it succeeds `201` — gating Scope 3 does not affect Scope 1/2, which stay available on every plan (`test_create_scope1_allowed_without_feature`).
+   **then** it succeeds `201` (`test_create_scope1_allowed_without_any_plan`).
 3. **Given** an existing Scope 1/2 record,
-   **when** it is `PATCH`ed to `{"Scope": 3}` on an entity without the feature,
-   **then** the update is rejected `402` — re-classifying into Scope 3 is gated exactly like creating one (`test_patch_record_to_scope3_denied_without_feature`).
-4. **Given** the entity has `scope_3` enabled via `PlanFeatures`,
+   **when** it is `PATCH`ed to `{"Scope": 3}`,
+   **then** the update succeeds `200` (`test_patch_record_to_scope3_allowed_without_any_plan`).
+4. **Given** `FEATURE_GATES_ENABLED` is switched back on and the entity lacks `scope_3`,
    **when** a Scope 3 record is created,
-   **then** it succeeds `201` (`test_create_scope3_allowed_with_feature`). The gate check is server-enforced on the write path, never left to the frontend (`CLAUDE.md` rule #6).
+   **then** it is rejected `402` with `{"code": "feature_gated", "feature": "scope_3", ...}`
+   (`test_gate_still_denies_when_enforcement_is_switched_on`). The gate is server-enforced on
+   the write path whenever it is on — per [F5](../diagrams/FINDINGS.md#f5) the status is `402`,
+   not `403`.
 
 ---
 

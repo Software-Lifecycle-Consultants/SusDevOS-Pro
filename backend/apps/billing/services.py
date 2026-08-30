@@ -5,6 +5,7 @@ Feature gate resolution lives here so it can be called from Celery tasks,
 management commands, and anywhere else that needs a plan check without an
 HTTP request object.
 """
+from django.conf import settings
 from django.utils import timezone
 
 ENTITLED_STATUSES = ("active", "trialing")
@@ -30,13 +31,31 @@ def get_entitled_subscription(*, entity_id: int):
     return None
 
 
+def feature_gates_enforced() -> bool:
+    """Whether per-capability feature gating is switched on.
+
+    Default OFF (settings.FEATURE_GATES_ENABLED): plans are sold on service and
+    hosting tiers, not on which capabilities unlock. Read from settings on every
+    call rather than captured at import, so tests and any future reintroduction
+    can toggle it with override_settings.
+    """
+    return bool(getattr(settings, "FEATURE_GATES_ENABLED", False))
+
+
 def is_feature_enabled(*, entity_id: int, feature_key: str) -> bool:
     """
     Return True if the entity's active subscription includes the feature.
     Returns False for unknown entities, no active subscription, or gated features.
     SuperAdmin bypass is NOT applied here — callers handle that check.
+
+    When gating is switched off every feature reads as enabled, for every caller
+    including Celery tasks and management commands. Plan *limits* are unaffected:
+    they resolve through get_active_plan(), not this function.
     """
     from apps.billing.models import PlanFeatures
+
+    if not feature_gates_enforced():
+        return True
 
     sub = get_entitled_subscription(entity_id=entity_id)
     if sub is None:
