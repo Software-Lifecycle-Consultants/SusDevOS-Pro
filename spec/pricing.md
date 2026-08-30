@@ -1,5 +1,44 @@
 # Pricing Model Specification — SusDevOS
 
+> **STATUS: per-capability gating is OFF. This document is partly superseded.**
+>
+> Packaging is moving to **service and hosting tiers** — how much of the platform
+> you use and what level of service wraps it — rather than which product
+> capabilities unlock. `settings.FEATURE_GATES_ENABLED` defaults to `False`, so
+> every authenticated tenant gets the full feature set today.
+>
+> **The tier dimensions that survive** are the quantitative ones on the `Plans`
+> model: `MaxEntities`, `MaxUsersPerEntity`, `MaxReportingYears`,
+> `MaxApiCallsPerDay`, `AdditionalEntityPriceGBP` and `SupportTier`. These are what
+> service and hosting tiers should be built from.
+>
+> **None of them is enforced yet.** `can_add_entity()` and `record_api_call()` are
+> implemented in `apps/billing/services.py` but have no callers, and
+> `MaxUsersPerEntity` / `MaxReportingYears` are never compared anywhere. So the
+> entity/user/year rows of the matrix below describe intent, not current behaviour.
+> Wiring them up is open work — it is what "package by service tier" needs next.
+>
+> **No longer enforced:** every capability row — Scope 3, market-based Scope 2,
+> formal GHG inventories, land-parcel GIS, ecosystem tracking, carbon offsets and
+> CSV/JSON export are available on all plans. The `PlanFeatures` table, the
+> `FeatureGateMixin` and the HTTP 402 contract are kept and still tested, so gating
+> is a settings flip rather than a rebuild.
+>
+> **Direction agreed, lineup on hold.** Tiers will be priced on **the number of
+> entities and the number of projects** a plan supports. The tier lineup below
+> (Free / Starter / Professional / Agency / Enterprise, with the prices shown) was
+> built around capability gating and is *not* the replacement — it is left as
+> written rather than rewritten speculatively, pending a proper packaging analysis.
+> Treat the prices and tier names here as historical.
+>
+> Two things that analysis will need to account for:
+>
+> * `Plans.MaxEntities` exists; **there is no project-count field**. Pricing on
+>   projects means adding one (`MaxProjects`) and a limit check on
+>   `DevelopmentProjects` creation.
+> * Neither axis is enforced today — see the gap note above. Pricing on entities and
+>   projects only means something once the limits actually bind.
+
 ---
 
 ## Model Summary
@@ -43,6 +82,10 @@ Sustainability managers are often solo or in a team of 2. Seat pricing underchar
 ---
 
 ## Feature Gate Matrix
+
+> Historical. Only the **Entities / Users per entity / Reporting years** rows are
+> enforced today; every capability row below reads as included on all plans while
+> `FEATURE_GATES_ENABLED` is `False`.
 
 `✓` = included, `—` = not available, `↑` = upgrade prompt shown
 
@@ -200,7 +243,11 @@ Stripe Smart Retries handles initial retries (days 1, 3, 5, 7). After all retrie
 
 ## Plan Enforcement — Application Layer
 
-Feature gate checks are done in a reusable Django mixin. Never rely on client-side checks alone.
+Feature gate checks are done in a reusable Django mixin. Never rely on client-side
+checks alone. The mixin below is still present and still tested, but is inert while
+`settings.FEATURE_GATES_ENABLED` is `False` — it returns early before any
+`PlanFeatures` lookup. The real implementation has drifted from this sketch; read
+`backend/apps/billing/mixins.py` for the current code.
 
 ```python
 # apps/billing/mixins.py

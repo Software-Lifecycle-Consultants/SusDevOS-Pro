@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "extends": ["next/core-web-vitals"],
+  "ignorePatterns": [
+    "src/lib/api/",
+    "src/types/api/",
+    "src/lib/schema.json",
+    ".next/",
+    "out/",
+    "next-env.d.ts"
+  ]
+}

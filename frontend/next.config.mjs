@@ -19,7 +19,11 @@ const SECURITY_HEADERS = [
   { key: "X-Content-Type-Options",   value: "nosniff" },
   { key: "X-Frame-Options",          value: "DENY" },
   { key: "Referrer-Policy",          value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy",       value: "camera=(), microphone=(), geolocation=()" },
+  // geolocation=(self): the land-parcel map offers a "My location" control, and
+  // geolocation=() would block navigator.geolocation for the whole origin — the
+  // button would fail in production while working on localhost. Camera and
+  // microphone stay fully disabled; nothing in the app uses them.
+  { key: "Permissions-Policy",       value: "camera=(), microphone=(), geolocation=(self)" },
   { key: "Content-Security-Policy",  value: CSP },
 ];
 

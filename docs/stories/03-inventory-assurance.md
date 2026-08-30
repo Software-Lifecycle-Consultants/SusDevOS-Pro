@@ -32,8 +32,8 @@ baseline, consolidation approach, and recorded GWP dataset
 
 **Acceptance criteria**
 
-1. **Given** an authenticated user whose entity has the `ghg_inventory_formal` feature
-   enabled, **when** they use the first-party form to submit `ReportingYear`,
+1. **Given** an authenticated user — no plan feature required, formal inventories ship on
+   every plan — **when** they use the first-party form to submit `ReportingYear`,
    `ReportingPeriodFrom`/`ReportingPeriodTo`, optional `BaselineYear` and `BoundaryNotes`,
    and `ConsolidationApproach`, **then** the response is `201`, all supplied boundary fields
    round-trip, and `VerificationStatus == 1` with `EntityId` taken only from the request.
@@ -44,10 +44,14 @@ baseline, consolidation approach, and recorded GWP dataset
    created, **then** the active default dataset is persisted on the inventory. If no active
    default exists, creation returns a field-specific HTTP 400 rather than storing an
    untraceable calculation basis.
-4. **Given** an entity without the `ghg_inventory_formal` feature, **when** it `GET`s or
-   `POST`s `/api/ghg-inventories/`, **then** the response is `402` with
-   `code == "feature_gated"` and `feature == "ghg_inventory_formal"`.
-5. **Given** a SuperAdmin user, **when** they access `/api/ghg-inventories/` on any entity,
+4. **Given** an entity with no subscription at all, **when** it `GET`s or `POST`s
+   `/api/ghg-inventories/`, **then** the response is `200`/`201`
+   (`test_entity_without_plan_can_use_inventories`) — gating is off, so no plan feature is
+   needed to run a formal inventory.
+5. **Given** `FEATURE_GATES_ENABLED` is switched back on and the entity lacks
+   `ghg_inventory_formal`, **then** the response is `402` carrying `code`, `feature`,
+   `detail` and `upgrade_url` (`test_gate_still_returns_the_402_contract_when_switched_on`).
+6. **Given** a SuperAdmin user, **when** they access `/api/ghg-inventories/` on any entity,
    **then** the feature gate is bypassed (`test_superadmin_bypasses_feature_gate`).
 
 ---

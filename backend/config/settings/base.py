@@ -155,6 +155,9 @@ REST_FRAMEWORK = {
         "anon":        "60/min",   # production.py tightens this to 10/min
         "user":        "300/min",  # production.py tightens this to 100/min
         "public_read": "60/min",   # public blog/sitemap — permissive for crawlers
+        # Map place-search proxies Nominatim, whose policy is 1 req/sec. Per-user
+        # ceiling so one tenant typing fast cannot burn the shared allowance.
+        "geocode":     "30/min",
     },
 }
 
@@ -274,10 +277,15 @@ DEFAULT_GWP_DATASET_ID = config("DEFAULT_GWP_DATASET_ID", default=1, cast=int)
 # tiers — seats, entities, reporting years, support level — not on which product
 # capabilities unlock, so every authenticated tenant gets the full feature set.
 #
-# This switch disables only PlanFeatures/402 gating. The quantitative plan limits
-# (MaxEntities, MaxUsersPerEntity, MaxReportingYears, MaxApiCallsPerDay) are
-# enforced elsewhere — can_add_entity() and record_api_call() resolve through
-# get_active_plan(), not is_feature_enabled() — and stay in force regardless.
+# This switch disables only PlanFeatures/402 gating. It does not touch the
+# quantitative plan limits (MaxEntities, MaxUsersPerEntity, MaxReportingYears,
+# MaxApiCallsPerDay), which resolve through get_active_plan() rather than
+# is_feature_enabled().
+#
+# Caveat: those limits are not actually enforced anywhere today. can_add_entity()
+# and record_api_call() are defined in apps/billing/services.py but have no
+# callers, and MaxUsersPerEntity / MaxReportingYears are never compared at all.
+# That gap pre-dates this switch and is unaffected by it, in either position.
 #
 # The gate machinery (FeatureGateMixin, PlanFeatures, the 402 contract) is kept
 # intact and tested so gating can be reintroduced by flipping this to True.
@@ -295,6 +303,18 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
 # Covered by apps/users/tests/test_frontend_urls.py.
 PASSWORD_RESET_URL = f"{FRONTEND_URL}/reset-password"
 ONBOARDING_URL     = f"{FRONTEND_URL}/onboard"
+
+# ── Geocoding (land-parcel map place search) ──────────────────────────────────────────
+
+# Nominatim needs no API key but its usage policy requires a User-Agent that
+# identifies the application and a contact URL. Swap NOMINATIM_URL for a
+# self-hosted or commercial endpoint without touching apps/land/integrations.py.
+NOMINATIM_URL = config(
+    "NOMINATIM_URL", default="https://nominatim.openstreetmap.org/search"
+)
+GEOCODER_USER_AGENT = config(
+    "GEOCODER_USER_AGENT", default=f"{SITE_NAME}/1.0 ({SITE_URL})"
+)
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 

@@ -2,6 +2,7 @@
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
 from apps.billing.mixins import FeatureGateMixin
@@ -12,14 +13,38 @@ from .serializers import LandParcelsDetailSerializer, LandParcelsListSerializer
 
 
 class LandParcelsViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
-    # GIS land-parcel mapping is a Professional+ feature (CLAUDE.md rule #6:
-    # feature gates are server-enforced, never frontend-only).
+    # Declared but inert: settings.FEATURE_GATES_ENABLED is False, so land parcels
+    # are available on every plan. Kept so gating is a settings flip, not a rewrite.
     required_feature = "land_parcel_gis"
     queryset = LandParcels.objects.all()
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         return LandParcelsListSerializer if self.action == "list" else LandParcelsDetailSerializer
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="geocode",
+        throttle_classes=[ScopedRateThrottle],
+    )
+    def geocode(self, request):
+        """Place-name search for the boundary map. GET ?q=<place>[&limit=n].
+
+        Reference lookup, not tenant data, so it is not entity-scoped — same shape
+        as the GBIF species search on SpeciesViewSet. Proxied rather than called
+        from the browser so the provider sees our User-Agent and cache, not the
+        tenant's IP.
+        """
+        from .integrations import search_places
+
+        try:
+            limit = int(request.query_params.get("limit", 5))
+        except (TypeError, ValueError):
+            limit = 5
+        return Response(search_places(request.query_params.get("q", ""), limit=limit))
+
+    geocode.throttle_scope = "geocode"
 
     @action(detail=True, methods=["get", "post"], url_path="ecosystems")
     def ecosystems(self, request, pk=None):

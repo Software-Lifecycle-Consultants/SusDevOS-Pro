@@ -8,11 +8,13 @@ Covers the full workflow for GHGInventories:
   - PATCH after verification → 403 verified_immutable
   - DELETE after verification → 403 verified_immutable
   - POST  /api/ghg-inventories/{id}/unlock/ (SuperAdmin only, reason required)
-  - Feature gate: entity without plan → HTTP 402 feature_gated
+  - Feature gate: off by default, still contract-tested when switched on
 
-The inventory API uses FeatureGateMixin (required_feature="ghg_inventory_formal"),
-so tests that use auth_client must have the feature enabled on the entity's plan.
-SuperAdmin (sa_client) bypasses the gate automatically.
+The inventory API still declares FeatureGateMixin (required_feature=
+"ghg_inventory_formal"), but per-capability gating is disabled platform-wide
+(settings.FEATURE_GATES_ENABLED, default False) now that plans are sold on
+service and hosting tiers. No feature grant is needed to reach the API; the
+tests that flip the switch keep the 402 contract from rotting.
 """
 
 from decimal import Decimal

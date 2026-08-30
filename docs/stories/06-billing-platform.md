@@ -65,11 +65,15 @@ Conventions, statuses and the story template are defined in [README.md](README.m
 
 | | |
 |---|---|
-| **Status** | ✅ Built — status code documented by [F5](../diagrams/FINDINGS.md#f5) |
+| **Status** | ✅ Built, ⚪ currently switched off |
 | **Diagram** | [UML 05 — gate enforcement path](../diagrams/uml/05-domain-platform.md) |
 | **Code** | `backend/apps/billing/mixins.py` · `backend/apps/shared/exceptions.py` |
-| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` · `backend/apps/reports/tests/test_feature_gate.py` |
+| **Tests** | `backend/apps/emissions/tests/test_ghg_inventory.py` · `backend/apps/reports/tests/test_feature_gate.py` · `backend/apps/billing/tests/test_entitlement.py` |
 | **Linear** | `area:bil` · `type:spec` |
+
+> **Gating is off.** `settings.FEATURE_GATES_ENABLED` defaults to `False` — plans are
+> sold on service and hosting tiers, not per capability. The criteria below describe the
+> gate as it behaves *when switched on*, which the tests still pin.
 
 **Acceptance criteria**
 

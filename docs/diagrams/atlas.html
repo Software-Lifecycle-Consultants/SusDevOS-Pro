@@ -1632,10 +1632,19 @@ entity gets a role, while the owning entity remains <code>DevelopmentProjects.En
 <p>Seeded state: 5 plans, 117 <code>PlanFeatures</code> rows. <code>seed_plans</code> must run <strong>before</strong> any entity
 is created, because <code>EntityCreateSerializer</code> attaches the free plan on creation.</p>
 <h3>Gate enforcement path</h3>
+<blockquote>
+<p><strong>⚪ Currently switched off.</strong> <code>settings.FEATURE_GATES_ENABLED</code> defaults to
+<code>False</code>, so every request takes the <code>OFF</code> branch below and no capability is gated.
+Packaging moved to service and hosting tiers. The path is kept and still tested from both
+positions of the switch (<code>apps/billing/tests/test_entitlement.py</code>), so re-enabling gating
+is a settings flip.</p>
+</blockquote>
 <figure class="plate"><div class="plate-scroll"><pre class="mermaid">flowchart LR
     REQ["Request to a gated view&lt;br/&gt;required_feature = scope_3"] --&gt; INIT["FeatureGateMixin.initial()"]
     INIT --&gt; SUPER["super().initial()&lt;br/&gt;auth + permissions first"]
-    SUPER --&gt; SA{"IsSuperAdmin?"}
+    SUPER --&gt; SW{"settings.&lt;br/&gt;FEATURE_GATES_ENABLED?"}
+    SW --&gt;|"False (default)"| OFFP["Gating disabled&lt;br/&gt;proceed"]
+    SW --&gt;|"True"| SA{"IsSuperAdmin?"}
     SA --&gt;|"Yes"| PASS["SUPERADMIN_BYPASS&lt;br/&gt;proceed"]
     SA --&gt;|"No"| EID{"request.entity_id&lt;br/&gt;present?"}
     EID --&gt;|"No"| DENY
@@ -1646,7 +1655,14 @@ is created, because <code>EntityCreateSerializer</code> attaches the free plan o
     RESP --&gt; UI["Frontend renders&lt;br/&gt;upgrade modal"]
 
     style DENY fill:#ffebee,stroke:#b71c1c,color:#000
-    style PASS fill:#e8f5e9,stroke:#1b5e20,color:#000</pre></div></figure><blockquote>
+    style PASS fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style OFFP fill:#e8f5e9,stroke:#1b5e20,color:#000
+    style SW fill:#fff8e1,stroke:#f57f17,color:#000</pre></div></figure><blockquote>
+<p>The switch is read inside <code>is_feature_enabled()</code> <strong>and</strong> at the top of
+<code>FeatureGateMixin._check_feature_gate()</code>. Both are needed: the <code>entity_id</code>-missing
+branch denies without ever reaching <code>is_feature_enabled()</code>, so short-circuiting only the
+service function would still have 402&#39;d a request that arrived without an entity header.</p>
+</blockquote><blockquote>
 <p><strong>✅ F5 · Documentation drift — gate status code documented — fixed 2026-08-21.</strong>
 <code>CLAUDE.md</code> documented the gate&#39;s response body (<code>{&quot;code&quot;: &quot;feature_gated&quot;, ...}</code>) but not
 its status code. The code raises <code>FeatureGatedException</code> carrying

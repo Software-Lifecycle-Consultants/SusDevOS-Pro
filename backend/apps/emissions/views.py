@@ -101,13 +101,15 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
         return None
 
     def _require_scope3_feature(self, validated_data):
-        """Scope 3 emissions accounting is a Starter+ feature (``scope_3``).
+        """Scope 3 gate (``scope_3``) — disabled under service-tier packaging.
 
         The record is calculated server-side regardless of the frontend, so the
-        gate must live on the write path, not just the UI (CLAUDE.md rule #6:
-        feature gates are server-enforced, never frontend-only). Scope 1 and 2
-        stay available on all plans, so this gates only the Scope 3 case rather
-        than the whole viewset."""
+        gate lives on the write path rather than the UI. It gates only the Scope 3
+        case rather than the whole viewset.
+        Inert by default: settings.FEATURE_GATES_ENABLED is False, so
+        is_feature_enabled() returns True for everyone. Kept wired up so
+        gating can be switched back on without re-plumbing the write path.
+        """
         if validated_data.get("Scope") != 3:
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
@@ -122,14 +124,17 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             )
 
     def _require_market_scope2_feature(self, validated_data):
-        """Market-based Scope 2 is a Starter+ feature (``scope_2_market_based``).
+        """Market-based Scope 2 gate (``scope_2_market_based``) — disabled.
 
-        Location-based Scope 2 is on every plan, so the gate triggers only when a
-        contractual/supplier market factor (``EFMarketBased``) is supplied on a
-        Scope 2 record — mirroring the ``scope_3`` gate. Rule #5 is unaffected:
-        both methods are still computed, and a Free-plan Scope 2 record simply
-        cannot set a distinct market factor (market falls back to location).
-        Server-enforced, never frontend-only (CLAUDE.md rule #6)."""
+        Triggers only when a contractual/supplier market factor (``EFMarketBased``)
+        is supplied on a Scope 2 record, mirroring the ``scope_3`` gate. While it
+        was enforced it pulled against rule #5: a gated tenant could not store a
+        distinct market factor, so market fell back to location and the dual
+        disclosure was not really available.
+        Inert by default: settings.FEATURE_GATES_ENABLED is False, so
+        is_feature_enabled() returns True for everyone. Kept wired up so
+        gating can be switched back on without re-plumbing the write path.
+        """
         if validated_data.get("Scope") != 2 or validated_data.get("EFMarketBased") is None:
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS

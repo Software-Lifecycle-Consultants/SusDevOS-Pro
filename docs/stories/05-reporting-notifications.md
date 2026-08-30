@@ -184,15 +184,15 @@ States: 1 Queued → 2 Processing → 3 Complete, or → 4 Failed.
 
 <a id="sdo-rep-08"></a>
 
-### SDO-REP-08 · Export format is gated by the entity's plan
+### SDO-REP-08 · Every export format is available to every tenant
 
-**As a** platform owner
-**I want** CSV and JSON export to be a paid capability
-**so that** the pricing tiers mean something.
+**As a** user on any plan
+**I want** CSV and JSON export alongside PDF
+**so that** I can take my own data into a spreadsheet or another system.
 
 | | |
 |---|---|
-| **Status** | ✅ Built |
+| **Status** | ✅ Built — no longer gated |
 | **Diagram** | [UML 05 — gate enforcement](../diagrams/uml/05-domain-platform.md) |
 | **Code** | `backend/apps/reports/views.py` · `_require_export_feature()` |
 | **Tests** | `backend/apps/reports/tests/test_feature_gate.py` |
@@ -200,9 +200,13 @@ States: 1 Queued → 2 Processing → 3 Complete, or → 4 Failed.
 
 **Acceptance criteria**
 
-1. **Given** an entity whose plan lacks the export feature, **when** it requests a CSV or JSON
-   report, **then** the response is 402 with `code = "feature_gated"`.
-2. **Given** a SuperAdmin, **when** they request the same, **then** the gate is bypassed.
+1. **Given** an entity with no subscription, **when** it requests a `csv`, `json` or `pdf`
+   report, **then** each is accepted `201`
+   (`test_every_export_format_allowed_without_any_plan`).
+2. **Given** `FEATURE_GATES_ENABLED` is switched back on and the plan lacks
+   `report_csv_json_export`, **when** a CSV report is requested, **then** the response is 402
+   with `code = "feature_gated"` (`test_gate_still_denies_csv_when_enforcement_is_switched_on`).
+3. **Given** a SuperAdmin, **when** they request the same, **then** the gate is bypassed.
 
 <a id="sdo-rep-09"></a>
 
