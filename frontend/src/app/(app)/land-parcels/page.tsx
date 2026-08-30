@@ -349,7 +349,7 @@ export default function LandParcelsPage() {
           {isLoading ? (
             <div className="p-6 text-sm text-surface-500">Loading…</div>
           ) : parcels.length === 0 ? (
-            <EmptyState message="No land parcels yet." action={{ label: "+ New parcel", href: "#" }} />
+            <EmptyState message="No land parcels yet." action={{ label: "+ New parcel", onClick: () => setShowCreate(true) }} />
           ) : (
             <table className="table-auto w-full">
               <thead>

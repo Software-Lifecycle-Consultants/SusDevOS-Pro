@@ -443,7 +443,7 @@ export default function EmissionsPage() {
         ) : records.length === 0 ? (
           <EmptyState
             message="No emissions records yet."
-            action={{ label: "+ New record", href: "#" }}
+            action={{ label: "+ New record", onClick: () => setShowCreate(true) }}
           />
         ) : (
           <table className="table-auto w-full">
