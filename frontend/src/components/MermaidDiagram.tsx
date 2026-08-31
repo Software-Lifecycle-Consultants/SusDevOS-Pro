@@ -20,7 +20,11 @@ export function MermaidDiagram({ chart, className }: Props) {
     let alive = true;
 
     import("mermaid").then(async ({ default: mermaid }) => {
-      mermaid.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "default",
+        securityLevel: "loose",
+      });
       try {
         const { svg } = await mermaid.render(id, chart);
         if (alive && ref.current) {
@@ -28,7 +32,8 @@ export function MermaidDiagram({ chart, className }: Props) {
           setReady(true);
         }
       } catch (err) {
-        if (alive) setError(err instanceof Error ? err.message : "Render failed");
+        if (alive)
+          setError(err instanceof Error ? err.message : "Render failed");
       }
     });
 
@@ -40,8 +45,12 @@ export function MermaidDiagram({ chart, className }: Props) {
   if (error) {
     return (
       <div className="rounded border border-red-200 bg-red-50 p-4">
-        <p className="mb-2 text-sm font-medium text-red-700">Diagram failed to render</p>
-        <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-surface-600">{chart}</pre>
+        <p className="mb-2 text-sm font-medium text-red-700">
+          Diagram failed to render
+        </p>
+        <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-surface-600">
+          {chart}
+        </pre>
       </div>
     );
   }
