@@ -38,10 +38,19 @@ class Command(BaseCommand):
             "--dry-run", action="store_true",
             help="Parse and report what would be imported without writing.",
         )
+        parser.add_argument(
+            "--if-empty", action="store_true",
+            help=(
+                "Do nothing if any factors already exist. For the deploy pipeline: "
+                "guarantees the library is never empty without putting GOV.UK in the "
+                "deploy path on every release."
+            ),
+        )
 
     def handle(self, *args, **options):
         from django.conf import settings
 
+        from apps.emissions.models import EmissionFactors
         from tasks.integrations.defra import (
             DefraImportError,
             download,
@@ -53,6 +62,15 @@ class Command(BaseCommand):
         year = options["year"]
         path = options["file"]
         url = options["url"]
+
+        # Checked before any network call, which is the whole point: a deploy of
+        # an already-populated instance must not depend on GOV.UK being up.
+        if options["if_empty"] and EmissionFactors.objects.exists():
+            self.stdout.write(
+                f"Factor library already populated "
+                f"({EmissionFactors.objects.count()} factors) — nothing to do."
+            )
+            return
 
         try:
             if path:

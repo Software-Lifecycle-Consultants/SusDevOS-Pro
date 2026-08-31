@@ -9,6 +9,8 @@ import io
 from decimal import Decimal
 from unittest.mock import patch
 
+from django.core.management import call_command
+
 import openpyxl
 import pytest
 import requests
@@ -247,3 +249,52 @@ class TestImportFactors:
     def test_refuses_to_import_nothing(self):
         with pytest.raises(DefraImportError, match="empty"):
             import_factors(rows=[], year=2026)
+
+
+# ── The deploy guard ─────────────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+class TestIfEmptyGuard:
+    """--if-empty is what the deploy pipeline runs on every release.
+
+    It has to guarantee the library is never empty without making each deploy
+    depend on GOV.UK being reachable, so the check must happen before any
+    network call rather than after a failed download.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _units(self):
+        call_command("seed_units")
+
+    def test_populated_library_makes_no_network_call(self):
+        from apps.emissions.models import EmissionFactors
+
+        rows = parse_flat_file(_workbook([
+            _row("1", "Scope 1", "Fuels", "Gaseous fuels", "Butane", "litres", "kg CO2e", "1.74533"),
+        ]))
+        import_factors(rows=rows, year=2026)
+
+        with patch("tasks.integrations.defra.download") as dl, \
+             patch("tasks.integrations.defra.resolve_flat_file_url") as resolve:
+            call_command("import_defra_factors", "--if-empty")
+
+        dl.assert_not_called()
+        resolve.assert_not_called()
+        assert EmissionFactors.objects.count() == 1
+
+    def test_empty_library_does_import(self):
+        from apps.emissions.models import EmissionFactors
+
+        content = _workbook([
+            _row("1", "Scope 1", "Fuels", "Gaseous fuels", "Butane", "litres", "kg CO2e", "1.74533"),
+            _row("2", "Scope 2", "UK electricity", "Electricity generated", "Electricity: UK",
+                 "kWh", "kg CO2e", "0.13096"),
+        ])
+        assert EmissionFactors.objects.count() == 0
+
+        with patch("tasks.integrations.defra.resolve_flat_file_url", return_value="https://x/f.xlsx"), \
+             patch("tasks.integrations.defra.download", return_value=content):
+            call_command("import_defra_factors", "--if-empty")
+
+        assert EmissionFactors.objects.count() == 2
