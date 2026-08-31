@@ -46,6 +46,12 @@ the fixes. Two findings changed shape once investigated (F1 turned out cheaper t
 F2 less severe than originally written) and one, F8, had no live producer in this codebase —
 see the [findings register](FINDINGS.md) for the full before/after detail on each.
 
+### C4 model
+
+| # | Diagram | Levels | What it answers |
+|---|---------|--------|-----------------|
+| 01 | [C4 Architecture Model](c4/01-c4-model.md) | L1 Context · L2 Containers · L3 Components (API pipeline, domain apps, async workers) · L4 Code (GHG calc) | Full structural decomposition of the platform from user interactions to inner calculation code |
+
 ### UML
 
 | # | Diagram | Kind | What it answers |
