@@ -78,6 +78,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               );
             })}
           </ul>
+
+          {user?.IsSuperAdmin && (
+            <>
+              <div className="mx-2 mt-4 mb-1 text-[10px] font-semibold uppercase tracking-widest text-surface-400">
+                Admin
+              </div>
+              <ul className="space-y-0.5">
+                <li>
+                  <Link
+                    href="/architecture"
+                    className={`nav-item ${pathname === "/architecture" || pathname.startsWith("/architecture/") ? "nav-item-active" : ""}`}
+                  >
+                    <span aria-hidden>🏗️</span>
+                    Architecture
+                  </Link>
+                </li>
+              </ul>
+            </>
+          )}
         </nav>
 
         <div className="border-t border-surface-100 p-3">
