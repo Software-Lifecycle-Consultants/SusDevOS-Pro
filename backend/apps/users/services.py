@@ -120,7 +120,7 @@ def invite_user(
     username: str,
     first_name: str,
     last_name: str,
-    designation: str | None = None,
+    designation: str = "",
     role_key: str,
 ) -> "Users":  # noqa: F821
     """

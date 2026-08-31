@@ -14,17 +14,17 @@ interface Offset {
   Title:                       string;
   OffsetType:                  string;
   Provider:                    string;
-  CertificateNumber:           string | null;
+  CertificateNumber:           string;
   OffsetAmountTonnes:          string;
   ValidFrom:                   string | null;
   ValidTo:                     string | null;
-  CreditSerialNumber:          string | null;
-  RegistryValidationStatus:    string | null;
-  RegistryProjectName:         string | null;
-  RegistryProjectType:         string | null;
+  CreditSerialNumber:          string;
+  RegistryValidationStatus:    string;
+  RegistryProjectName:         string;
+  RegistryProjectType:         string;
   RegistryVintageYear:         number | null;
-  RegistryRetirementBeneficiary: string | null;
-  Remarks:                     string | null;
+  RegistryRetirementBeneficiary: string;
+  Remarks:                     string;
 }
 
 interface EmissionsRecord { EmissionsId: number; Title: string; ReportingYear: number | null; }
@@ -64,13 +64,13 @@ function CreateOffsetModal({ onClose, entityId, emissionsRecords }: {
       Title:                form.Title,
       OffsetType:           form.OffsetType,
       Provider:             form.Provider,
-      CertificateNumber:    form.CertificateNumber    || null,
+      CertificateNumber:    form.CertificateNumber,
       OffsetAmountTonnes:   Number(form.OffsetAmountTonnes),
       ValidFrom:            form.ValidFrom             || null,
       ValidTo:              form.ValidTo               || null,
-      CreditSerialNumber:   form.CreditSerialNumber    || null,
+      CreditSerialNumber:   form.CreditSerialNumber,
       CreditRegistry:       form.CreditRegistry,
-      Remarks:              form.Remarks               || null,
+      Remarks:              form.Remarks,
     }, { headers }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["offsets", entityId] });

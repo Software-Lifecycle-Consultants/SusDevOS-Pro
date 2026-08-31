@@ -82,7 +82,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         try:
             token = PasswordResetTokens.objects.select_related("UserId").get(Token=value)
         except PasswordResetTokens.DoesNotExist:
-            raise serializers.ValidationError("Invalid or expired token.")
+            raise serializers.ValidationError("Invalid or expired token.") from None
         if token.is_used:
             raise serializers.ValidationError("This token has already been used.")
         if token.is_expired:
@@ -100,7 +100,7 @@ class OnboardSerializer(serializers.Serializer):
         try:
             token = PasswordResetTokens.objects.select_related("UserId").get(Token=value)
         except PasswordResetTokens.DoesNotExist:
-            raise serializers.ValidationError("Invalid token.")
+            raise serializers.ValidationError("Invalid token.") from None
         if token.is_used:
             raise serializers.ValidationError("This token has already been used.")
         if token.is_expired:
@@ -178,7 +178,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             username    = validated_data.get("username", validated_data["email"].split("@")[0]),
             first_name  = validated_data.get("FirstName", ""),
             last_name   = validated_data.get("LastName", ""),
-            designation = validated_data.get("Designation"),
+            designation = validated_data.get("Designation") or "",
             role_key    = role_key,
         )
 

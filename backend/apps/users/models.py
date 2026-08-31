@@ -48,12 +48,12 @@ class Users(AbstractBaseUser, PermissionsMixin, BaseAuditMixin):
     )
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=255, unique=True)
-    FirstName = models.CharField(max_length=100, blank=True, null=True)
-    LastName = models.CharField(max_length=100, blank=True, null=True)
-    Designation = models.CharField(max_length=200, blank=True, null=True)
-    Bio = models.TextField(blank=True, null=True)
-    ProfilePicturePath = models.CharField(max_length=500, blank=True, null=True)
-    PhoneNumber = models.CharField(max_length=20, blank=True, null=True)
+    FirstName = models.CharField(max_length=100, blank=True)
+    LastName = models.CharField(max_length=100, blank=True)
+    Designation = models.CharField(max_length=200, blank=True)
+    Bio = models.TextField(blank=True)
+    ProfilePicturePath = models.CharField(max_length=500, blank=True)
+    PhoneNumber = models.CharField(max_length=20, blank=True)
     IsSuperAdmin = models.BooleanField(default=False)
 
     # Django internal fields
@@ -91,7 +91,7 @@ class Modules(BaseAuditMixin):
     ModuleId = models.AutoField(primary_key=True)
     ModuleName = models.CharField(max_length=100)
     ModuleKey = models.CharField(max_length=50, unique=True)
-    Description = models.TextField(blank=True, null=True)
+    Description = models.TextField(blank=True)
 
     class Meta:
         db_table = "modules"
@@ -108,7 +108,7 @@ class Interfaces(BaseAuditMixin):
     ModuleId = models.ForeignKey(Modules, on_delete=models.CASCADE, related_name="interfaces")
     InterfaceName = models.CharField(max_length=100)
     InterfaceKey = models.CharField(max_length=50, unique=True)
-    Description = models.TextField(blank=True, null=True)
+    Description = models.TextField(blank=True)
 
     class Meta:
         db_table = "interfaces"
@@ -131,7 +131,7 @@ class Roles(BaseAuditMixin):
     RoleId = models.AutoField(primary_key=True)
     RoleName = models.CharField(max_length=100)
     RoleKey = models.CharField(max_length=20, unique=True, choices=ROLE_CHOICES)
-    Description = models.TextField(blank=True, null=True)
+    Description = models.TextField(blank=True)
 
     class Meta:
         db_table = "roles"
@@ -236,6 +236,9 @@ class PasswordResetTokens(models.Model):
     class Meta:
         db_table = "password_reset_tokens"
 
+    def __str__(self):
+        return f"Reset token for {self.UserId} (expires {self.ExpiresAt})"
+
     @property
     def is_expired(self):
         from django.utils import timezone
@@ -264,3 +267,6 @@ class RevokedTokens(models.Model):
     class Meta:
         db_table = "revoked_tokens"
         indexes = [models.Index(fields=["Jti"], name="idx_revoked_token_jti")]
+
+    def __str__(self):
+        return f"Revoked {self.Jti} (user {self.UserId_id})"

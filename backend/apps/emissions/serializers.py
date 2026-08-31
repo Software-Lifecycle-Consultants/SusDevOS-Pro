@@ -295,10 +295,10 @@ class EmissionsOffsetsSerializer(RejectServerManagedInputMixin, serializers.Mode
                 {
                     "RegistryValidatedAt": None,
                     "RegistryValidationStatus": "unverified",
-                    "RegistryProjectName": None,
-                    "RegistryProjectType": None,
+                    "RegistryProjectName": "",
+                    "RegistryProjectType": "",
                     "RegistryVintageYear": None,
-                    "RegistryRetirementBeneficiary": None,
+                    "RegistryRetirementBeneficiary": "",
                 }
             )
         return super().update(instance, validated_data)

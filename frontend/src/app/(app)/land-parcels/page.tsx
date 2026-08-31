@@ -29,11 +29,11 @@ const MapPicker = dynamic(() => import("@/components/land/MapPicker"), {
 interface LandParcel {
   LandParcelId:      number;
   ParcelName:        string;
-  ParcelReference:   string | null;
+  ParcelReference:   string;
   AreaHectares:      string | null;
-  LandUseType:       string | null;
-  Tenure:            string | null;
-  PlanningReference: string | null;
+  LandUseType:       string;
+  Tenure:            string;
+  PlanningReference: string;
   BoundaryGeoJSON:   object | null;
   Status:            number;
 }
@@ -82,12 +82,12 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
       }
       return axiosInstance.post("/api/land-parcels/", {
         ParcelName:        form.ParcelName,
-        ParcelReference:   form.ParcelReference   || null,
+        ParcelReference:   form.ParcelReference,
         AreaHectares:      form.AreaHectares       ? Number(form.AreaHectares) : null,
-        LandUseType:       form.LandUseType        || null,
-        Tenure:            form.Tenure             || null,
-        PlanningReference: form.PlanningReference  || null,
-        Description:       form.Description        || null,
+        LandUseType:       form.LandUseType,
+        Tenure:            form.Tenure,
+        PlanningReference: form.PlanningReference,
+        Description:       form.Description,
         BoundaryGeoJSON:   boundary,
       }, { headers });
     },

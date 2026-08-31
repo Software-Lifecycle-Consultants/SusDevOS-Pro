@@ -9,8 +9,8 @@ export interface AuthUser {
   UserId:           number;
   email:            string;
   username:         string;
-  FirstName:        string | null;
-  LastName:         string | null;
+  FirstName:        string;
+  LastName:         string;
   IsSuperAdmin:     boolean;
   entity_id:        number | null;
   role:             string | null;

@@ -44,7 +44,7 @@ def sync_verra_registry(self):
         resp = requests.get(csv_url, timeout=120, stream=True)
         resp.raise_for_status()
     except requests.RequestException as exc:
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc
 
     reader = csv.DictReader(codecs.iterdecode(resp.iter_lines(), "utf-8"))
     for row in reader:
@@ -73,10 +73,9 @@ def sync_verra_registry(self):
     # legacy rows) — never mark a Gold Standard credit invalid against the VCS list.
     from django.db.models import Q
     pending = EmissionsOffsets.objects.filter(
-        Q(CreditRegistry="verra") | Q(CreditRegistry__isnull=True),
+        Q(CreditRegistry="verra") | Q(CreditRegistry=""),
         RegistryValidationStatus__in=["pending", "unverified"],
-        CreditSerialNumber__isnull=False,
-    )
+    ).exclude(CreditSerialNumber="")
     validated = 0
     invalidated = 0
 

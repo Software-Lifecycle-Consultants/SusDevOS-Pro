@@ -12,8 +12,7 @@ export interface Notifications {
   readonly Type: TypeEnum;
   readonly Title: string;
   readonly Body: string;
-  /** @nullable */
-  readonly RelatedModule: string | null;
+  readonly RelatedModule: string;
   /** @nullable */
   readonly RelatedRecordId: number | null;
   IsRead?: boolean;

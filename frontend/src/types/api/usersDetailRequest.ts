@@ -12,33 +12,17 @@ export interface UsersDetailRequest {
    * @maxLength 150
    */
   username: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  FirstName?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  LastName?: string | null;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  Designation?: string | null;
-  /** @nullable */
-  Bio?: string | null;
-  /**
-   * @maxLength 20
-   * @nullable
-   */
-  PhoneNumber?: string | null;
-  /**
-   * @maxLength 500
-   * @nullable
-   */
-  ProfilePicturePath?: string | null;
+  /** @maxLength 100 */
+  FirstName?: string;
+  /** @maxLength 100 */
+  LastName?: string;
+  /** @maxLength 200 */
+  Designation?: string;
+  Bio?: string;
+  /** @maxLength 20 */
+  PhoneNumber?: string;
+  /** @maxLength 500 */
+  ProfilePicturePath?: string;
   is_active?: boolean;
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted

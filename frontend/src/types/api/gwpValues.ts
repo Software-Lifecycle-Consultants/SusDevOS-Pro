@@ -10,11 +10,8 @@ export interface GwpValues {
   readonly GwpValueId: number;
   /** @maxLength 50 */
   Gas: string;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GasSubtype?: string | null;
+  /** @maxLength 50 */
+  GasSubtype?: string;
   /** @pattern ^-?\d{0,6}(?:\.\d{0,4})?$ */
   GwpFactor: string;
 }

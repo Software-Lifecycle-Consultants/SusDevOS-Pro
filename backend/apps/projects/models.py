@@ -12,13 +12,13 @@ class DevelopmentProjects(BaseAuditMixin):
     ProjectId = models.AutoField(primary_key=True)
     EntityId = models.ForeignKey("entities.Entities", on_delete=models.PROTECT, related_name="projects")
     ProjectName = models.CharField(max_length=200)
-    ProjectReference = models.CharField(max_length=100, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
-    ProjectType = models.CharField(max_length=100, blank=True, null=True)
+    ProjectReference = models.CharField(max_length=100, blank=True)
+    Description = models.TextField(blank=True)
+    ProjectType = models.CharField(max_length=100, blank=True)
     StartDate = models.DateField(null=True, blank=True)
     EndDate = models.DateField(null=True, blank=True)
-    Location = models.CharField(max_length=200, blank=True, null=True)
-    Country = models.CharField(max_length=100, blank=True, null=True)
+    Location = models.CharField(max_length=200, blank=True)
+    Country = models.CharField(max_length=100, blank=True)
     TotalAreaHectares = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
     EstimatedValueGBP = models.DecimalField(max_digits=18, decimal_places=2, null=True, blank=True)
 
@@ -37,7 +37,7 @@ class ProjectPhases(BaseAuditMixin):
     EntityId = models.ForeignKey("entities.Entities", on_delete=models.PROTECT, related_name="project_phases")
     PhaseName = models.CharField(max_length=200)
     PhaseNumber = models.PositiveSmallIntegerField(null=True, blank=True)
-    Description = models.TextField(blank=True, null=True)
+    Description = models.TextField(blank=True)
     StartDate = models.DateField(null=True, blank=True)
     EndDate = models.DateField(null=True, blank=True)
     TargetEmissionsTonnes = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
@@ -58,7 +58,7 @@ class RelatedProjects(models.Model):
     RelatedProjectId = models.ForeignKey(
         DevelopmentProjects, on_delete=models.CASCADE, related_name="related_as_secondary"
     )
-    RelationshipType = models.CharField(max_length=50, blank=True, null=True)
+    RelationshipType = models.CharField(max_length=50, blank=True)
     CreatedAt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -69,6 +69,9 @@ class RelatedProjects(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f"{self.PrimaryProjectId} -> {self.RelatedProjectId}"
+
 
 class DevelopmentProjectTags(models.Model):
     id = models.AutoField(primary_key=True)
@@ -77,6 +80,9 @@ class DevelopmentProjectTags(models.Model):
 
     class Meta:
         db_table = "development_project_tags"
+
+    def __str__(self):
+        return f"{self.ProjectId} / {self.TagId}"
 
 
 class DevelopmentProjectPartners(models.Model):
@@ -88,13 +94,16 @@ class DevelopmentProjectPartners(models.Model):
         null=True, blank=True, choices=CONSOLIDATION_APPROACH_CHOICES
     )
     IsDoubleCountingRisk = models.BooleanField(default=False)
-    DoubleCountingNotes = models.TextField(null=True, blank=True)
+    DoubleCountingNotes = models.TextField(blank=True)
 
     class Meta:
         db_table = "development_project_partners"
         indexes = [
             models.Index(fields=["EntityId", "ProjectId"], name="idx_project_partner_entity")
         ]
+
+    def __str__(self):
+        return f"{self.ProjectId} / {self.EntityId}"
 
 
 class DevelopmentProjectLandParcels(models.Model):
@@ -105,6 +114,9 @@ class DevelopmentProjectLandParcels(models.Model):
     class Meta:
         db_table = "development_project_land_parcels"
 
+    def __str__(self):
+        return f"{self.ProjectId} / {self.LandParcelId}"
+
 
 class DevelopmentProjectContacts(models.Model):
     id = models.AutoField(primary_key=True)
@@ -113,6 +125,9 @@ class DevelopmentProjectContacts(models.Model):
 
     class Meta:
         db_table = "development_project_contacts"
+
+    def __str__(self):
+        return f"{self.ProjectId} / {self.ContactId}"
 
 
 class DevelopmentProjectDocuments(models.Model):
@@ -123,6 +138,9 @@ class DevelopmentProjectDocuments(models.Model):
     class Meta:
         db_table = "development_project_documents"
 
+    def __str__(self):
+        return f"{self.ProjectId} / {self.DocumentId}"
+
 
 class DevelopmentProjectImages(models.Model):
     id = models.AutoField(primary_key=True)
@@ -132,6 +150,9 @@ class DevelopmentProjectImages(models.Model):
     class Meta:
         db_table = "development_project_images"
 
+    def __str__(self):
+        return f"{self.ProjectId} / {self.ImageId}"
+
 
 class DevelopmentProjectEntities(models.Model):
     id = models.AutoField(primary_key=True)
@@ -140,3 +161,6 @@ class DevelopmentProjectEntities(models.Model):
 
     class Meta:
         db_table = "development_project_entities"
+
+    def __str__(self):
+        return f"{self.ProjectId} / {self.EntityId}"

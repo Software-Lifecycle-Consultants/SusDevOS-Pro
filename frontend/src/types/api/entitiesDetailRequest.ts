@@ -34,41 +34,20 @@ export interface EntitiesDetailRequest {
    * @nullable
    */
   EntityType?: EntitiesDetailRequestEntityType;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  RegistrationNumber?: string | null;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  VATNumber?: string | null;
-  /**
-   * @maxLength 255
-   * @nullable
-   */
-  AddressLine1?: string | null;
-  /**
-   * @maxLength 255
-   * @nullable
-   */
-  AddressLine2?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  City?: string | null;
-  /**
-   * @maxLength 20
-   * @nullable
-   */
-  PostCode?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Country?: string | null;
+  /** @maxLength 50 */
+  RegistrationNumber?: string;
+  /** @maxLength 50 */
+  VATNumber?: string;
+  /** @maxLength 255 */
+  AddressLine1?: string;
+  /** @maxLength 255 */
+  AddressLine2?: string;
+  /** @maxLength 100 */
+  City?: string;
+  /** @maxLength 20 */
+  PostCode?: string;
+  /** @maxLength 100 */
+  Country?: string;
   /**
    * @minLength 1
    * @maxLength 3
@@ -92,19 +71,13 @@ export interface EntitiesDetailRequest {
    * @pattern ^-?\d{0,3}(?:\.\d{0,3})?$
    */
   OwnershipSharePercent?: string | null;
-  /**
-   * @maxLength 20
-   * @nullable
-   */
-  CompaniesHouseNumber?: string | null;
+  /** @maxLength 20 */
+  CompaniesHouseNumber?: string;
   SICCodes?: unknown;
   /** @nullable */
   IncorporationDate?: string | null;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  ExternalRegistryUrl?: string | null;
+  /** @maxLength 200 */
+  ExternalRegistryUrl?: string;
   /** @nullable */
   ParentEntityId?: number | null;
 }

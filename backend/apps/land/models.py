@@ -8,13 +8,13 @@ class LandParcels(BaseAuditMixin):
     LandParcelId = models.AutoField(primary_key=True)
     EntityId = models.ForeignKey("entities.Entities", on_delete=models.PROTECT, related_name="land_parcels")
     ParcelName = models.CharField(max_length=200)
-    ParcelReference = models.CharField(max_length=100, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
+    ParcelReference = models.CharField(max_length=100, blank=True)
+    Description = models.TextField(blank=True)
     AreaHectares = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
     BoundaryGeoJSON = models.JSONField(null=True, blank=True, help_text="GeoJSON polygon boundary")
-    Tenure = models.CharField(max_length=100, blank=True, null=True)
-    LandUseType = models.CharField(max_length=100, blank=True, null=True)
-    PlanningReference = models.CharField(max_length=100, blank=True, null=True)
+    Tenure = models.CharField(max_length=100, blank=True)
+    LandUseType = models.CharField(max_length=100, blank=True)
+    PlanningReference = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = "land_parcels"
@@ -32,6 +32,9 @@ class LandParcelTags(models.Model):
     class Meta:
         db_table = "land_parcel_tags"
 
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.TagId}"
+
 
 class LandParcelEcosystems(models.Model):
     id = models.AutoField(primary_key=True)
@@ -40,6 +43,9 @@ class LandParcelEcosystems(models.Model):
 
     class Meta:
         db_table = "land_parcel_ecosystems"
+
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.EcosystemId}"
 
 
 class LandParcelContacts(models.Model):
@@ -50,6 +56,9 @@ class LandParcelContacts(models.Model):
     class Meta:
         db_table = "land_parcel_contacts"
 
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.ContactId}"
+
 
 class LandParcelDocuments(models.Model):
     id = models.AutoField(primary_key=True)
@@ -58,6 +67,9 @@ class LandParcelDocuments(models.Model):
 
     class Meta:
         db_table = "land_parcel_documents"
+
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.DocumentId}"
 
 
 class LandParcelImages(models.Model):
@@ -68,6 +80,9 @@ class LandParcelImages(models.Model):
     class Meta:
         db_table = "land_parcel_images"
 
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.ImageId}"
+
 
 class LandParcelEntities(models.Model):
     id = models.AutoField(primary_key=True)
@@ -77,6 +92,9 @@ class LandParcelEntities(models.Model):
     class Meta:
         db_table = "land_parcel_entities"
 
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.EntityId}"
+
 
 class LandParcelLocations(models.Model):
     id = models.AutoField(primary_key=True)
@@ -85,3 +103,6 @@ class LandParcelLocations(models.Model):
 
     class Meta:
         db_table = "land_parcel_locations"
+
+    def __str__(self):
+        return f"{self.LandParcelId} / {self.LocationId}"

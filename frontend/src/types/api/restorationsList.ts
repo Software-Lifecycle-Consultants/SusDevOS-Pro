@@ -10,11 +10,8 @@ export interface RestorationsList {
   readonly RestorationId: number;
   /** @maxLength 200 */
   RestorationName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  RestorationReference?: string | null;
+  /** @maxLength 100 */
+  RestorationReference?: string;
   /** @nullable */
   StartDate?: string | null;
   /**

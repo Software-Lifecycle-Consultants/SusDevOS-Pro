@@ -9,9 +9,9 @@ import { useAuthStore } from "@/store/auth";
 interface AuditEntry {
   LogId:             number;
   Action:            string;
-  TableName:         string | null;
+  TableName:         string;
   RecordId:          number | null;
-  Description:       string | null;
+  Description:       string;
   ChangedByUsername: string;
   ChangedOn:         string;
   RetentionTier:     number;

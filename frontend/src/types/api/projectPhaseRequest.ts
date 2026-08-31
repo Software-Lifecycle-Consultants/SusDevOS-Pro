@@ -21,8 +21,7 @@ export interface ProjectPhaseRequest {
    * @nullable
    */
   PhaseNumber?: number | null;
-  /** @nullable */
-  Description?: string | null;
+  Description?: string;
   /** @nullable */
   StartDate?: string | null;
   /** @nullable */

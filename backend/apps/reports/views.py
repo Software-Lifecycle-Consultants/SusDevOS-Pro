@@ -39,13 +39,13 @@ class ReportJobsViewSet(EntityScopeInitialMixin, ModelViewSet):
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             return
-        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.mixins import FeatureGatedError
         from apps.billing.services import get_upgrade_message, is_feature_enabled
         entity_id = getattr(self.request, "entity_id", None)
         if not entity_id or not is_feature_enabled(
             entity_id=entity_id, feature_key="report_csv_json_export"
         ):
-            raise FeatureGatedException(
+            raise FeatureGatedError(
                 feature_key="report_csv_json_export",
                 message=get_upgrade_message(feature_key="report_csv_json_export"),
             )

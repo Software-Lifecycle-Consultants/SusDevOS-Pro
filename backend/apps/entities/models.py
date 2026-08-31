@@ -32,15 +32,15 @@ class Entities(BaseAuditMixin):
     EntityId = models.AutoField(primary_key=True)
     EntityName = models.CharField(max_length=200)
     EntityType = models.PositiveSmallIntegerField(choices=ENTITY_TYPE_CHOICES, null=True, blank=True)
-    RegistrationNumber = models.CharField(max_length=50, blank=True, null=True)
-    VATNumber = models.CharField(max_length=50, blank=True, null=True)
+    RegistrationNumber = models.CharField(max_length=50, blank=True)
+    VATNumber = models.CharField(max_length=50, blank=True)
 
     # Address
-    AddressLine1 = models.CharField(max_length=255, blank=True, null=True)
-    AddressLine2 = models.CharField(max_length=255, blank=True, null=True)
-    City = models.CharField(max_length=100, blank=True, null=True)
-    PostCode = models.CharField(max_length=20, blank=True, null=True)
-    Country = models.CharField(max_length=100, blank=True, null=True)
+    AddressLine1 = models.CharField(max_length=255, blank=True)
+    AddressLine2 = models.CharField(max_length=255, blank=True)
+    City = models.CharField(max_length=100, blank=True)
+    PostCode = models.CharField(max_length=20, blank=True)
+    Country = models.CharField(max_length=100, blank=True)
 
     # Reporting settings
     BaseCurrency = models.CharField(max_length=3, default="GBP")
@@ -62,10 +62,10 @@ class Entities(BaseAuditMixin):
     )
 
     # External registry IDs (ref: 0027_api_integration_fields)
-    CompaniesHouseNumber = models.CharField(max_length=20, null=True, blank=True)
+    CompaniesHouseNumber = models.CharField(max_length=20, blank=True)
     SICCodes = models.JSONField(default=list, blank=True)
     IncorporationDate = models.DateField(null=True, blank=True)
-    ExternalRegistryUrl = models.URLField(null=True, blank=True)
+    ExternalRegistryUrl = models.URLField(blank=True)
 
     class Meta:
         db_table = "entities"
@@ -86,7 +86,7 @@ class RelatedEntities(models.Model):
     ChildEntityId = models.ForeignKey(
         Entities, on_delete=models.CASCADE, related_name="parent_relations"
     )
-    RelationshipType = models.CharField(max_length=50, blank=True, null=True)
+    RelationshipType = models.CharField(max_length=50, blank=True)
     CreatedAt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -97,6 +97,9 @@ class RelatedEntities(models.Model):
                 name="unique_entity_relation",
             )
         ]
+
+    def __str__(self):
+        return f"{self.ParentEntityId} -> {self.ChildEntityId}"
 
 
 class EntityLocations(models.Model):
@@ -110,6 +113,9 @@ class EntityLocations(models.Model):
             models.UniqueConstraint(fields=["EntityId", "LocationId"], name="unique_entity_location")
         ]
 
+    def __str__(self):
+        return f"{self.EntityId} / {self.LocationId}"
+
 
 class EntityContacts(models.Model):
     id = models.AutoField(primary_key=True)
@@ -118,6 +124,9 @@ class EntityContacts(models.Model):
 
     class Meta:
         db_table = "entity_contacts"
+
+    def __str__(self):
+        return f"{self.EntityId} / {self.ContactId}"
 
 
 class EntityDocuments(models.Model):
@@ -128,6 +137,9 @@ class EntityDocuments(models.Model):
     class Meta:
         db_table = "entity_documents"
 
+    def __str__(self):
+        return f"{self.EntityId} / {self.DocumentId}"
+
 
 class EntityTags(models.Model):
     id = models.AutoField(primary_key=True)
@@ -136,6 +148,9 @@ class EntityTags(models.Model):
 
     class Meta:
         db_table = "entity_tags"
+
+    def __str__(self):
+        return f"{self.EntityId} / {self.TagId}"
 
 
 class EntityApiKeysIntermediary(models.Model):
@@ -147,6 +162,9 @@ class EntityApiKeysIntermediary(models.Model):
 
     class Meta:
         db_table = "entity_api_keys_intermediary"
+
+    def __str__(self):
+        return f"{self.EntityId} / {self.ApiKeyId}"
 
 
 class EntityMembers(models.Model):
@@ -170,3 +188,6 @@ class EntityMembers(models.Model):
             models.UniqueConstraint(fields=["UserId", "EntityId"], name="unique_user_entity_membership"),
         ]
         indexes = [models.Index(fields=["UserId"], name="idx_entity_member_user")]
+
+    def __str__(self):
+        return f"{self.UserId} in {self.EntityId}"

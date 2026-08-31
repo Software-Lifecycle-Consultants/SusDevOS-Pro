@@ -13,12 +13,12 @@ pytestmark = pytest.mark.django_db
 
 def _emission(entity, gwp_dataset, **kwargs):
     from apps.emissions.models import EmissionsData
-    defaults = dict(
-        EntityId=entity, Title="rec", Scope=1,
-        QuantityOrCost=Decimal("1000"), Unit="kWh",
-        EmissionFactor=Decimal("0.5"), EmissionFactorSource="test",
-        Gas="CO2", GwpDatasetId=gwp_dataset,
-    )
+    defaults = {
+        "EntityId": entity, "Title": "rec", "Scope": 1,
+        "QuantityOrCost": Decimal("1000"), "Unit": "kWh",
+        "EmissionFactor": Decimal("0.5"), "EmissionFactorSource": "test",
+        "Gas": "CO2", "GwpDatasetId": gwp_dataset,
+    }
     defaults.update(kwargs)
     return EmissionsData.objects.create(**defaults)
 

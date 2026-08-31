@@ -12,6 +12,5 @@ export interface Modules {
   ModuleName: string;
   /** @maxLength 50 */
   ModuleKey: string;
-  /** @nullable */
-  Description?: string | null;
+  Description?: string;
 }

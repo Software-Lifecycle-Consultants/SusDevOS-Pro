@@ -148,8 +148,8 @@ def sync_climatiq_emission_factors(self):
         return {"skipped": "CLIMATIQ_API_KEY not configured"}
 
     cutoff = now() - STALE_AFTER
-    stale = EmissionFactors.objects.filter(
-        ClimatiqActivityId__isnull=False,
+    stale = EmissionFactors.objects.exclude(
+        ClimatiqActivityId="",
     ).filter(
         models.Q(ExternalSyncedAt__isnull=True) | models.Q(ExternalSyncedAt__lt=cutoff)
     )

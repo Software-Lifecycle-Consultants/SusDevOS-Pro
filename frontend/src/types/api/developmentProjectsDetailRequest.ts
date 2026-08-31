@@ -26,32 +26,19 @@ export interface DevelopmentProjectsDetailRequest {
    * @maxLength 200
    */
   ProjectName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ProjectReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ProjectType?: string | null;
+  /** @maxLength 100 */
+  ProjectReference?: string;
+  Description?: string;
+  /** @maxLength 100 */
+  ProjectType?: string;
   /** @nullable */
   StartDate?: string | null;
   /** @nullable */
   EndDate?: string | null;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  Location?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Country?: string | null;
+  /** @maxLength 200 */
+  Location?: string;
+  /** @maxLength 100 */
+  Country?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$

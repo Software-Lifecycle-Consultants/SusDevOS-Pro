@@ -10,21 +10,15 @@ export interface LandParcelsList {
   readonly LandParcelId: number;
   /** @maxLength 200 */
   ParcelName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ParcelReference?: string | null;
+  /** @maxLength 100 */
+  ParcelReference?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$
    */
   AreaHectares?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  LandUseType?: string | null;
+  /** @maxLength 100 */
+  LandUseType?: string;
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted
    * @minimum 0

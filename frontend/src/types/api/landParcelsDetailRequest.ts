@@ -27,13 +27,9 @@ export interface LandParcelsDetailRequest {
    * @maxLength 200
    */
   ParcelName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ParcelReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  ParcelReference?: string;
+  Description?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$
@@ -44,19 +40,10 @@ export interface LandParcelsDetailRequest {
    * @nullable
    */
   BoundaryGeoJSON?: LandParcelsDetailRequestBoundaryGeoJSON;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Tenure?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  LandUseType?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  PlanningReference?: string | null;
+  /** @maxLength 100 */
+  Tenure?: string;
+  /** @maxLength 100 */
+  LandUseType?: string;
+  /** @maxLength 100 */
+  PlanningReference?: string;
 }

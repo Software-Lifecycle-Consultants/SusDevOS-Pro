@@ -16,7 +16,7 @@ interface GHGInventory {
   GwpDatasetName:            string;
   ConsolidationApproach:     number | null;
   VerificationStatus:        number;
-  BoundaryNotes:             string | null;
+  BoundaryNotes:             string;
   TotalScope1Tonnes:         string | null;
   TotalScope2LocationTonnes: string | null;
   TotalScope2MarketTonnes:   string | null;
@@ -81,7 +81,7 @@ function CreateInventoryModal({ onClose, entityId }: { onClose: () => void; enti
         ReportingPeriodTo:     form.ReportingPeriodTo,
         BaselineYear:          form.BaselineYear ? Number(form.BaselineYear) : null,
         ConsolidationApproach: form.ConsolidationApproach ? Number(form.ConsolidationApproach) : null,
-        BoundaryNotes:         form.BoundaryNotes || null,
+        BoundaryNotes:         form.BoundaryNotes,
       }, { headers }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventories", entityId] });

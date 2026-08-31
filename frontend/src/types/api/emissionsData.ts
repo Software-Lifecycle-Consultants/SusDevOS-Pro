@@ -45,14 +45,12 @@ export interface EmissionsData {
    * @nullable
    */
   Scope3Category?: number | null;
-  /** @nullable */
-  ActivityDescription?: string | null;
+  ActivityDescription?: string;
   /**
    * Supplier shown on the bill, contract, or source evidence.
    * @maxLength 200
-   * @nullable
    */
-  SupplierName?: string | null;
+  SupplierName?: string;
   /** @pattern ^-?\d{0,14}(?:\.\d{0,4})?$ */
   QuantityOrCost: string;
   /** @maxLength 50 */
@@ -68,11 +66,8 @@ export interface EmissionsData {
   EmissionFactorSource: string;
   /** @maxLength 50 */
   Gas: string;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GasSubtype?: string | null;
+  /** @maxLength 50 */
+  GasSubtype?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,14}(?:\.\d{0,4})?$
@@ -126,11 +121,8 @@ export interface EmissionsData {
    * @pattern ^-?\d{0,14}(?:\.\d{0,4})?$
    */
   readonly EmissionsAmountMarketBased: string | null;
-  /**
-   * @maxLength 3
-   * @nullable
-   */
-  SpendCurrency?: string | null;
+  /** @maxLength 3 */
+  SpendCurrency?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,16}(?:\.\d{0,2})?$
@@ -148,11 +140,8 @@ export interface EmissionsData {
   readonly ExchangeRateToUSD: string | null;
   /** @nullable */
   readonly ExchangeRateDate: string | null;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GridSubregion?: string | null;
+  /** @maxLength 50 */
+  GridSubregion?: string;
   /**
    * @minimum 0
    * @maximum 32767
@@ -176,8 +165,7 @@ export interface EmissionsData {
   VerificationStatus?: number;
   /** @nullable */
   readonly VerifiedAt: string | null;
-  /** @nullable */
-  VerificationNotes?: string | null;
+  VerificationNotes?: string;
   readonly EntityId: number;
   /** @nullable */
   ProjectId?: number | null;

@@ -114,11 +114,11 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             return
-        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.mixins import FeatureGatedError
         from apps.billing.services import get_upgrade_message, is_feature_enabled
         entity_id = getattr(self.request, "entity_id", None)
         if not entity_id or not is_feature_enabled(entity_id=entity_id, feature_key="scope_3"):
-            raise FeatureGatedException(
+            raise FeatureGatedError(
                 feature_key="scope_3",
                 message=get_upgrade_message(feature_key="scope_3"),
             )
@@ -139,13 +139,13 @@ class EmissionsDataViewSet(TenantViewSetMixin, ModelViewSet):
             return
         if getattr(self.request.user, "IsSuperAdmin", False):  # SUPERADMIN_BYPASS
             return
-        from apps.billing.mixins import FeatureGatedException
+        from apps.billing.mixins import FeatureGatedError
         from apps.billing.services import get_upgrade_message, is_feature_enabled
         entity_id = getattr(self.request, "entity_id", None)
         if not entity_id or not is_feature_enabled(
             entity_id=entity_id, feature_key="scope_2_market_based"
         ):
-            raise FeatureGatedException(
+            raise FeatureGatedError(
                 feature_key="scope_2_market_based",
                 message=get_upgrade_message(feature_key="scope_2_market_based"),
             )
@@ -583,7 +583,7 @@ class GHGInventoriesViewSet(FeatureGateMixin, TenantViewSetMixin, ModelViewSet):
         inventory.VerificationStatus = 3
         inventory.VerifiedBy = request.user
         inventory.VerifiedAt = timezone.now()
-        inventory.VerificationNotes = request.data.get("notes") or None
+        inventory.VerificationNotes = request.data.get("notes") or ""
         inventory.UpdatedBy = request.user.UserId
         inventory.save(
             update_fields=[

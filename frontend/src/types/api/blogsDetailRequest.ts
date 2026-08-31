@@ -40,16 +40,10 @@ export interface BlogsDetailRequest {
    * @maximum 32767
    */
   BlogStatus?: number;
-  /**
-   * @maxLength 60
-   * @nullable
-   */
-  SeoTitle?: string | null;
-  /**
-   * @maxLength 160
-   * @nullable
-   */
-  SeoDescription?: string | null;
+  /** @maxLength 60 */
+  SeoTitle?: string;
+  /** @maxLength 160 */
+  SeoDescription?: string;
   EmbedUrls?: unknown;
   /**
    * @minimum -2147483648

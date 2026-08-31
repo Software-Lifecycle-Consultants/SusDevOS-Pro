@@ -71,7 +71,6 @@ export interface Targets {
    * @maximum 32767
    */
   ValidationStatus?: number;
-  /** @nullable */
-  Notes?: string | null;
+  Notes?: string;
   readonly EntityId: number;
 }

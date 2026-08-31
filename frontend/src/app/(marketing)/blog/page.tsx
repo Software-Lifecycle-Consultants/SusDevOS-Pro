@@ -17,8 +17,8 @@ interface PostSummary {
   Slug:        string;
   PostBody:    string;
   PublishedAt: string | null;
-  SeoTitle:    string | null;
-  SeoDescription: string | null;
+  SeoTitle:    string;
+  SeoDescription: string;
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";

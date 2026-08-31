@@ -18,7 +18,7 @@ interface Parcel {
   ParcelName:      string;
   AreaHectares:    string | null;
   BoundaryGeoJSON: object | null;
-  LandUseType:     string | null;
+  LandUseType:     string;
 }
 
 // Leaflet's bindPopup renders raw HTML, so tenant-supplied strings must be

@@ -5,24 +5,17 @@
  * GHG reporting, ecosystem tracking, and sustainable development platform. Aligned to GHG Protocol, IPCC, and TNFD.
  * OpenAPI spec version: 1.0.0
  */
-import type { SpeciesListIUCNStatus } from './speciesListIUCNStatus';
+import type { IUCNStatusEnum } from './iUCNStatusEnum';
 
 export interface SpeciesList {
   readonly SpeciesId: number;
   /** @maxLength 200 */
   CommonName: string;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  ScientificName?: string | null;
-  /** @nullable */
-  IUCNStatus?: SpeciesListIUCNStatus;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Family?: string | null;
+  /** @maxLength 200 */
+  ScientificName?: string;
+  IUCNStatus?: IUCNStatusEnum;
+  /** @maxLength 100 */
+  Family?: string;
   /**
    * 1: Active, 2: Disabled, 3: Draft, 4: Deleted
    * @minimum 0

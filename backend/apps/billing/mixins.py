@@ -55,13 +55,13 @@ class FeatureGateMixin:
 
     def _deny(self, feature_key: str):
         from apps.billing.services import get_upgrade_message
-        raise FeatureGatedException(
+        raise FeatureGatedError(
             feature_key = feature_key,
             message     = get_upgrade_message(feature_key=feature_key),
         )
 
 
-class FeatureGatedException(Exception):
+class FeatureGatedError(Exception):
     """Raised when a feature gate check fails. Caught by the custom exception handler."""
     status_code = status.HTTP_402_PAYMENT_REQUIRED
 

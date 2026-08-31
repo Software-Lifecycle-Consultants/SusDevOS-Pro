@@ -58,7 +58,7 @@ interface CreateEmissionPayload {
   EmissionFactorSource: string;
   EmissionFactorId: number;
   Gas: string;
-  GasSubtype: string | null;
+  GasSubtype: string;
   Scope3Category: number | null;
   ReportingPeriodFrom: string;
   ReportingPeriodTo: string;
@@ -66,8 +66,8 @@ interface CreateEmissionPayload {
   ProjectId: number | null;
   PhaseId: number | null;
   InventoryId: number | null;
-  SupplierName: string | null;
-  ActivityDescription: string | null;
+  SupplierName: string;
+  ActivityDescription: string;
 }
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
@@ -179,7 +179,7 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
       EmissionFactorSource: `${selectedEF.set_name}${selectedEF.ApplicableYear ? ` ${selectedEF.ApplicableYear}` : ""}`,
       EmissionFactorId:     selectedEF.FactorId,
       Gas:                  form.Gas,
-      GasSubtype:           form.GasSubtype || null,
+      GasSubtype:           form.GasSubtype,
       Scope3Category:       form.Scope === "3" && form.Scope3Category ? Number(form.Scope3Category) : null,
       ReportingPeriodFrom:  form.ReportingPeriodFrom,
       ReportingPeriodTo:    form.ReportingPeriodTo,
@@ -187,8 +187,8 @@ function CreateEmissionsModal({ onClose, entityId }: { onClose: () => void; enti
       ProjectId:            form.ProjectId ? Number(form.ProjectId) : null,
       PhaseId:              form.PhaseId ? Number(form.PhaseId) : null,
       InventoryId:          form.InventoryId ? Number(form.InventoryId) : null,
-      SupplierName:         form.SupplierName || null,
-      ActivityDescription:  form.ActivityDescription || null,
+      SupplierName:         form.SupplierName,
+      ActivityDescription:  form.ActivityDescription,
     });
   }
 

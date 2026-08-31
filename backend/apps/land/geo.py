@@ -27,7 +27,7 @@ def _ring_area_m2(ring) -> float:
     ``ring`` is a GeoJSON coordinate list: [[lng, lat], ...]. A closed ring
     (first point repeated last) is fine — the closing edge contributes zero.
     """
-    if not isinstance(ring, (list, tuple)) or len(ring) < 3:
+    if not isinstance(ring, list | tuple) or len(ring) < 3:
         return 0.0
 
     total = 0.0
@@ -49,7 +49,7 @@ def _ring_area_m2(ring) -> float:
 
 def _polygon_area_m2(rings) -> float:
     """Exterior ring minus any interior rings (holes)."""
-    if not isinstance(rings, (list, tuple)) or not rings:
+    if not isinstance(rings, list | tuple) or not rings:
         return 0.0
     exterior = _ring_area_m2(rings[0])
     holes = sum(_ring_area_m2(r) for r in rings[1:])
@@ -65,19 +65,19 @@ def _geometry_area_m2(geom) -> float:
         return _polygon_area_m2(geom.get("coordinates"))
     if gtype == "MultiPolygon":
         polys = geom.get("coordinates")
-        if not isinstance(polys, (list, tuple)):
+        if not isinstance(polys, list | tuple):
             return 0.0
         return sum(_polygon_area_m2(p) for p in polys)
     if gtype == "GeometryCollection":
         geoms = geom.get("geometries")
-        if not isinstance(geoms, (list, tuple)):
+        if not isinstance(geoms, list | tuple):
             return 0.0
         return sum(_geometry_area_m2(g) for g in geoms)
     if gtype == "Feature":
         return _geometry_area_m2(geom.get("geometry"))
     if gtype == "FeatureCollection":
         feats = geom.get("features")
-        if not isinstance(feats, (list, tuple)):
+        if not isinstance(feats, list | tuple):
             return 0.0
         return sum(_geometry_area_m2(f) for f in feats)
 

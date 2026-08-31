@@ -11,14 +11,14 @@ export interface EmissionFactor {
   set_name:       string;
   set_publisher:  string;
   ActivityName:   string;
-  ActivityCategory: string | null;
+  ActivityCategory: string;
   Scope:          number;
   Scope3Category: number | null;
   Gas:            string;
-  GasSubtype:     string | null;
+  GasSubtype:     string;
   FactorValue:    string;
   unit:           string | null;
-  CountryCode:    string | null;
+  CountryCode:    string;
   ApplicableYear: number | null;
 }
 

@@ -23,11 +23,8 @@ export interface BlogsList {
   BlogStatus?: number;
   /** @nullable */
   PublishedAt?: string | null;
-  /**
-   * @maxLength 60
-   * @nullable
-   */
-  SeoTitle?: string | null;
+  /** @maxLength 60 */
+  SeoTitle?: string;
   /** @nullable */
   AuthorId?: number | null;
   readonly CreatedAt: string;

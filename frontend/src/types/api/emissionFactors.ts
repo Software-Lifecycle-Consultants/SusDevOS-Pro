@@ -13,11 +13,8 @@ export interface EmissionFactors {
   readonly set_publisher: string;
   /** @maxLength 200 */
   ActivityName: string;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  ActivityCategory?: string | null;
+  /** @maxLength 200 */
+  ActivityCategory?: string;
   /**
    * @minimum 0
    * @maximum 32767
@@ -31,19 +28,13 @@ export interface EmissionFactors {
   Scope3Category?: number | null;
   /** @maxLength 50 */
   Gas: string;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GasSubtype?: string | null;
+  /** @maxLength 50 */
+  GasSubtype?: string;
   /** @pattern ^-?\d{0,10}(?:\.\d{0,8})?$ */
   FactorValue: string;
   readonly unit: string;
-  /**
-   * @maxLength 3
-   * @nullable
-   */
-  CountryCode?: string | null;
+  /** @maxLength 3 */
+  CountryCode?: string;
   /**
    * @minimum 0
    * @maximum 32767

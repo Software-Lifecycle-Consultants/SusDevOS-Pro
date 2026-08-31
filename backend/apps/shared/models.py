@@ -69,7 +69,7 @@ class Locations(BaseAuditMixin):
     Title = models.CharField(max_length=100)
     City = models.CharField(max_length=100)
     Country = models.CharField(max_length=100)
-    Remarks = models.CharField(max_length=200, blank=True, null=True)
+    Remarks = models.CharField(max_length=200, blank=True)
     GPSCoordinates = models.JSONField(
         default=dict,
         help_text="GeoJSON Point: { type: 'Point', coordinates: [lng, lat] }",
@@ -101,12 +101,12 @@ class Tags(BaseAuditMixin):
             ),
         ]
 
+    def __str__(self):
+        return self.TagName
+
     def save(self, *args, **kwargs):
         self.TagNameNormalized = (self.TagName or "").strip().lower()
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.TagName
 
 
 class Contacts(BaseAuditMixin):
@@ -115,15 +115,15 @@ class Contacts(BaseAuditMixin):
     ContactId = models.AutoField(primary_key=True)
     EntityId = models.IntegerField(help_text="FK to entities.Entities (IntegerField — avoids circular import)")
     Name = models.CharField(max_length=200)
-    Designation = models.CharField(max_length=200, blank=True, null=True)
-    Email = models.EmailField(max_length=255, blank=True, null=True)
-    PhoneNumber = models.CharField(max_length=20, blank=True, null=True)
+    Designation = models.CharField(max_length=200, blank=True)
+    Email = models.EmailField(max_length=255, blank=True)
+    PhoneNumber = models.CharField(max_length=20, blank=True)
     ModuleKey = models.CharField(max_length=50, choices=MODULE_KEY_CHOICES)
-    AddressTitle = models.CharField(max_length=200, blank=True, null=True)
-    AddressLine1 = models.CharField(max_length=255, blank=True, null=True)
-    AddressLine2 = models.CharField(max_length=255, blank=True, null=True)
-    PostCode = models.CharField(max_length=20, blank=True, null=True)
-    Country = models.CharField(max_length=100, blank=True, null=True)
+    AddressTitle = models.CharField(max_length=200, blank=True)
+    AddressLine1 = models.CharField(max_length=255, blank=True)
+    AddressLine2 = models.CharField(max_length=255, blank=True)
+    PostCode = models.CharField(max_length=20, blank=True)
+    Country = models.CharField(max_length=100, blank=True)
     GPSCoordinates = models.JSONField(default=dict, blank=True)
     LocationId = models.ForeignKey(
         "shared.Locations", on_delete=models.SET_NULL, null=True, blank=True,
@@ -144,9 +144,9 @@ class Documents(BaseAuditMixin):
     DocTitle = models.CharField(max_length=200)
     DocPath = models.TextField()
     DocType = models.CharField(max_length=50)
-    Description = models.TextField(blank=True, null=True)
-    Excerpt = models.TextField(blank=True, null=True)
-    DocField = models.CharField(max_length=100, blank=True, null=True)
+    Description = models.TextField(blank=True)
+    Excerpt = models.TextField(blank=True)
+    DocField = models.CharField(max_length=100, blank=True)
     ModuleKey = models.CharField(max_length=50, choices=MODULE_KEY_CHOICES)
 
     class Meta:
@@ -170,6 +170,9 @@ class DocumentTags(models.Model):
     class Meta:
         db_table = "document_tags"
 
+    def __str__(self):
+        return f"{self.DocumentId} / {self.TagId}"
+
 
 class Images(BaseAuditMixin):
     """Entity-scoped image attachments. ImagePath stores the S3 key only."""
@@ -177,11 +180,11 @@ class Images(BaseAuditMixin):
     ImageId = models.AutoField(primary_key=True)
     EntityId = models.IntegerField()
     ImagePath = models.TextField()
-    AltText = models.CharField(max_length=255, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
+    AltText = models.CharField(max_length=255, blank=True)
+    Description = models.TextField(blank=True)
     Priority = models.PositiveSmallIntegerField(blank=True, null=True)
     IsCover = models.BooleanField(default=False)
-    CopyrightInfo = models.TextField(blank=True, null=True)
+    CopyrightInfo = models.TextField(blank=True)
     ModuleKey = models.CharField(max_length=50, choices=MODULE_KEY_CHOICES)
 
     class Meta:
@@ -204,6 +207,9 @@ class ImageTags(models.Model):
 
     class Meta:
         db_table = "image_tags"
+
+    def __str__(self):
+        return f"{self.ImageId} / {self.TagId}"
 
 
 class EntityApiKeys(BaseAuditMixin):
@@ -241,15 +247,15 @@ class AuditLog(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
         related_name="audit_actions",
     )
-    ChangedByUsername = models.CharField(max_length=100, blank=True, null=True)
+    ChangedByUsername = models.CharField(max_length=100, blank=True)
     Action = models.CharField(max_length=50, choices=ACTION_CHOICES)
-    TableName = models.CharField(max_length=100, blank=True, null=True)
+    TableName = models.CharField(max_length=100, blank=True)
     RecordId = models.IntegerField(null=True, blank=True)
-    Description = models.TextField(blank=True, null=True)
+    Description = models.TextField(blank=True)
     OldValues = models.JSONField(null=True, blank=True)
     NewValues = models.JSONField(null=True, blank=True)
-    IpAddress = models.CharField(max_length=45, blank=True, null=True)
-    UserAgent = models.CharField(max_length=500, blank=True, null=True)
+    IpAddress = models.CharField(max_length=45, blank=True)
+    UserAgent = models.CharField(max_length=500, blank=True)
     ChangedOn = models.DateTimeField(auto_now_add=True)
     RetentionTier = models.PositiveSmallIntegerField(
         default=2,
@@ -266,3 +272,6 @@ class AuditLog(models.Model):
             models.Index(fields=["Action", "ChangedOn"], name="idx_audit_action_date"),
             models.Index(fields=["RetentionTier", "ChangedOn"], name="idx_audit_retention"),
         ]
+
+    def __str__(self):
+        return f"{self.Action} on {self.TableName} by {self.ChangedByUsername}"

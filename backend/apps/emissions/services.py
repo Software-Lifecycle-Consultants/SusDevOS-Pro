@@ -117,14 +117,14 @@ def _get_gwp_factor(instance) -> Decimal:
     if dataset is None:
         return Decimal("1")
 
-    subtype = instance.GasSubtype or None
+    subtype = instance.GasSubtype or ""
     try:
         return dataset.gwp_values.get(Gas=instance.Gas, GasSubtype=subtype).GwpFactor
     except ObjectDoesNotExist:
-        if subtype is not None:
-            # Retry subtype-agnostically — recovers a canonical (Gas, None) row.
+        if subtype:
+            # Retry subtype-agnostically — recovers a canonical (Gas, "") row.
             try:
-                return dataset.gwp_values.get(Gas=instance.Gas, GasSubtype=None).GwpFactor
+                return dataset.gwp_values.get(Gas=instance.Gas, GasSubtype="").GwpFactor
             except (ObjectDoesNotExist, MultipleObjectsReturned):
                 pass
         logger.warning(

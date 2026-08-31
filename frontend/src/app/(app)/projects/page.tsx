@@ -10,8 +10,8 @@ import { EmptyState } from "@/components/EmptyState";
 interface Project {
   ProjectId:   number;
   ProjectName: string;
-  ProjectType: string | null;
-  Country:     string | null;
+  ProjectType: string;
+  Country:     string;
   StartDate:   string | null;
   EndDate:     string | null;
   Status:      number;
@@ -61,7 +61,7 @@ function CreateProjectModal({ onClose, entityId }: { onClose: () => void; entity
             mutation.mutate({
               ProjectName: form.ProjectName,
               ProjectType: form.ProjectType,
-              Country:     form.Country || null,
+              Country:     form.Country,
               StartDate:   form.StartDate || null,
               EndDate:     form.EndDate || null,
             });

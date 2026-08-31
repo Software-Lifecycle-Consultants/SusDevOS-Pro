@@ -118,13 +118,17 @@ def enrich_species(species) -> bool:
         if matches:
             m = matches[0]
             if m.get("ScientificName"):
-                species.ScientificName = m["ScientificName"]; changed_fields.append("ScientificName")
+                species.ScientificName = m["ScientificName"]
+                changed_fields.append("ScientificName")
             if m.get("GBIFKey") and not species.GBIFKey:
-                species.GBIFKey = m["GBIFKey"]; changed_fields.append("GBIFKey")
+                species.GBIFKey = m["GBIFKey"]
+                changed_fields.append("GBIFKey")
             if m.get("Family") and not species.Family:
-                species.Family = m["Family"]; changed_fields.append("Family")
+                species.Family = m["Family"]
+                changed_fields.append("Family")
             if m.get("Kingdom") and not species.Kingdom:
-                species.Kingdom = m["Kingdom"]; changed_fields.append("Kingdom")
+                species.Kingdom = m["Kingdom"]
+                changed_fields.append("Kingdom")
 
     # Conservation status from IUCN when we have a scientific name and no status yet.
     if species.ScientificName and not species.IUCNStatus:

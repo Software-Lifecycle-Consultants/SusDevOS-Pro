@@ -19,7 +19,7 @@ class LandParcelsDetailSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("LandParcelId", "EntityId", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
 
-    def validate_BoundaryGeoJSON(self, value):
+    def validate_BoundaryGeoJSON(self, value):  # noqa: N802 — DRF resolves validators by exact field name
         """Reject anything that is not a GeoJSON object.
 
         The column is a plain JSONField, so without this any JSON at all would be

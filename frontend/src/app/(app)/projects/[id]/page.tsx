@@ -24,7 +24,7 @@ interface ProjectPhase {
   PhaseId: number;
   PhaseName: string;
   PhaseNumber: number | null;
-  Description: string | null;
+  Description: string;
   StartDate: string | null;
   EndDate: string | null;
   TargetEmissionsTonnes: string | null;
@@ -176,7 +176,7 @@ function ProjectPhasesPanel({ projectId }: { projectId: string }) {
             save.mutate({
               PhaseName: form.PhaseName,
               PhaseNumber: form.PhaseNumber ? Number(form.PhaseNumber) : null,
-              Description: form.Description || null,
+              Description: form.Description,
               StartDate: form.StartDate || null,
               EndDate: form.EndDate || null,
               TargetEmissionsTonnes: form.TargetEmissionsTonnes || null,

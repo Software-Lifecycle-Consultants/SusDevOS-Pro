@@ -31,8 +31,8 @@ class Ecosystem(BaseAuditMixin):
         db_column="EntityId",
     )
     EcosystemName = models.CharField(max_length=200)
-    EcosystemType = models.CharField(max_length=100, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
+    EcosystemType = models.CharField(max_length=100, blank=True)
+    Description = models.TextField(blank=True)
     AreaHectares = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
 
     class Meta:
@@ -51,6 +51,9 @@ class EcosystemTags(models.Model):
     class Meta:
         db_table = "ecosystem_tags"
 
+    def __str__(self):
+        return f"{self.EcosystemId} / {self.TagId}"
+
 
 class Species(BaseAuditMixin):
     SpeciesId = models.AutoField(primary_key=True)
@@ -61,16 +64,16 @@ class Species(BaseAuditMixin):
         db_column="EntityId",
     )
     CommonName = models.CharField(max_length=200)
-    ScientificName = models.CharField(max_length=200, null=True, blank=True)
-    Family = models.CharField(max_length=100, null=True, blank=True)
-    Kingdom = models.CharField(max_length=50, null=True, blank=True)
-    Description = models.TextField(blank=True, null=True)
-    IUCNStatus = models.CharField(max_length=2, choices=IUCN_STATUS_CHOICES, null=True, blank=True)
+    ScientificName = models.CharField(max_length=200, blank=True)
+    Family = models.CharField(max_length=100, blank=True)
+    Kingdom = models.CharField(max_length=50, blank=True)
+    Description = models.TextField(blank=True)
+    IUCNStatus = models.CharField(max_length=2, choices=IUCN_STATUS_CHOICES, blank=True)
     IUCNSyncedAt = models.DateTimeField(null=True, blank=True)
     GBIFKey = models.PositiveIntegerField(null=True, blank=True)
     # ── IPCC LULUCF biomass parameters (ghg_calculation_spec §6) ────────────────
     IPCCForestType = models.CharField(
-        max_length=20, choices=IPCC_FOREST_TYPE_CHOICES, null=True, blank=True,
+        max_length=20, choices=IPCC_FOREST_TYPE_CHOICES, blank=True,
         help_text="IPCC forest type for Tier 1 BEF/R lookup",
     )
     BasicWoodDensity = models.DecimalField(
@@ -94,7 +97,7 @@ class Species(BaseAuditMixin):
         help_text="Mean annual CO2e sequestered per ha at maturity (IPCC Annex 3A.1)",
     )
     BiomassDataSource = models.CharField(
-        max_length=200, null=True, blank=True,
+        max_length=200, blank=True,
         help_text="Citation for biomass parameter values (IPCC table ref, study DOI)",
     )
 
@@ -115,6 +118,9 @@ class SpeciesTags(models.Model):
     class Meta:
         db_table = "species_tags"
 
+    def __str__(self):
+        return f"{self.SpeciesId} / {self.TagId}"
+
 
 class SpeciesLandParcels(models.Model):
     """Junction: Species <-> LandParcels. Uses IntegerField to avoid circular import."""
@@ -124,3 +130,6 @@ class SpeciesLandParcels(models.Model):
 
     class Meta:
         db_table = "species_land_parcels"
+
+    def __str__(self):
+        return f"{self.SpeciesId} / parcel {self.LandParcelId}"

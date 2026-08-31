@@ -50,7 +50,7 @@ class GwpValues(BaseAuditMixin):
     GwpValueId = models.AutoField(primary_key=True)
     GwpDatasetId = models.ForeignKey(GwpDatasets, on_delete=models.PROTECT, related_name="gwp_values")
     Gas = models.CharField(max_length=50)
-    GasSubtype = models.CharField(max_length=50, blank=True, null=True)
+    GasSubtype = models.CharField(max_length=50, blank=True)
     GwpFactor = models.DecimalField(max_digits=10, decimal_places=4)
 
     class Meta:
@@ -87,9 +87,9 @@ class EmissionFactorSets(BaseAuditMixin):
     SetId = models.AutoField(primary_key=True)
     SetName = models.CharField(max_length=200)
     Publisher = models.CharField(max_length=200)
-    Version = models.CharField(max_length=50, blank=True, null=True)
+    Version = models.CharField(max_length=50, blank=True)
     ApplicableYear = models.PositiveSmallIntegerField(null=True, blank=True)
-    GeographicScope = models.CharField(max_length=100, blank=True, null=True)
+    GeographicScope = models.CharField(max_length=100, blank=True)
     IsActive = models.BooleanField(default=True)
 
     class Meta:
@@ -104,17 +104,17 @@ class EmissionFactors(BaseAuditMixin):
     FactorId = models.AutoField(primary_key=True)
     SetId = models.ForeignKey(EmissionFactorSets, on_delete=models.PROTECT, related_name="factors")
     ActivityName = models.CharField(max_length=200)
-    ActivityCategory = models.CharField(max_length=200, blank=True, null=True)
+    ActivityCategory = models.CharField(max_length=200, blank=True)
     Scope = models.PositiveSmallIntegerField()
     Scope3Category = models.PositiveSmallIntegerField(null=True, blank=True)
     Gas = models.CharField(max_length=50)
-    GasSubtype = models.CharField(max_length=50, null=True, blank=True)
+    GasSubtype = models.CharField(max_length=50, blank=True)
     FactorValue = models.DecimalField(max_digits=18, decimal_places=8)
     InputUnitId = models.ForeignKey(Units, on_delete=models.PROTECT, null=True, blank=True, related_name="emission_factors")
-    CountryCode = models.CharField(max_length=3, blank=True, null=True)
+    CountryCode = models.CharField(max_length=3, blank=True)
     ApplicableYear = models.PositiveSmallIntegerField(null=True, blank=True)
-    ClimatiqActivityId = models.CharField(max_length=200, null=True, blank=True)
-    GridSubregion = models.CharField(max_length=50, null=True, blank=True)
+    ClimatiqActivityId = models.CharField(max_length=200, blank=True)
+    GridSubregion = models.CharField(max_length=50, blank=True)
     ExternalSyncedAt = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -146,7 +146,6 @@ class GHGInventories(BaseAuditMixin):
         null=True, blank=True, choices=CONSOLIDATION_APPROACH_CHOICES
     )
     BoundaryNotes = models.TextField(
-        null=True,
         blank=True,
         help_text="Included/excluded operations and rationale for the inventory boundary.",
     )
@@ -155,7 +154,7 @@ class GHGInventories(BaseAuditMixin):
         "users.Users", on_delete=models.SET_NULL, null=True, blank=True, related_name="verified_inventories"
     )
     VerifiedAt = models.DateTimeField(null=True, blank=True)
-    VerificationNotes = models.TextField(blank=True, null=True)
+    VerificationNotes = models.TextField(blank=True)
     TotalScope1Tonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     TotalScope2LocationTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     TotalScope2MarketTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
@@ -182,8 +181,8 @@ class Scope3RelevanceAssessments(BaseAuditMixin):
     EntityId = models.ForeignKey("entities.Entities", on_delete=models.PROTECT, related_name="scope3_assessments")
     CategoryNumber = models.PositiveSmallIntegerField()
     IsRelevant = models.BooleanField(null=True, blank=True)
-    ExclusionReason = models.TextField(blank=True, null=True)
-    Notes = models.TextField(blank=True, null=True)
+    ExclusionReason = models.TextField(blank=True)
+    Notes = models.TextField(blank=True)
 
     class Meta:
         db_table = "scope3_relevance_assessments"
@@ -214,11 +213,10 @@ class EmissionsData(BaseAuditMixin):
     Title = models.CharField(max_length=200)
     Scope = models.PositiveSmallIntegerField()
     Scope3Category = models.PositiveSmallIntegerField(null=True, blank=True)
-    ActivityDescription = models.TextField(blank=True, null=True)
+    ActivityDescription = models.TextField(blank=True)
     SupplierName = models.CharField(
         max_length=200,
         blank=True,
-        null=True,
         help_text="Supplier shown on the bill, contract, or source evidence.",
     )
     QuantityOrCost = models.DecimalField(max_digits=18, decimal_places=4)
@@ -233,7 +231,7 @@ class EmissionsData(BaseAuditMixin):
         EmissionFactors, on_delete=models.SET_NULL, null=True, blank=True, related_name="emissions_records"
     )
     Gas = models.CharField(max_length=50)
-    GasSubtype = models.CharField(max_length=50, null=True, blank=True)
+    GasSubtype = models.CharField(max_length=50, blank=True)
     GwpDatasetId = models.ForeignKey(GwpDatasets, on_delete=models.PROTECT, related_name="emissions_records")
     # Calculated outputs (server-side only)
     EmissionsAmount = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
@@ -258,12 +256,12 @@ class EmissionsData(BaseAuditMixin):
     EmissionsAmountLocationBased = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     EmissionsAmountMarketBased = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     # Spend-based FX (from 0027)
-    SpendCurrency = models.CharField(max_length=3, null=True, blank=True)
+    SpendCurrency = models.CharField(max_length=3, blank=True)
     SpendAmountLocal = models.DecimalField(max_digits=18, decimal_places=2, null=True, blank=True)
     SpendAmountUSD = models.DecimalField(max_digits=18, decimal_places=2, null=True, blank=True)
     ExchangeRateToUSD = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
     ExchangeRateDate = models.DateField(null=True, blank=True)
-    GridSubregion = models.CharField(max_length=50, null=True, blank=True)
+    GridSubregion = models.CharField(max_length=50, blank=True)
     BaselineYear = models.PositiveSmallIntegerField(null=True, blank=True)
     ReportingPeriodFrom = models.DateField(null=True, blank=True)
     ReportingPeriodTo = models.DateField(null=True, blank=True)
@@ -273,7 +271,7 @@ class EmissionsData(BaseAuditMixin):
         "users.Users", on_delete=models.SET_NULL, null=True, blank=True, related_name="verified_emissions"
     )
     VerifiedAt = models.DateTimeField(null=True, blank=True)
-    VerificationNotes = models.TextField(null=True, blank=True)
+    VerificationNotes = models.TextField(blank=True)
 
     class Meta:
         db_table = "emissions_data"
@@ -304,11 +302,11 @@ class EmissionsDetails(BaseAuditMixin):
     EmissionFactor = models.DecimalField(max_digits=18, decimal_places=8)
     EmissionFactorSource = models.CharField(max_length=200)
     Gas = models.CharField(max_length=50)
-    GasSubtype = models.CharField(max_length=50, null=True, blank=True)
+    GasSubtype = models.CharField(max_length=50, blank=True)
     GwpDatasetId = models.ForeignKey(GwpDatasets, on_delete=models.PROTECT, related_name="emissions_details")
     EmissionsAmount = models.DecimalField(max_digits=18, decimal_places=4, null=True, blank=True)
     EmissionsAmountTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
-    Remarks = models.TextField(null=True, blank=True)
+    Remarks = models.TextField(blank=True)
 
     class Meta:
         db_table = "emissions_details"
@@ -321,24 +319,24 @@ class EmissionsOffsets(BaseAuditMixin):
     Title = models.CharField(max_length=200)
     OffsetType = models.CharField(max_length=100)
     Provider = models.CharField(max_length=200)
-    CertificateNumber = models.CharField(max_length=100, blank=True, null=True)
+    CertificateNumber = models.CharField(max_length=100, blank=True)
     OffsetAmountTonnes = models.DecimalField(max_digits=18, decimal_places=6)
     ValidFrom = models.DateField(null=True, blank=True)
     ValidTo = models.DateField(null=True, blank=True)
-    Remarks = models.TextField(null=True, blank=True)
-    CreditSerialNumber = models.CharField(max_length=200, null=True, blank=True)
+    Remarks = models.TextField(blank=True)
+    CreditSerialNumber = models.CharField(max_length=200, blank=True)
     CreditRegistry = models.CharField(
-        max_length=20, null=True, blank=True, choices=CREDIT_REGISTRY_CHOICES,
+        max_length=20, blank=True, choices=CREDIT_REGISTRY_CHOICES,
         help_text="Which registry validates this credit (drives the registry-sync task).",
     )
     RegistryValidatedAt = models.DateTimeField(null=True, blank=True)
     RegistryValidationStatus = models.CharField(
-        max_length=20, null=True, blank=True, choices=REGISTRY_VALIDATION_STATUS, default="unverified"
+        max_length=20, blank=True, choices=REGISTRY_VALIDATION_STATUS, default="unverified"
     )
-    RegistryProjectName = models.CharField(max_length=300, null=True, blank=True)
-    RegistryProjectType = models.CharField(max_length=200, null=True, blank=True)
+    RegistryProjectName = models.CharField(max_length=300, blank=True)
+    RegistryProjectType = models.CharField(max_length=200, blank=True)
     RegistryVintageYear = models.PositiveSmallIntegerField(null=True, blank=True)
-    RegistryRetirementBeneficiary = models.CharField(max_length=300, null=True, blank=True)
+    RegistryRetirementBeneficiary = models.CharField(max_length=300, blank=True)
 
     class Meta:
         db_table = "emissions_offsets"
@@ -364,6 +362,9 @@ class ExchangeRates(models.Model):
         ]
         indexes = [models.Index(fields=["FromCurrency", "ToCurrency", "RateDate"], name="idx_fx_currency_date")]
 
+    def __str__(self):
+        return f"{self.FromCurrency}->{self.ToCurrency} @ {self.Rate} ({self.RateDate})"
+
 
 class Targets(BaseAuditMixin):
     TargetId = models.AutoField(primary_key=True)
@@ -376,7 +377,7 @@ class Targets(BaseAuditMixin):
     ReductionPercent = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     Scope = models.PositiveSmallIntegerField(null=True, blank=True)
     ValidationStatus = models.PositiveSmallIntegerField(default=1)
-    Notes = models.TextField(blank=True, null=True)
+    Notes = models.TextField(blank=True)
 
     class Meta:
         db_table = "targets"
@@ -394,7 +395,7 @@ class TargetMilestones(BaseAuditMixin):
     TargetEmissionsTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     ActualEmissionsTonnes = models.DecimalField(max_digits=18, decimal_places=6, null=True, blank=True)
     IsAchieved = models.BooleanField(default=False)
-    Notes = models.TextField(blank=True, null=True)
+    Notes = models.TextField(blank=True)
 
     class Meta:
         db_table = "target_milestones"

@@ -36,17 +36,17 @@ interface Entity {
   EntityId:             number;
   EntityName:           string;
   EntityType:           number | null;
-  RegistrationNumber:   string | null;
-  VATNumber:            string | null;
-  AddressLine1:         string | null;
-  AddressLine2:         string | null;
-  City:                 string | null;
-  PostCode:             string | null;
-  Country:              string | null;
+  RegistrationNumber:   string;
+  VATNumber:            string;
+  AddressLine1:         string;
+  AddressLine2:         string;
+  City:                 string;
+  PostCode:             string;
+  Country:              string;
   BaseCurrency:         string;
   FiscalYearEndMonth:   number;
   ConsolidationApproach: number | null;
-  CompaniesHouseNumber: string | null;
+  CompaniesHouseNumber: string;
 }
 
 export default function EntitySettingsPage() {
