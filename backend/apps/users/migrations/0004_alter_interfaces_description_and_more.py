@@ -20,6 +20,14 @@ def backfill_empty_strings(apps, schema_editor):
                 **{field_name: ""}
             )
 
+    # The UPDATEs above queue deferred FK trigger events, and PostgreSQL refuses to
+    # ALTER a table that has any pending -- "cannot ALTER TABLE because it has
+    # pending trigger events". Both run in one transaction, so the AlterField
+    # operations below would fail on any database that actually has rows. An empty
+    # database updates nothing, queues nothing, and passes, which is why CI and a
+    # fresh test database never caught this.
+    schema_editor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
 
 def noop(apps, schema_editor):
     """Reverse is a no-op — '' and NULL are indistinguishable once merged."""
