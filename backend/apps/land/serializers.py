@@ -19,7 +19,11 @@ class LandParcelsDetailSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("LandParcelId", "EntityId", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
 
-    def validate_BoundaryGeoJSON(self, value):  # noqa: N802 — DRF resolves validators by exact field name
+    # noqa on the name: DRF dispatches field validators by exact field name, and the
+    # field is BoundaryGeoJSON. Lowercasing it to satisfy N802 would silently stop the
+    # validator running. Same class of false positive as the N805/N806 entries already
+    # ignored in pyproject.toml.
+    def validate_BoundaryGeoJSON(self, value):  # noqa: N802
         """Reject anything that is not a GeoJSON object.
 
         The column is a plain JSONField, so without this any JSON at all would be
