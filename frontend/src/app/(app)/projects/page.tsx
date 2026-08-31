@@ -168,8 +168,8 @@ export default function ProjectsPage() {
                   <td className="font-medium">
                     <Link href={`/projects/${p.ProjectId}`} className="text-brand-700 hover:underline">{p.ProjectName}</Link>
                   </td>
-                  <td className="text-surface-500">{p.ProjectType ?? "—"}</td>
-                  <td className="text-surface-500">{p.Country ?? "—"}</td>
+                  <td className="text-surface-500">{p.ProjectType || "—"}</td>
+                  <td className="text-surface-500">{p.Country || "—"}</td>
                   <td className="text-surface-500">{p.StartDate ?? "—"}</td>
                   <td className="text-surface-500">{p.EndDate ?? "—"}</td>
                   <td className="tabular-nums text-center">{p.phase_count}</td>

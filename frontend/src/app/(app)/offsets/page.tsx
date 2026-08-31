@@ -277,7 +277,7 @@ export default function OffsetsPage() {
             </thead>
             <tbody>
               {offsets.map((o) => {
-                const rs = REGISTRY_STATUS[o.RegistryValidationStatus ?? "unverified"] ?? REGISTRY_STATUS.unverified;
+                const rs = REGISTRY_STATUS[o.RegistryValidationStatus || "unverified"] ?? REGISTRY_STATUS.unverified;
                 return (
                   <tr key={o.OffsetId}>
                     <td>

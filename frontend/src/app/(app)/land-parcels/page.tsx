@@ -402,7 +402,7 @@ export default function LandParcelsPage() {
                 {parcels.map((p) => (
                   <tr key={p.LandParcelId}>
                     <td className="font-medium text-surface-900">{p.ParcelName}</td>
-                    <td className="text-surface-500 text-xs">{p.ParcelReference ?? "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.ParcelReference || "—"}</td>
                     <td className="text-right tabular-nums">
                       {p.AreaHectares ? parseFloat(p.AreaHectares).toFixed(2) : "—"}
                     </td>
@@ -411,8 +411,8 @@ export default function LandParcelsPage() {
                         ? <span className="badge badge-slate text-xs">{p.LandUseType}</span>
                         : <span className="text-surface-400 text-xs">—</span>}
                     </td>
-                    <td className="text-surface-500 text-xs">{p.Tenure ?? "—"}</td>
-                    <td className="text-surface-500 text-xs">{p.PlanningReference ?? "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.Tenure || "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.PlanningReference || "—"}</td>
                     <td>
                       {p.BoundaryGeoJSON
                         ? <span className="badge badge-green text-xs">Mapped</span>

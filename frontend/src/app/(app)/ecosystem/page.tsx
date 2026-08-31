@@ -311,7 +311,7 @@ export default function EcosystemPage() {
                     <td className="text-right tabular-nums">
                       {e.AreaHectares ? parseFloat(e.AreaHectares).toFixed(2) : "—"}
                     </td>
-                    <td className="text-surface-500 text-xs truncate max-w-[240px]">{e.Description ?? "—"}</td>
+                    <td className="text-surface-500 text-xs truncate max-w-[240px]">{e.Description || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -345,9 +345,9 @@ export default function EcosystemPage() {
                     <td className="font-medium">
                       <Link href={`/species/${s.SpeciesId}`} className="text-brand-700 hover:underline">{s.CommonName}</Link>
                     </td>
-                    <td className="italic text-surface-600 text-sm">{s.ScientificName ?? "—"}</td>
-                    <td className="text-surface-500 text-sm">{s.Family ?? "—"}</td>
-                    <td className="text-surface-500 text-sm">{s.Kingdom ?? "—"}</td>
+                    <td className="italic text-surface-600 text-sm">{s.ScientificName || "—"}</td>
+                    <td className="text-surface-500 text-sm">{s.Family || "—"}</td>
+                    <td className="text-surface-500 text-sm">{s.Kingdom || "—"}</td>
                     <td><IUCNBadge status={s.IUCNStatus} /></td>
                     <td className="text-surface-400 text-xs">
                       {s.GBIFKey

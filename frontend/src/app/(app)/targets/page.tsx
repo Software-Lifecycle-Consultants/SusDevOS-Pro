@@ -164,7 +164,7 @@ function MilestonesRow({
             )}
           </td>
           <td className="px-4 py-2.5 text-xs text-surface-400 truncate max-w-[140px]">
-            {m.Notes ?? "—"}
+            {m.Notes || "—"}
           </td>
         </tr>
       ))}

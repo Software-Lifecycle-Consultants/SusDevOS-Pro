@@ -171,7 +171,7 @@ export default function AuditLogPage() {
                       : "—"}
                   </td>
                   <td className="text-surface-600 text-sm max-w-[280px] truncate" title={e.Description ?? ""}>
-                    {e.Description ?? "—"}
+                    {e.Description || "—"}
                   </td>
                   <td className="text-surface-600 text-sm">{e.ChangedByUsername}</td>
                   <td className="text-surface-400 text-xs whitespace-nowrap" title={e.ChangedOn}>

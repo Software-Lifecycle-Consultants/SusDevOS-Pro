@@ -368,7 +368,7 @@ export default function RestorationsPage() {
                         ? <span className="badge badge-green text-xs">Plan in place</span>
                         : <span className="badge badge-red text-xs">None</span>}
                     </td>
-                    <td className="text-surface-500 text-xs truncate max-w-[200px]">{r.Description ?? "—"}</td>
+                    <td className="text-surface-500 text-xs truncate max-w-[200px]">{r.Description || "—"}</td>
                   </tr>
                 ))}
               </tbody>
