@@ -15,8 +15,8 @@ class Blogs(BaseAuditMixin):
     PostBody = models.TextField()
     BlogStatus = models.PositiveSmallIntegerField(default=1, help_text="1: Draft, 2: Published, 3: Archived")
     PublishedAt = models.DateTimeField(null=True, blank=True)
-    SeoTitle = models.CharField(max_length=60, blank=True, null=True)
-    SeoDescription = models.CharField(max_length=160, blank=True, null=True)
+    SeoTitle = models.CharField(max_length=60, blank=True)
+    SeoDescription = models.CharField(max_length=160, blank=True)
     EmbedUrls = models.JSONField(default=list)
     FeaturedImageId = models.IntegerField(null=True, blank=True)
 

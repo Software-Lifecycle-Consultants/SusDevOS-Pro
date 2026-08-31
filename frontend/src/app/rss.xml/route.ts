@@ -11,8 +11,8 @@ interface Post {
   Slug:           string;
   PostBody:       string;
   PublishedAt:    string | null;
-  SeoTitle:       string | null;
-  SeoDescription: string | null;
+  SeoTitle:       string;
+  SeoDescription: string;
 }
 
 function escapeXml(str: string): string {

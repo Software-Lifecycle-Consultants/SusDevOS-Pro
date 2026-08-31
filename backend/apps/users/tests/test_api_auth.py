@@ -23,7 +23,7 @@ class TestLogin:
     URL = "/api/auth/login"
 
     def test_valid_credentials_returns_token(self):
-        user = SuperAdminFactory(email="login@test.com")
+        SuperAdminFactory(email="login@test.com")
         client = APIClient()
         resp = client.post(self.URL, {"username": "login@test.com", "password": "testpassword123!"})
         assert resp.status_code == status.HTTP_200_OK
@@ -32,7 +32,7 @@ class TestLogin:
 
     def test_email_or_username_both_work(self, db):
         """Users can log in with either email or username."""
-        user = UsersFactory(email="user@corp.com", username="corp_user")
+        UsersFactory(email="user@corp.com", username="corp_user")
         client = APIClient()
         by_email    = client.post(self.URL, {"username": "user@corp.com",  "password": "testpassword123!"})
         by_username = client.post(self.URL, {"username": "corp_user", "password": "testpassword123!"})
@@ -96,7 +96,7 @@ class TestLogout:
 
     def test_logout_revokes_access_token(self):
         """After logout, the same access token must be rejected."""
-        user = SuperAdminFactory(email="logout@test.com")
+        SuperAdminFactory(email="logout@test.com")
         client = APIClient()
 
         login = client.post(self.LOGIN_URL, {"username": "logout@test.com", "password": "testpassword123!"})

@@ -12,21 +12,15 @@ export interface EmissionFactorSets {
   SetName: string;
   /** @maxLength 200 */
   Publisher: string;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  Version?: string | null;
+  /** @maxLength 50 */
+  Version?: string;
   /**
    * @minimum 0
    * @maximum 32767
    * @nullable
    */
   ApplicableYear?: number | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  GeographicScope?: string | null;
+  /** @maxLength 100 */
+  GeographicScope?: string;
   IsActive?: boolean;
 }

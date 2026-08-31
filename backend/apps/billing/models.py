@@ -16,8 +16,8 @@ class Plans(models.Model):
     SupportTier = models.CharField(max_length=50)
     IsPublic = models.BooleanField(default=True)
     SortOrder = models.PositiveSmallIntegerField(default=0)
-    StripePriceIdMonthly = models.CharField(max_length=100, null=True, blank=True)
-    StripePriceIdAnnual = models.CharField(max_length=100, null=True, blank=True)
+    StripePriceIdMonthly = models.CharField(max_length=100, blank=True)
+    StripePriceIdAnnual = models.CharField(max_length=100, blank=True)
     CreatedAt = models.DateTimeField(auto_now_add=True)
     UpdatedAt = models.DateTimeField(auto_now=True)
 
@@ -44,6 +44,9 @@ class PlanFeatures(models.Model):
         ]
         indexes = [models.Index(fields=["PlanId", "FeatureKey"], name="idx_plan_feature_key")]
 
+    def __str__(self):
+        return f"{self.PlanId}: {self.FeatureKey}"
+
 
 class EntitySubscriptions(models.Model):
     STATUS_CHOICES = [
@@ -64,11 +67,11 @@ class EntitySubscriptions(models.Model):
     CurrentPeriodEnd = models.DateTimeField(null=True, blank=True)
     CanceledAt = models.DateTimeField(null=True, blank=True)
     CancelAtPeriodEnd = models.BooleanField(default=False)
-    StripeCustomerId = models.CharField(max_length=100, null=True, blank=True)
-    StripeSubscriptionId = models.CharField(max_length=100, null=True, blank=True)
-    StripeLatestInvoiceId = models.CharField(max_length=100, null=True, blank=True)
+    StripeCustomerId = models.CharField(max_length=100, blank=True)
+    StripeSubscriptionId = models.CharField(max_length=100, blank=True)
+    StripeLatestInvoiceId = models.CharField(max_length=100, blank=True)
     AdditionalEntities = models.PositiveSmallIntegerField(default=0)
-    DiscountCode = models.CharField(max_length=50, null=True, blank=True)
+    DiscountCode = models.CharField(max_length=50, blank=True)
     CreatedAt = models.DateTimeField(auto_now_add=True)
     UpdatedAt = models.DateTimeField(auto_now=True)
 
@@ -78,6 +81,9 @@ class EntitySubscriptions(models.Model):
             models.Index(fields=["StripeCustomerId"], name="idx_sub_stripe_customer"),
             models.Index(fields=["StripeSubscriptionId"], name="idx_sub_stripe_subscription"),
         ]
+
+    def __str__(self):
+        return f"{self.EntityId} - {self.PlanId} ({self.Status})"
 
 
 class UsageTracking(models.Model):
@@ -99,3 +105,6 @@ class UsageTracking(models.Model):
                 fields=["EntityId", "PeriodStart"], name="unique_usage_per_entity_period"
             )
         ]
+
+    def __str__(self):
+        return f"{self.EntityId} usage {self.PeriodStart} to {self.PeriodEnd}"

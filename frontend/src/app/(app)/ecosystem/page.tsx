@@ -11,19 +11,19 @@ import { EmptyState } from "@/components/EmptyState";
 interface Ecosystem {
   EcosystemId:   number;
   EcosystemName: string;
-  EcosystemType: string | null;
+  EcosystemType: string;
   AreaHectares:  string | null;
-  Description:   string | null;
+  Description:   string;
   Status:        number;
 }
 
 interface Species {
   SpeciesId:      number;
   CommonName:     string;
-  ScientificName: string | null;
-  Family:         string | null;
-  Kingdom:        string | null;
-  IUCNStatus:     string | null;
+  ScientificName: string;
+  Family:         string;
+  Kingdom:        string;
+  IUCNStatus:     string;
   GBIFKey:        number | null;
   Status:         number;
 }
@@ -74,9 +74,9 @@ function CreateEcosystemModal({ onClose, entityId }: { onClose: () => void; enti
   const mutation = useMutation({
     mutationFn: () => axiosInstance.post("/api/ecosystems/", {
       EcosystemName: form.EcosystemName,
-      EcosystemType: form.EcosystemType || null,
+      EcosystemType: form.EcosystemType,
       AreaHectares:  form.AreaHectares ? Number(form.AreaHectares) : null,
-      Description:   form.Description || null,
+      Description:   form.Description,
     }, { headers }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["ecosystems", entityId] }); onClose(); },
     onError: (err: unknown) => {
@@ -145,12 +145,12 @@ function CreateSpeciesModal({ onClose, entityId }: { onClose: () => void; entity
   const mutation = useMutation({
     mutationFn: () => axiosInstance.post("/api/species/", {
       CommonName:     form.CommonName,
-      ScientificName: form.ScientificName || null,
-      Family:         form.Family || null,
-      Kingdom:        form.Kingdom || null,
-      IUCNStatus:     form.IUCNStatus || null,
+      ScientificName: form.ScientificName,
+      Family:         form.Family,
+      Kingdom:        form.Kingdom,
+      IUCNStatus:     form.IUCNStatus,
       GBIFKey:        form.GBIFKey ? Number(form.GBIFKey) : null,
-      Description:    form.Description || null,
+      Description:    form.Description,
     }, { headers }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["species", entityId] }); onClose(); },
     onError: (err: unknown) => {
@@ -311,7 +311,7 @@ export default function EcosystemPage() {
                     <td className="text-right tabular-nums">
                       {e.AreaHectares ? parseFloat(e.AreaHectares).toFixed(2) : "—"}
                     </td>
-                    <td className="text-surface-500 text-xs truncate max-w-[240px]">{e.Description ?? "—"}</td>
+                    <td className="text-surface-500 text-xs truncate max-w-[240px]">{e.Description || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -345,9 +345,9 @@ export default function EcosystemPage() {
                     <td className="font-medium">
                       <Link href={`/species/${s.SpeciesId}`} className="text-brand-700 hover:underline">{s.CommonName}</Link>
                     </td>
-                    <td className="italic text-surface-600 text-sm">{s.ScientificName ?? "—"}</td>
-                    <td className="text-surface-500 text-sm">{s.Family ?? "—"}</td>
-                    <td className="text-surface-500 text-sm">{s.Kingdom ?? "—"}</td>
+                    <td className="italic text-surface-600 text-sm">{s.ScientificName || "—"}</td>
+                    <td className="text-surface-500 text-sm">{s.Family || "—"}</td>
+                    <td className="text-surface-500 text-sm">{s.Kingdom || "—"}</td>
                     <td><IUCNBadge status={s.IUCNStatus} /></td>
                     <td className="text-surface-400 text-xs">
                       {s.GBIFKey

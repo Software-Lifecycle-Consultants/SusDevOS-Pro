@@ -12,6 +12,5 @@ export interface Roles {
   /** @maxLength 100 */
   RoleName: string;
   RoleKey: RoleKeyEnum;
-  /** @nullable */
-  Description?: string | null;
+  Description?: string;
 }

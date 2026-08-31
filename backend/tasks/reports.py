@@ -74,7 +74,7 @@ def generate_report(self, report_job_id: int):
                 _notify_failed(job, str(exc))
         except Exception:
             pass
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc
 
 
 def _render_report(job):
@@ -164,7 +164,7 @@ def purge_expired_reports():
     from apps.reports.models import ReportJobs
 
     expired = ReportJobs.objects.filter(PurgeAfter__lt=now())
-    s3_keys = list(expired.exclude(S3Key__isnull=True).values_list("S3Key", flat=True))
+    s3_keys = list(expired.exclude(S3Key="").values_list("S3Key", flat=True))
 
     if s3_keys:
         _delete_s3_objects(s3_keys)

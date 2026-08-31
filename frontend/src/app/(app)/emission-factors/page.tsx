@@ -205,7 +205,7 @@ export default function EmissionFactorsPage() {
                       <p className="font-medium text-surface-800 leading-snug">{ef.ActivityName}</p>
                     </td>
                     <td className="px-4 py-3 text-surface-500 text-xs max-w-[160px]">
-                      {ef.ActivityCategory ?? "—"}
+                      {ef.ActivityCategory || "—"}
                     </td>
                     <td className="px-3 py-3 text-center">
                       <span className="badge badge-slate text-xs">

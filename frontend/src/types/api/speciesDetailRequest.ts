@@ -5,8 +5,8 @@
  * GHG reporting, ecosystem tracking, and sustainable development platform. Aligned to GHG Protocol, IPCC, and TNFD.
  * OpenAPI spec version: 1.0.0
  */
-import type { SpeciesDetailRequestIUCNStatus } from './speciesDetailRequestIUCNStatus';
-import type { SpeciesDetailRequestIPCCForestType } from './speciesDetailRequestIPCCForestType';
+import type { IUCNStatusEnum } from './iUCNStatusEnum';
+import type { IPCCForestTypeEnum } from './iPCCForestTypeEnum';
 
 export interface SpeciesDetailRequest {
   /**
@@ -28,36 +28,22 @@ export interface SpeciesDetailRequest {
    * @maxLength 200
    */
   CommonName: string;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  ScientificName?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Family?: string | null;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  Kingdom?: string | null;
-  /** @nullable */
-  Description?: string | null;
-  /** @nullable */
-  IUCNStatus?: SpeciesDetailRequestIUCNStatus;
+  /** @maxLength 200 */
+  ScientificName?: string;
+  /** @maxLength 100 */
+  Family?: string;
+  /** @maxLength 50 */
+  Kingdom?: string;
+  Description?: string;
+  IUCNStatus?: IUCNStatusEnum;
   /**
    * @minimum 0
    * @maximum 2147483647
    * @nullable
    */
   GBIFKey?: number | null;
-  /**
-   * IPCC forest type for Tier 1 BEF/R lookup
-   * @nullable
-   */
-  IPCCForestType?: SpeciesDetailRequestIPCCForestType;
+  /** IPCC forest type for Tier 1 BEF/R lookup */
+  IPCCForestType?: IPCCForestTypeEnum;
   /**
    * D — tonnes dry matter per m³ fresh volume (IPCC Table 4.13)
    * @nullable
@@ -91,7 +77,6 @@ export interface SpeciesDetailRequest {
   /**
    * Citation for biomass parameter values (IPCC table ref, study DOI)
    * @maxLength 200
-   * @nullable
    */
-  BiomassDataSource?: string | null;
+  BiomassDataSource?: string;
 }

@@ -10,21 +10,12 @@ export interface DevelopmentProjectsList {
   readonly ProjectId: number;
   /** @maxLength 200 */
   ProjectName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ProjectReference?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  ProjectType?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Country?: string | null;
+  /** @maxLength 100 */
+  ProjectReference?: string;
+  /** @maxLength 100 */
+  ProjectType?: string;
+  /** @maxLength 100 */
+  Country?: string;
   /** @nullable */
   StartDate?: string | null;
   /** @nullable */

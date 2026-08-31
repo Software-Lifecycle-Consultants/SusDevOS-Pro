@@ -30,13 +30,9 @@ export interface RestorationsDetail {
   readonly UpdatedBy: number | null;
   /** @maxLength 200 */
   RestorationName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  RestorationReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  RestorationReference?: string;
+  Description?: string;
   /** @nullable */
   StartDate?: string | null;
   /** @nullable */
@@ -57,7 +53,6 @@ export interface RestorationsDetail {
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$
    */
   readonly EstimatedCarbonSequestrationTonnes: string | null;
-  /** @nullable */
-  MonitoringNotes?: string | null;
+  MonitoringNotes?: string;
   readonly EntityId: number;
 }

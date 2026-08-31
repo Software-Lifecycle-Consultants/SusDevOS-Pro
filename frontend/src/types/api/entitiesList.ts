@@ -17,16 +17,10 @@ export interface EntitiesList {
    * @nullable
    */
   EntityType?: EntitiesListEntityType;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  RegistrationNumber?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Country?: string | null;
+  /** @maxLength 50 */
+  RegistrationNumber?: string;
+  /** @maxLength 100 */
+  Country?: string;
   /** @maxLength 3 */
   BaseCurrency?: string;
   /**

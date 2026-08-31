@@ -143,45 +143,6 @@
             }
         },
         "/api/entities/": {
-            "post": {
-                "operationId": "entities_create",
-                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-                "tags": [
-                    "entities"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntityCreateRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntityCreateRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntityCreateRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntityCreate"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "entities_list",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
@@ -229,6 +190,45 @@
                         "description": ""
                     }
                 }
+            },
+            "post": {
+                "operationId": "entities_create",
+                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
+                "tags": [
+                    "entities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntityCreateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntityCreateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntityCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityCreate"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
             }
         },
         "/api/entities/accessible/": {
@@ -253,56 +253,6 @@
             }
         },
         "/api/entities/{EntityId}/": {
-            "put": {
-                "operationId": "entities_update",
-                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EntityId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this entities.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "entities"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntitiesDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntitiesDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EntitiesDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntitiesDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "entities_retrieve",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
@@ -333,8 +283,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "entities_partial_update",
+            "put": {
+                "operationId": "entities_update",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
                 "parameters": [
                     {
@@ -405,6 +355,56 @@
                         "description": "No response body"
                     }
                 }
+            },
+            "patch": {
+                "operationId": "entities_partial_update",
+                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EntityId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this entities.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "entities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntitiesDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntitiesDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntitiesDetailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntitiesDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
             }
         },
         "/api/entities/{EntityId}/consolidated-emissions/": {
@@ -440,6 +440,36 @@
             }
         },
         "/api/entities/{EntityId}/contacts/": {
+            "get": {
+                "operationId": "entities_contacts_retrieve",
+                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EntityId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this entities.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "entities"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntitiesDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "entities_contacts_create",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
@@ -489,9 +519,11 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/entities/{EntityId}/documents/": {
             "get": {
-                "operationId": "entities_contacts_retrieve",
+                "operationId": "entities_documents_retrieve",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
                 "parameters": [
                     {
@@ -519,9 +551,7 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/entities/{EntityId}/documents/": {
+            },
             "post": {
                 "operationId": "entities_documents_create",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
@@ -559,36 +589,6 @@
                     },
                     "required": true
                 },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntitiesDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "entities_documents_retrieve",
-                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EntityId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this entities.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "entities"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -686,6 +686,36 @@
             }
         },
         "/api/entities/{EntityId}/locations/": {
+            "get": {
+                "operationId": "entities_locations_retrieve",
+                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EntityId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this entities.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "entities"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntitiesDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "entities_locations_create",
                 "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
@@ -735,10 +765,12 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/entities/{EntityId}/members/": {
             "get": {
-                "operationId": "entities_locations_retrieve",
-                "description": "CRUD for Entities.\nSA sees all; Admin sees own + related branches.\nCreation is SA-only and also creates the initial admin user.",
+                "operationId": "entities_members_retrieve",
+                "description": "GET: list members of this entity. POST (SuperAdmin): grant a user access.",
                 "parameters": [
                     {
                         "in": "path",
@@ -765,9 +797,7 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/entities/{EntityId}/members/": {
+            },
             "post": {
                 "operationId": "entities_members_create",
                 "description": "GET: list members of this entity. POST (SuperAdmin): grant a user access.",
@@ -805,36 +835,6 @@
                     },
                     "required": true
                 },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntitiesDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "entities_members_retrieve",
-                "description": "GET: list members of this entity. POST (SuperAdmin): grant a user access.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EntityId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this entities.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "entities"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -955,45 +955,6 @@
             }
         },
         "/api/users/": {
-            "post": {
-                "operationId": "users_create",
-                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
-                "tags": [
-                    "users"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UserCreateRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UserCreateRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UserCreateRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserCreate"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "users_list",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
@@ -1041,32 +1002,48 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/users/{UserId}/": {
-            "delete": {
-                "operationId": "users_destroy",
+            },
+            "post": {
+                "operationId": "users_create",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "UserId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this users.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "users"
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
-                    "204": {
-                        "description": "No response body"
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserCreate"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/users/{UserId}/": {
             "get": {
                 "operationId": "users_retrieve",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
@@ -1094,6 +1071,29 @@
                             }
                         },
                         "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "users_destroy",
+                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "UserId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this users.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "users"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
                     }
                 }
             },
@@ -1541,45 +1541,6 @@
             }
         },
         "/api/projects/": {
-            "post": {
-                "operationId": "projects_create",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "tags": [
-                    "projects"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "projects_list",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -1627,23 +1588,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/projects/{ProjectId}/": {
-            "put": {
-                "operationId": "projects_update",
+            },
+            "post": {
+                "operationId": "projects_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "ProjectId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this development projects.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "projects"
                 ],
@@ -1668,7 +1616,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1679,7 +1627,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/projects/{ProjectId}/": {
             "get": {
                 "operationId": "projects_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -1710,8 +1660,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "projects_partial_update",
+            "put": {
+                "operationId": "projects_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -1782,43 +1732,9 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/projects/{ProjectId}/emissions/summary/": {
-            "get": {
-                "operationId": "projects_emissions_summary_retrieve",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "ProjectId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this development projects.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "projects"
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/{ProjectId}/partners/": {
-            "post": {
-                "operationId": "projects_partners_create",
+            },
+            "patch": {
+                "operationId": "projects_partial_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -1866,7 +1782,41 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/projects/{ProjectId}/emissions/summary/": {
+            "get": {
+                "operationId": "projects_emissions_summary_retrieve",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "ProjectId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this development projects.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/projects/{ProjectId}/partners/": {
             "get": {
                 "operationId": "projects_partners_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -1884,6 +1834,56 @@
                 "tags": [
                     "projects"
                 ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "projects_partners_create",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "ProjectId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this development projects.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DevelopmentProjectsDetailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "content": {
@@ -2031,6 +2031,36 @@
             }
         },
         "/api/projects/{ProjectId}/phases/": {
+            "get": {
+                "operationId": "projects_phases_retrieve",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "ProjectId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this development projects.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "projects_phases_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -2080,36 +2110,6 @@
                         "description": ""
                     }
                 }
-            },
-            "get": {
-                "operationId": "projects_phases_retrieve",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "ProjectId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this development projects.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "projects"
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DevelopmentProjectsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
             }
         },
         "/api/projects/{ProjectId}/partners/{partner_id}/": {
@@ -2147,45 +2147,6 @@
             }
         },
         "/api/land-parcels/": {
-            "post": {
-                "operationId": "land_parcels_create",
-                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
-                "tags": [
-                    "land-parcels"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LandParcelsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "land_parcels_list",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
@@ -2233,23 +2194,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/land-parcels/{LandParcelId}/": {
-            "put": {
-                "operationId": "land_parcels_update",
+            },
+            "post": {
+                "operationId": "land_parcels_create",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "LandParcelId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this land parcels.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "land-parcels"
                 ],
@@ -2274,6 +2222,27 @@
                     "required": true
                 },
                 "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LandParcelsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/land-parcels/geocode/": {
+            "get": {
+                "operationId": "land_parcels_geocode_retrieve",
+                "description": "Place-name search for the boundary map. GET ?q=<place>[&limit=n].\n\nReference lookup, not tenant data, so it is not entity-scoped — same shape\nas the GBIF species search on SpeciesViewSet. Proxied rather than called\nfrom the browser so the provider sees our User-Agent and cache, not the\ntenant's IP.",
+                "tags": [
+                    "land-parcels"
+                ],
+                "responses": {
                     "200": {
                         "content": {
                             "application/json": {
@@ -2285,7 +2254,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/land-parcels/{LandParcelId}/": {
             "get": {
                 "operationId": "land_parcels_retrieve",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
@@ -2316,8 +2287,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "land_parcels_partial_update",
+            "put": {
+                "operationId": "land_parcels_update",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
                 "parameters": [
                     {
@@ -2388,9 +2359,89 @@
                         "description": "No response body"
                     }
                 }
+            },
+            "patch": {
+                "operationId": "land_parcels_partial_update",
+                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "LandParcelId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this land parcels.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "land-parcels"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LandParcelsDetailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LandParcelsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
             }
         },
         "/api/land-parcels/{LandParcelId}/ecosystems/": {
+            "get": {
+                "operationId": "land_parcels_ecosystems_retrieve",
+                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "LandParcelId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this land parcels.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "land-parcels"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LandParcelsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "land_parcels_ecosystems_create",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
@@ -2440,36 +2491,6 @@
                         "description": ""
                     }
                 }
-            },
-            "get": {
-                "operationId": "land_parcels_ecosystems_retrieve",
-                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "LandParcelId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this land parcels.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "land-parcels"
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LandParcelsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
             }
         },
         "/api/land-parcels/{LandParcelId}/ecosystems/{ecosystem_id}/": {
@@ -2507,45 +2528,6 @@
             }
         },
         "/api/ecosystems/": {
-            "post": {
-                "operationId": "ecosystems_create",
-                "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
-                "tags": [
-                    "ecosystems"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EcosystemDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EcosystemDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EcosystemDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EcosystemDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "ecosystems_list",
                 "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
@@ -2593,23 +2575,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/ecosystems/{EcosystemId}/": {
-            "put": {
-                "operationId": "ecosystems_update",
+            },
+            "post": {
+                "operationId": "ecosystems_create",
                 "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EcosystemId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this ecosystem.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "ecosystems"
                 ],
@@ -2634,7 +2603,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2645,7 +2614,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/ecosystems/{EcosystemId}/": {
             "get": {
                 "operationId": "ecosystems_retrieve",
                 "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
@@ -2676,8 +2647,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "ecosystems_partial_update",
+            "put": {
+                "operationId": "ecosystems_update",
                 "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
                 "parameters": [
                     {
@@ -2748,48 +2719,59 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/species/": {
-            "post": {
-                "operationId": "species_create",
-                "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
+            },
+            "patch": {
+                "operationId": "ecosystems_partial_update",
+                "description": "Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EcosystemId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ecosystem.",
+                        "required": true
+                    }
+                ],
                 "tags": [
-                    "species"
+                    "ecosystems"
                 ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SpeciesDetailRequest"
+                                "$ref": "#/components/schemas/EcosystemDetailRequest"
                             }
                         },
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "$ref": "#/components/schemas/SpeciesDetailRequest"
+                                "$ref": "#/components/schemas/EcosystemDetailRequest"
                             }
                         },
                         "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/SpeciesDetailRequest"
+                                "$ref": "#/components/schemas/EcosystemDetailRequest"
                             }
                         }
                     },
                     "required": true
                 },
                 "responses": {
-                    "201": {
+                    "200": {
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SpeciesDetail"
+                                    "$ref": "#/components/schemas/EcosystemDetail"
                                 }
                             }
                         },
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/species/": {
             "get": {
                 "operationId": "species_list",
                 "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
@@ -2837,44 +2819,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/species/search/": {
-            "get": {
-                "operationId": "species_search_retrieve",
-                "description": "GBIF taxonomy lookup. GET ?q=<common or scientific name> → top matches.",
-                "tags": [
-                    "species"
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SpeciesDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/species/{SpeciesId}/": {
-            "put": {
-                "operationId": "species_update",
+            },
+            "post": {
+                "operationId": "species_create",
                 "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "SpeciesId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this species.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "species"
                 ],
@@ -2899,6 +2847,27 @@
                     "required": true
                 },
                 "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpeciesDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/species/search/": {
+            "get": {
+                "operationId": "species_search_retrieve",
+                "description": "GBIF taxonomy lookup. GET ?q=<common or scientific name> → top matches.",
+                "tags": [
+                    "species"
+                ],
+                "responses": {
                     "200": {
                         "content": {
                             "application/json": {
@@ -2910,7 +2879,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/species/{SpeciesId}/": {
             "get": {
                 "operationId": "species_retrieve",
                 "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
@@ -2941,8 +2912,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "species_partial_update",
+            "put": {
+                "operationId": "species_update",
                 "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
                 "parameters": [
                     {
@@ -3013,48 +2984,59 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/emissions/": {
-            "post": {
-                "operationId": "emissions_create",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+            },
+            "patch": {
+                "operationId": "species_partial_update",
+                "description": "Species.EntityId is a real FK to entities.Entities; tenant scoping,\naudit logging and soft-delete are provided by TenantViewSetMixin.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "SpeciesId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this species.",
+                        "required": true
+                    }
+                ],
                 "tags": [
-                    "emissions"
+                    "species"
                 ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                                "$ref": "#/components/schemas/SpeciesDetailRequest"
                             }
                         },
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                                "$ref": "#/components/schemas/SpeciesDetailRequest"
                             }
                         },
                         "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                                "$ref": "#/components/schemas/SpeciesDetailRequest"
                             }
                         }
                     },
                     "required": true
                 },
                 "responses": {
-                    "201": {
+                    "200": {
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmissionsData"
+                                    "$ref": "#/components/schemas/SpeciesDetail"
                                 }
                             }
                         },
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/emissions/": {
             "get": {
                 "operationId": "emissions_list",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -3102,23 +3084,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/emissions/{EmissionsId}/": {
-            "put": {
-                "operationId": "emissions_update",
+            },
+            "post": {
+                "operationId": "emissions_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EmissionsId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this emissions data.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "emissions"
                 ],
@@ -3143,7 +3112,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3154,7 +3123,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/emissions/{EmissionsId}/": {
             "get": {
                 "operationId": "emissions_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -3185,8 +3156,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "emissions_partial_update",
+            "put": {
+                "operationId": "emissions_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -3255,6 +3226,56 @@
                 "responses": {
                     "204": {
                         "description": "No response body"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "emissions_partial_update",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EmissionsId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this emissions data.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "emissions"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmissionsDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmissionsData"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
             }
@@ -3353,6 +3374,36 @@
             }
         },
         "/api/emissions/{EmissionsId}/details/": {
+            "get": {
+                "operationId": "emissions_details_retrieve",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EmissionsId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this emissions data.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "emissions"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmissionsData"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "emissions_details_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -3390,36 +3441,6 @@
                     },
                     "required": true
                 },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmissionsData"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "emissions_details_retrieve",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EmissionsId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this emissions data.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "emissions"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -3528,6 +3549,36 @@
             }
         },
         "/api/emissions/{EmissionsId}/offsets/": {
+            "get": {
+                "operationId": "emissions_offsets_retrieve_2",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "EmissionsId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this emissions data.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "emissions"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmissionsData"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "emissions_offsets_create_2",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -3565,36 +3616,6 @@
                     },
                     "required": true
                 },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmissionsData"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "emissions_offsets_retrieve_2",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "EmissionsId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this emissions data.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "emissions"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -3714,45 +3735,6 @@
             }
         },
         "/api/emissions-offsets/": {
-            "post": {
-                "operationId": "emissions_offsets_create",
-                "description": "Standalone offset management — GET /api/emissions-offsets/\nLists all offsets for the entity regardless of which emissions record they\nbelong to, so the sustainability manager has a single place to review them.\nThe nested actions on EmissionsDataViewSet remain for record-level access.",
-                "tags": [
-                    "emissions-offsets"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/StandaloneEmissionsOffsets"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "emissions_offsets_list",
                 "description": "Standalone offset management — GET /api/emissions-offsets/\nLists all offsets for the entity regardless of which emissions record they\nbelong to, so the sustainability manager has a single place to review them.\nThe nested actions on EmissionsDataViewSet remain for record-level access.",
@@ -3800,32 +3782,48 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/emissions-offsets/{OffsetId}/": {
-            "delete": {
-                "operationId": "emissions_offsets_destroy",
+            },
+            "post": {
+                "operationId": "emissions_offsets_create",
                 "description": "Standalone offset management — GET /api/emissions-offsets/\nLists all offsets for the entity regardless of which emissions record they\nbelong to, so the sustainability manager has a single place to review them.\nThe nested actions on EmissionsDataViewSet remain for record-level access.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "OffsetId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this emissions offsets.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "emissions-offsets"
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StandaloneEmissionsOffsetsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
-                    "204": {
-                        "description": "No response body"
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandaloneEmissionsOffsets"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/emissions-offsets/{OffsetId}/": {
             "get": {
                 "operationId": "emissions_offsets_retrieve",
                 "description": "Standalone offset management — GET /api/emissions-offsets/\nLists all offsets for the entity regardless of which emissions record they\nbelong to, so the sustainability manager has a single place to review them.\nThe nested actions on EmissionsDataViewSet remain for record-level access.",
@@ -3853,6 +3851,29 @@
                             }
                         },
                         "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "emissions_offsets_destroy",
+                "description": "Standalone offset management — GET /api/emissions-offsets/\nLists all offsets for the entity regardless of which emissions record they\nbelong to, so the sustainability manager has a single place to review them.\nThe nested actions on EmissionsDataViewSet remain for record-level access.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "OffsetId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this emissions offsets.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "emissions-offsets"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
                     }
                 }
             },
@@ -3990,45 +4011,6 @@
             }
         },
         "/api/ghg-inventories/": {
-            "post": {
-                "operationId": "ghg_inventories_create",
-                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
-                "tags": [
-                    "ghg-inventories"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GHGInventoriesRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GHGInventoriesRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GHGInventoriesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GHGInventories"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "ghg_inventories_list",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
@@ -4076,23 +4058,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/ghg-inventories/{InventoryId}/": {
-            "put": {
-                "operationId": "ghg_inventories_update",
+            },
+            "post": {
+                "operationId": "ghg_inventories_create",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "InventoryId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this ghg inventories.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "ghg-inventories"
                 ],
@@ -4117,7 +4086,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4128,7 +4097,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/ghg-inventories/{InventoryId}/": {
             "get": {
                 "operationId": "ghg_inventories_retrieve",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
@@ -4159,8 +4130,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "ghg_inventories_partial_update",
+            "put": {
+                "operationId": "ghg_inventories_update",
                 "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
                 "parameters": [
                     {
@@ -4229,6 +4200,56 @@
                 "responses": {
                     "204": {
                         "description": "No response body"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "ghg_inventories_partial_update",
+                "description": "Mix into a DRF APIView or ViewSet.\nSet ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "InventoryId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ghg inventories.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ghg-inventories"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GHGInventoriesRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GHGInventoriesRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GHGInventoriesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GHGInventories"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
             }
@@ -4422,45 +4443,6 @@
             }
         },
         "/api/targets/": {
-            "post": {
-                "operationId": "targets_create",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "tags": [
-                    "targets"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TargetsRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TargetsRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TargetsRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Targets"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "targets_list",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -4508,23 +4490,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/targets/{TargetId}/": {
-            "put": {
-                "operationId": "targets_update",
+            },
+            "post": {
+                "operationId": "targets_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "TargetId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this targets.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "targets"
                 ],
@@ -4549,7 +4518,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4560,7 +4529,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/targets/{TargetId}/": {
             "get": {
                 "operationId": "targets_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -4591,8 +4562,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "targets_partial_update",
+            "put": {
+                "operationId": "targets_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -4663,11 +4634,9 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/targets/{TargetId}/milestones/": {
-            "post": {
-                "operationId": "targets_milestones_create",
+            },
+            "patch": {
+                "operationId": "targets_partial_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -4715,7 +4684,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/targets/{TargetId}/milestones/": {
             "get": {
                 "operationId": "targets_milestones_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -4733,6 +4704,56 @@
                 "tags": [
                     "targets"
                 ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Targets"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "targets_milestones_create",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "TargetId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this targets.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "targets"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TargetsRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TargetsRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TargetsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "content": {
@@ -4903,44 +4924,6 @@
             }
         },
         "/api/tree-removals/": {
-            "post": {
-                "operationId": "tree_removals_create",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "tags": [
-                    "tree-removals"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TreeRemovalsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "tree_removals_list",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -4988,23 +4971,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/tree-removals/{TreeRemovalId}/": {
-            "put": {
-                "operationId": "tree_removals_update",
+            },
+            "post": {
+                "operationId": "tree_removals_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "TreeRemovalId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this tree removals.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "tree-removals"
                 ],
@@ -5028,7 +4998,7 @@
                     }
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5039,7 +5009,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/tree-removals/{TreeRemovalId}/": {
             "get": {
                 "operationId": "tree_removals_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5070,8 +5042,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "tree_removals_partial_update",
+            "put": {
+                "operationId": "tree_removals_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -5141,11 +5113,9 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/tree-removals/{TreeRemovalId}/affected-species/": {
-            "post": {
-                "operationId": "tree_removals_affected_species_create",
+            },
+            "patch": {
+                "operationId": "tree_removals_partial_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -5192,7 +5162,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/tree-removals/{TreeRemovalId}/affected-species/": {
             "get": {
                 "operationId": "tree_removals_affected_species_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5210,6 +5182,55 @@
                 "tags": [
                     "tree-removals"
                 ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreeRemovalsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "tree_removals_affected_species_create",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "TreeRemovalId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this tree removals.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "tree-removals"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TreeRemovalsDetailRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "content": {
@@ -5317,6 +5338,36 @@
             }
         },
         "/api/tree-removals/{TreeRemovalId}/removed-species/": {
+            "get": {
+                "operationId": "tree_removals_removed_species_retrieve",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "TreeRemovalId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this tree removals.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "tree-removals"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreeRemovalsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "operationId": "tree_removals_removed_species_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5353,36 +5404,6 @@
                         }
                     }
                 },
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TreeRemovalsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "tree_removals_removed_species_retrieve",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "TreeRemovalId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this tree removals.",
-                        "required": true
-                    }
-                ],
-                "tags": [
-                    "tree-removals"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -5490,45 +5511,6 @@
             }
         },
         "/api/restorations/": {
-            "post": {
-                "operationId": "restorations_create",
-                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "tags": [
-                    "restorations"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RestorationsDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RestorationsDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RestorationsDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RestorationsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "restorations_list",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5576,23 +5558,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/restorations/{RestorationId}/": {
-            "put": {
-                "operationId": "restorations_update",
+            },
+            "post": {
+                "operationId": "restorations_create",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "RestorationId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this restorations.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "restorations"
                 ],
@@ -5617,7 +5586,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5628,7 +5597,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/restorations/{RestorationId}/": {
             "get": {
                 "operationId": "restorations_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5659,8 +5630,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "restorations_partial_update",
+            "put": {
+                "operationId": "restorations_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -5731,11 +5702,9 @@
                         "description": "No response body"
                     }
                 }
-            }
-        },
-        "/api/restorations/{RestorationId}/species/": {
-            "post": {
-                "operationId": "restorations_species_create",
+            },
+            "patch": {
+                "operationId": "restorations_partial_update",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
                 "parameters": [
                     {
@@ -5783,7 +5752,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/restorations/{RestorationId}/species/": {
             "get": {
                 "operationId": "restorations_species_retrieve",
                 "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
@@ -5801,6 +5772,56 @@
                 "tags": [
                     "restorations"
                 ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RestorationsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "restorations_species_create",
+                "description": "Mixin for tenant-scoped ModelViewSets.\n\nThe Django middleware runs before DRF authentication, so request.user may\nstill be anonymous when the middleware sets request.entity_id.  entity_id is\nre-resolved in initial() (via EntityScopeInitialMixin) once DRF has\nauthenticated the user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "RestorationId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this restorations.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "restorations"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RestorationsDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RestorationsDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RestorationsDetailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "content": {
@@ -6066,45 +6087,6 @@
             }
         },
         "/api/blog/": {
-            "post": {
-                "operationId": "blog_create",
-                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
-                "tags": [
-                    "blog"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BlogsDetailRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BlogsDetailRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BlogsDetailRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BlogsDetail"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "blog_list",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
@@ -6152,23 +6134,10 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/blog/{BlogId}/": {
-            "put": {
-                "operationId": "blog_update",
+            },
+            "post": {
+                "operationId": "blog_create",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "BlogId",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "A unique integer value identifying this blogs.",
-                        "required": true
-                    }
-                ],
                 "tags": [
                     "blog"
                 ],
@@ -6193,7 +6162,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6204,7 +6173,9 @@
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/blog/{BlogId}/": {
             "get": {
                 "operationId": "blog_retrieve",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
@@ -6235,8 +6206,8 @@
                     }
                 }
             },
-            "patch": {
-                "operationId": "blog_partial_update",
+            "put": {
+                "operationId": "blog_update",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
                 "parameters": [
                     {
@@ -6305,6 +6276,56 @@
                 "responses": {
                     "204": {
                         "description": "No response body"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "blog_partial_update",
+                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "BlogId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this blogs.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "blog"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogsDetailRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogsDetailRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BlogsDetailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BlogsDetail"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
             }
@@ -6414,45 +6435,6 @@
             }
         },
         "/api/reports/": {
-            "post": {
-                "operationId": "reports_create",
-                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
-                "tags": [
-                    "reports"
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ReportJobCreateRequest"
-                            }
-                        },
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ReportJobCreateRequest"
-                            }
-                        },
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ReportJobCreateRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ReportJobCreate"
-                                }
-                            }
-                        },
-                        "description": ""
-                    }
-                }
-            },
             "get": {
                 "operationId": "reports_list",
                 "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
@@ -6494,6 +6476,45 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PaginatedReportJobList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "reports_create",
+                "description": "Re-resolve ``request.entity_id`` after DRF authentication.\n\nMix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``\nbut cannot use the full :class:`TenantViewSetMixin` — e.g. views with a\nbespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.\nWithout this, ``request.entity_id`` is None for JWT requests and tenant\nscoping silently fails (empty reads, NOT-NULL violations on create).",
+                "tags": [
+                    "reports"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportJobCreateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportJobCreateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportJobCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportJobCreate"
                                 }
                             }
                         },
@@ -6723,12 +6744,10 @@
                     },
                     "SeoTitle": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 60
                     },
                     "SeoDescription": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 160
                     },
                     "EmbedUrls": {},
@@ -6803,12 +6822,10 @@
                     },
                     "SeoTitle": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 60
                     },
                     "SeoDescription": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 160
                     },
                     "EmbedUrls": {},
@@ -6858,7 +6875,6 @@
                     },
                     "SeoTitle": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 60
                     },
                     "AuthorId": {
@@ -6951,16 +6967,13 @@
                     },
                     "ProjectReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "ProjectType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "StartDate": {
@@ -6975,12 +6988,10 @@
                     },
                     "Location": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "TotalAreaHectares": {
@@ -7038,16 +7049,13 @@
                     },
                     "ProjectReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "ProjectType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "StartDate": {
@@ -7062,12 +7070,10 @@
                     },
                     "Location": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "TotalAreaHectares": {
@@ -7100,17 +7106,14 @@
                     },
                     "ProjectReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "ProjectType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "StartDate": {
@@ -7190,12 +7193,10 @@
                     },
                     "EcosystemType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "AreaHectares": {
                         "type": "string",
@@ -7245,12 +7246,10 @@
                     },
                     "EcosystemType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "AreaHectares": {
                         "type": "string",
@@ -7276,7 +7275,6 @@
                     },
                     "EcosystemType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "AreaHectares": {
@@ -7314,7 +7312,6 @@
                     },
                     "Version": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "ApplicableYear": {
@@ -7325,7 +7322,6 @@
                     },
                     "GeographicScope": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "IsActive": {
@@ -7362,7 +7358,6 @@
                     },
                     "ActivityCategory": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Scope": {
@@ -7382,7 +7377,6 @@
                     },
                     "GasSubtype": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "FactorValue": {
@@ -7396,7 +7390,6 @@
                     },
                     "CountryCode": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 3
                     },
                     "ApplicableYear": {
@@ -7482,12 +7475,10 @@
                         "nullable": true
                     },
                     "ActivityDescription": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "SupplierName": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Supplier shown on the bill, contract, or source evidence.",
                         "maxLength": 200
                     },
@@ -7522,7 +7513,6 @@
                     },
                     "GasSubtype": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "EmissionsAmount": {
@@ -7597,7 +7587,6 @@
                     },
                     "SpendCurrency": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 3
                     },
                     "SpendAmountLocal": {
@@ -7628,7 +7617,6 @@
                     },
                     "GridSubregion": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "BaselineYear": {
@@ -7665,8 +7653,7 @@
                         "nullable": true
                     },
                     "VerificationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "EntityId": {
                         "type": "integer",
@@ -7847,12 +7834,10 @@
                         "nullable": true
                     },
                     "ActivityDescription": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "SupplierName": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Supplier shown on the bill, contract, or source evidence.",
                         "maxLength": 200
                     },
@@ -7883,7 +7868,6 @@
                     },
                     "GasSubtype": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "BiogenicCO2FactorKg": {
@@ -7909,7 +7893,6 @@
                     },
                     "SpendCurrency": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 3
                     },
                     "SpendAmountLocal": {
@@ -7920,7 +7903,6 @@
                     },
                     "GridSubregion": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "BaselineYear": {
@@ -7951,8 +7933,7 @@
                         "minimum": 0
                     },
                     "VerificationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "ProjectId": {
                         "type": "integer",
@@ -8045,37 +8026,30 @@
                     },
                     "RegistrationNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "VATNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "AddressLine1": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "AddressLine2": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "City": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PostCode": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "BaseCurrency": {
@@ -8109,7 +8083,6 @@
                     },
                     "CompaniesHouseNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "SICCodes": {},
@@ -8121,7 +8094,6 @@
                     "ExternalRegistryUrl": {
                         "type": "string",
                         "format": "uri",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "ParentEntityId": {
@@ -8175,37 +8147,30 @@
                     },
                     "RegistrationNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "VATNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "AddressLine1": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "AddressLine2": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "City": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PostCode": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "BaseCurrency": {
@@ -8240,7 +8205,6 @@
                     },
                     "CompaniesHouseNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "SICCodes": {},
@@ -8252,7 +8216,6 @@
                     "ExternalRegistryUrl": {
                         "type": "string",
                         "format": "uri",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "ParentEntityId": {
@@ -8287,12 +8250,10 @@
                     },
                     "RegistrationNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "BaseCurrency": {
@@ -8337,37 +8298,30 @@
                     },
                     "RegistrationNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "VATNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "AddressLine1": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "AddressLine2": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "City": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PostCode": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "BaseCurrency": {
@@ -8406,37 +8360,30 @@
                     },
                     "RegistrationNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "VATNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "AddressLine1": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "AddressLine2": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 255
                     },
                     "City": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PostCode": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "Country": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "BaseCurrency": {
@@ -8575,7 +8522,6 @@
                     },
                     "BoundaryNotes": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Included/excluded operations and rationale for the inventory boundary."
                     },
                     "VerificationStatus": {
@@ -8594,8 +8540,7 @@
                         "nullable": true
                     },
                     "VerificationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "TotalScope1Tonnes": {
                         "type": "string",
@@ -8743,7 +8688,6 @@
                     },
                     "BoundaryNotes": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Included/excluded operations and rationale for the inventory boundary."
                     },
                     "VerificationStatus": {
@@ -8756,8 +8700,7 @@
                         "maximum": 32767
                     },
                     "VerificationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -8825,7 +8768,6 @@
                     },
                     "GasSubtype": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "GwpFactor": {
@@ -8925,12 +8867,10 @@
                     },
                     "ParcelReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "AreaHectares": {
                         "type": "string",
@@ -8944,17 +8884,14 @@
                     },
                     "Tenure": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LandUseType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PlanningReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "EntityId": {
@@ -8999,12 +8936,10 @@
                     },
                     "ParcelReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "AreaHectares": {
                         "type": "string",
@@ -9018,17 +8953,14 @@
                     },
                     "Tenure": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LandUseType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "PlanningReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     }
                 },
@@ -9049,7 +8981,6 @@
                     },
                     "ParcelReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "AreaHectares": {
@@ -9060,7 +8991,6 @@
                     },
                     "LandUseType": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Status": {
@@ -9091,8 +9021,7 @@
                         "maxLength": 50
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9126,8 +9055,7 @@
                     },
                     "RelatedModule": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "RelatedRecordId": {
                         "type": "integer",
@@ -9800,8 +9728,7 @@
                         "nullable": true
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "StartDate": {
                         "type": "string",
@@ -9847,8 +9774,7 @@
                         "nullable": true
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "StartDate": {
                         "type": "string",
@@ -9914,8 +9840,7 @@
                     },
                     "CeleryTaskId": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "FileSizeBytes": {
                         "type": "integer",
@@ -9924,8 +9849,7 @@
                     },
                     "ErrorMessage": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "QueuedAt": {
                         "type": "string",
@@ -10056,12 +9980,10 @@
                     },
                     "RestorationReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "StartDate": {
                         "type": "string",
@@ -10093,8 +10015,7 @@
                         "nullable": true
                     },
                     "MonitoringNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "EntityId": {
                         "type": "integer",
@@ -10139,12 +10060,10 @@
                     },
                     "RestorationReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "StartDate": {
                         "type": "string",
@@ -10169,8 +10088,7 @@
                         "nullable": true
                     },
                     "MonitoringNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -10190,7 +10108,6 @@
                     },
                     "RestorationReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "StartDate": {
@@ -10246,8 +10163,7 @@
                         "$ref": "#/components/schemas/RoleKeyEnum"
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -10306,30 +10222,21 @@
                     },
                     "ScientificName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Family": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Kingdom": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "IUCNStatus": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/IUCNStatusEnum"
-                            }
-                        ],
-                        "nullable": true
+                        "$ref": "#/components/schemas/IUCNStatusEnum"
                     },
                     "IUCNSyncedAt": {
                         "type": "string",
@@ -10349,7 +10256,6 @@
                                 "$ref": "#/components/schemas/IPCCForestTypeEnum"
                             }
                         ],
-                        "nullable": true,
                         "description": "IPCC forest type for Tier 1 BEF/R lookup"
                     },
                     "BasicWoodDensity": {
@@ -10389,7 +10295,6 @@
                     },
                     "BiomassDataSource": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Citation for biomass parameter values (IPCC table ref, study DOI)",
                         "maxLength": 200
                     },
@@ -10436,30 +10341,21 @@
                     },
                     "ScientificName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Family": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Kingdom": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 50
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "IUCNStatus": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/IUCNStatusEnum"
-                            }
-                        ],
-                        "nullable": true
+                        "$ref": "#/components/schemas/IUCNStatusEnum"
                     },
                     "GBIFKey": {
                         "type": "integer",
@@ -10473,7 +10369,6 @@
                                 "$ref": "#/components/schemas/IPCCForestTypeEnum"
                             }
                         ],
-                        "nullable": true,
                         "description": "IPCC forest type for Tier 1 BEF/R lookup"
                     },
                     "BasicWoodDensity": {
@@ -10513,7 +10408,6 @@
                     },
                     "BiomassDataSource": {
                         "type": "string",
-                        "nullable": true,
                         "description": "Citation for biomass parameter values (IPCC table ref, study DOI)",
                         "maxLength": 200
                     }
@@ -10535,20 +10429,13 @@
                     },
                     "ScientificName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "IUCNStatus": {
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/IUCNStatusEnum"
-                            }
-                        ],
-                        "nullable": true
+                        "$ref": "#/components/schemas/IUCNStatusEnum"
                     },
                     "Family": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Status": {
@@ -10627,7 +10514,6 @@
                     },
                     "CertificateNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "OffsetAmountTonnes": {
@@ -10646,12 +10532,10 @@
                         "nullable": true
                     },
                     "Remarks": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "CreditSerialNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "CreditRegistry": {
@@ -10660,7 +10544,6 @@
                                 "$ref": "#/components/schemas/CreditRegistryEnum"
                             }
                         ],
-                        "nullable": true,
                         "description": "Which registry validates this credit (drives the registry-sync task)."
                     },
                     "RegistryValidatedAt": {
@@ -10675,18 +10558,15 @@
                                 "$ref": "#/components/schemas/RegistryValidationStatusEnum"
                             }
                         ],
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "RegistryProjectName": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "RegistryProjectType": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "RegistryVintageYear": {
                         "type": "integer",
@@ -10695,8 +10575,7 @@
                     },
                     "RegistryRetirementBeneficiary": {
                         "type": "string",
-                        "readOnly": true,
-                        "nullable": true
+                        "readOnly": true
                     },
                     "EntityId": {
                         "type": "integer",
@@ -10774,7 +10653,6 @@
                     },
                     "CertificateNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "OffsetAmountTonnes": {
@@ -10793,12 +10671,10 @@
                         "nullable": true
                     },
                     "Remarks": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "CreditSerialNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "CreditRegistry": {
@@ -10807,7 +10683,6 @@
                                 "$ref": "#/components/schemas/CreditRegistryEnum"
                             }
                         ],
-                        "nullable": true,
                         "description": "Which registry validates this credit (drives the registry-sync task)."
                     }
                 },
@@ -10907,8 +10782,7 @@
                         "minimum": 0
                     },
                     "Notes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "EntityId": {
                         "type": "integer",
@@ -11002,8 +10876,7 @@
                         "minimum": 0
                     },
                     "Notes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -11060,12 +10933,10 @@
                     },
                     "RemovalReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "RemovalDate": {
                         "type": "string",
@@ -11089,8 +10960,7 @@
                         "type": "boolean"
                     },
                     "MitigationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "EntityId": {
                         "type": "integer",
@@ -11134,12 +11004,10 @@
                     },
                     "RemovalReference": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Description": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "RemovalDate": {
                         "type": "string",
@@ -11156,8 +11024,7 @@
                         "type": "boolean"
                     },
                     "MitigationNotes": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "ProjectId": {
                         "type": "integer",
@@ -11233,17 +11100,14 @@
                     },
                     "FirstName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LastName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Designation": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     }
                 },
@@ -11268,17 +11132,14 @@
                     },
                     "FirstName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LastName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Designation": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "role_key": {
@@ -11311,31 +11172,25 @@
                     },
                     "FirstName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LastName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Designation": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Bio": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "PhoneNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "ProfilePicturePath": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 500
                     },
                     "EntityId": {
@@ -11397,31 +11252,25 @@
                     },
                     "FirstName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LastName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "Designation": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 200
                     },
                     "Bio": {
-                        "type": "string",
-                        "nullable": true
+                        "type": "string"
                     },
                     "PhoneNumber": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 20
                     },
                     "ProfilePicturePath": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 500
                     },
                     "is_active": {
@@ -11456,12 +11305,10 @@
                     },
                     "FirstName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "LastName": {
                         "type": "string",
-                        "nullable": true,
                         "maxLength": 100
                     },
                     "EntityId": {

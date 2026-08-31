@@ -11,7 +11,7 @@ interface Notification {
   Type:            string;
   Title:           string;
   Body:            string | null;
-  RelatedModule:   string | null;
+  RelatedModule:   string;
   RelatedRecordId: number | null;
   IsRead:          boolean;
   CreatedAt:       string;

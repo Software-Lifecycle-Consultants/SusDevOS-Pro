@@ -16,7 +16,7 @@ interface Target {
   ReductionPercent: string | null;
   Scope: number | null;
   ValidationStatus: number;
-  Notes: string | null;
+  Notes: string;
 }
 
 interface Milestone {
@@ -25,7 +25,7 @@ interface Milestone {
   TargetEmissionsTonnes: string | null;
   ActualEmissionsTonnes: string | null;
   IsAchieved: boolean;
-  Notes: string | null;
+  Notes: string;
 }
 
 const TARGET_TYPE_LABELS: Record<string, string> = {
@@ -164,7 +164,7 @@ function MilestonesRow({
             )}
           </td>
           <td className="px-4 py-2.5 text-xs text-surface-400 truncate max-w-[140px]">
-            {m.Notes ?? "—"}
+            {m.Notes || "—"}
           </td>
         </tr>
       ))}
@@ -209,7 +209,7 @@ function CreateTargetModal({
             ? Number(form.BaselineEmissionsTonnes)
             : null,
           Scope: form.Scope ? Number(form.Scope) : null,
-          Notes: form.Notes || null,
+          Notes: form.Notes,
         },
         { headers },
       ),

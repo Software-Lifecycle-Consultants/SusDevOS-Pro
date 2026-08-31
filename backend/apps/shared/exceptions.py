@@ -3,7 +3,7 @@ Custom DRF exception handler.
 Wraps all error responses in a consistent envelope:
   { "code": "...", "detail": "...", "errors": {...} }
 
-Also handles FeatureGatedException → HTTP 402 with upgrade modal payload.
+Also handles FeatureGatedError → HTTP 402 with upgrade modal payload.
 """
 from rest_framework import status
 from rest_framework.response import Response
@@ -13,8 +13,8 @@ from rest_framework.views import exception_handler
 def custom_exception_handler(exc, context):
     # Handle feature gate before DRF exception_handler (which doesn't know it)
     try:
-        from apps.billing.mixins import FeatureGatedException
-        if isinstance(exc, FeatureGatedException):
+        from apps.billing.mixins import FeatureGatedError
+        if isinstance(exc, FeatureGatedError):
             return Response(
                 {
                     "code":        "feature_gated",

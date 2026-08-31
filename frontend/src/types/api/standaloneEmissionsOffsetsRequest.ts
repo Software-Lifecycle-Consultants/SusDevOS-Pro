@@ -5,7 +5,7 @@
  * GHG reporting, ecosystem tracking, and sustainable development platform. Aligned to GHG Protocol, IPCC, and TNFD.
  * OpenAPI spec version: 1.0.0
  */
-import type { StandaloneEmissionsOffsetsRequestCreditRegistry } from './standaloneEmissionsOffsetsRequestCreditRegistry';
+import type { CreditRegistryEnum } from './creditRegistryEnum';
 
 /**
  * Offset serializer whose parent emission is selected in the body.
@@ -53,27 +53,17 @@ export interface StandaloneEmissionsOffsetsRequest {
    * @maxLength 200
    */
   Provider: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  CertificateNumber?: string | null;
+  /** @maxLength 100 */
+  CertificateNumber?: string;
   /** @pattern ^-?\d{0,12}(?:\.\d{0,6})?$ */
   OffsetAmountTonnes: string;
   /** @nullable */
   ValidFrom?: string | null;
   /** @nullable */
   ValidTo?: string | null;
-  /** @nullable */
-  Remarks?: string | null;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  CreditSerialNumber?: string | null;
-  /**
-   * Which registry validates this credit (drives the registry-sync task).
-   * @nullable
-   */
-  CreditRegistry?: StandaloneEmissionsOffsetsRequestCreditRegistry;
+  Remarks?: string;
+  /** @maxLength 200 */
+  CreditSerialNumber?: string;
+  /** Which registry validates this credit (drives the registry-sync task). */
+  CreditRegistry?: CreditRegistryEnum;
 }

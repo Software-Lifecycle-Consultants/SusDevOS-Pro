@@ -40,13 +40,9 @@ export interface TreeRemovalsDetail {
   readonly CreatedBy: number | null;
   /** @nullable */
   readonly UpdatedBy: number | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  RemovalReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  RemovalReference?: string;
+  Description?: string;
   /** @nullable */
   RemovalDate?: string | null;
   /**
@@ -61,8 +57,7 @@ export interface TreeRemovalsDetail {
    */
   readonly TotalBiomassCarbon: string | null;
   HasMitigationPlan?: boolean;
-  /** @nullable */
-  MitigationNotes?: string | null;
+  MitigationNotes?: string;
   readonly EntityId: number;
   /** @nullable */
   ProjectId?: number | null;

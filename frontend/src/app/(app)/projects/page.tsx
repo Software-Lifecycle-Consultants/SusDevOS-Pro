@@ -10,8 +10,8 @@ import { EmptyState } from "@/components/EmptyState";
 interface Project {
   ProjectId:   number;
   ProjectName: string;
-  ProjectType: string | null;
-  Country:     string | null;
+  ProjectType: string;
+  Country:     string;
   StartDate:   string | null;
   EndDate:     string | null;
   Status:      number;
@@ -61,7 +61,7 @@ function CreateProjectModal({ onClose, entityId }: { onClose: () => void; entity
             mutation.mutate({
               ProjectName: form.ProjectName,
               ProjectType: form.ProjectType,
-              Country:     form.Country || null,
+              Country:     form.Country,
               StartDate:   form.StartDate || null,
               EndDate:     form.EndDate || null,
             });
@@ -168,8 +168,8 @@ export default function ProjectsPage() {
                   <td className="font-medium">
                     <Link href={`/projects/${p.ProjectId}`} className="text-brand-700 hover:underline">{p.ProjectName}</Link>
                   </td>
-                  <td className="text-surface-500">{p.ProjectType ?? "—"}</td>
-                  <td className="text-surface-500">{p.Country ?? "—"}</td>
+                  <td className="text-surface-500">{p.ProjectType || "—"}</td>
+                  <td className="text-surface-500">{p.Country || "—"}</td>
                   <td className="text-surface-500">{p.StartDate ?? "—"}</td>
                   <td className="text-surface-500">{p.EndDate ?? "—"}</td>
                   <td className="tabular-nums text-center">{p.phase_count}</td>

@@ -22,41 +22,20 @@ export interface EntityCreateRequest {
    * @nullable
    */
   EntityType?: EntityCreateRequestEntityType;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  RegistrationNumber?: string | null;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  VATNumber?: string | null;
-  /**
-   * @maxLength 255
-   * @nullable
-   */
-  AddressLine1?: string | null;
-  /**
-   * @maxLength 255
-   * @nullable
-   */
-  AddressLine2?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  City?: string | null;
-  /**
-   * @maxLength 20
-   * @nullable
-   */
-  PostCode?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  Country?: string | null;
+  /** @maxLength 50 */
+  RegistrationNumber?: string;
+  /** @maxLength 50 */
+  VATNumber?: string;
+  /** @maxLength 255 */
+  AddressLine1?: string;
+  /** @maxLength 255 */
+  AddressLine2?: string;
+  /** @maxLength 100 */
+  City?: string;
+  /** @maxLength 20 */
+  PostCode?: string;
+  /** @maxLength 100 */
+  Country?: string;
   /**
    * @minLength 1
    * @maxLength 3

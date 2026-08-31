@@ -25,7 +25,7 @@ class RevokedTokenJWTAuthentication(JWTAuthentication):
             try:
                 jti_uuid = uuid.UUID(jti)
             except ValueError:
-                raise InvalidToken("Token has an invalid jti claim.")
+                raise InvalidToken("Token has an invalid jti claim.") from None
             if RevokedTokens.objects.filter(Jti=jti_uuid).exists():
                 raise InvalidToken("Token has been revoked.")
         return validated

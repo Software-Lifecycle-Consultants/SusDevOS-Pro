@@ -30,13 +30,9 @@ export interface EcosystemDetail {
   readonly UpdatedBy: number | null;
   /** @maxLength 200 */
   EcosystemName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  EcosystemType?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  EcosystemType?: string;
+  Description?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,10}(?:\.\d{0,4})?$

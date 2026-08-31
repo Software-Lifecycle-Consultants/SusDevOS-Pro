@@ -24,13 +24,13 @@ class TreeRemovals(BaseAuditMixin):
         "projects.DevelopmentProjects", on_delete=models.SET_NULL, null=True, blank=True,
         related_name="tree_removals",
     )
-    RemovalReference = models.CharField(max_length=100, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
+    RemovalReference = models.CharField(max_length=100, blank=True)
+    Description = models.TextField(blank=True)
     RemovalDate = models.DateField(null=True, blank=True)
     TotalTreesRemoved = models.PositiveIntegerField(null=True, blank=True)
     TotalBiomassCarbon = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
     HasMitigationPlan = models.BooleanField(default=False)
-    MitigationNotes = models.TextField(blank=True, null=True)
+    MitigationNotes = models.TextField(blank=True)
 
     class Meta:
         db_table = "tree_removals"
@@ -48,6 +48,9 @@ class TreeRemovalEcosystems(models.Model):
     class Meta:
         db_table = "tree_removal_ecosystems"
 
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.EcosystemId}"
+
 
 class TreeRemovalTags(models.Model):
     id = models.AutoField(primary_key=True)
@@ -56,6 +59,9 @@ class TreeRemovalTags(models.Model):
 
     class Meta:
         db_table = "tree_removal_tags"
+
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.TagId}"
 
 
 class TreeRemovalContacts(models.Model):
@@ -66,6 +72,9 @@ class TreeRemovalContacts(models.Model):
     class Meta:
         db_table = "tree_removal_contacts"
 
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.ContactId}"
+
 
 class TreeRemovalDocuments(models.Model):
     id = models.AutoField(primary_key=True)
@@ -74,6 +83,9 @@ class TreeRemovalDocuments(models.Model):
 
     class Meta:
         db_table = "tree_removal_documents"
+
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.DocumentId}"
 
 
 class TreeRemovalLandParcels(models.Model):
@@ -84,6 +96,9 @@ class TreeRemovalLandParcels(models.Model):
     class Meta:
         db_table = "tree_removal_land_parcels"
 
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.LandParcelId}"
+
 
 class TreeRemovalEntities(models.Model):
     id = models.AutoField(primary_key=True)
@@ -93,6 +108,9 @@ class TreeRemovalEntities(models.Model):
     class Meta:
         db_table = "tree_removal_entities"
 
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.EntityId}"
+
 
 class TreeRemovalImages(models.Model):
     id = models.AutoField(primary_key=True)
@@ -101,6 +119,9 @@ class TreeRemovalImages(models.Model):
 
     class Meta:
         db_table = "tree_removal_images"
+
+    def __str__(self):
+        return f"{self.TreeRemovalId} / {self.ImageId}"
 
 
 class TreeRemovalRemovedSpecies(models.Model):
@@ -118,7 +139,7 @@ class TreeRemovalRemovedSpecies(models.Model):
         help_text="Which IPCC tier / approach was used",
     )
     BiomassCalculationNotes = models.TextField(
-        null=True, blank=True,
+        blank=True,
         help_text="Mandatory when BiomassCalculationMethod=4 (Manual) — document source",
     )
     DeadOrganicMatterTonnesCO2e = models.DecimalField(
@@ -140,6 +161,9 @@ class TreeRemovalRemovedSpecies(models.Model):
     class Meta:
         db_table = "tree_removal_removed_species"
 
+    def __str__(self):
+        return f"{self.TreeRemovalId} - removed {self.SpeciesId}"
+
     def save(self, *args, **kwargs):
         from apps.restorations.services import (
             compute_removed_species_carbon,
@@ -160,18 +184,21 @@ class TreeRemovalAffectedSpecies(models.Model):
     id = models.AutoField(primary_key=True)
     TreeRemovalId = models.ForeignKey(TreeRemovals, on_delete=models.CASCADE, related_name="affected_species")
     SpeciesId = models.ForeignKey("ecosystem.Species", on_delete=models.CASCADE, related_name="tree_removal_affected")
-    Notes = models.TextField(blank=True, null=True)
+    Notes = models.TextField(blank=True)
 
     class Meta:
         db_table = "tree_removal_affected_species"
+
+    def __str__(self):
+        return f"{self.TreeRemovalId} - affected {self.SpeciesId}"
 
 
 class Restorations(BaseAuditMixin):
     RestorationId = models.AutoField(primary_key=True)
     EntityId = models.ForeignKey("entities.Entities", on_delete=models.PROTECT, related_name="restorations")
     RestorationName = models.CharField(max_length=200)
-    RestorationReference = models.CharField(max_length=100, blank=True, null=True)
-    Description = models.TextField(blank=True, null=True)
+    RestorationReference = models.CharField(max_length=100, blank=True)
+    Description = models.TextField(blank=True)
     StartDate = models.DateField(null=True, blank=True)
     CompletionDate = models.DateField(null=True, blank=True)
     TotalAreaHectares = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
@@ -179,7 +206,7 @@ class Restorations(BaseAuditMixin):
     EstimatedCarbonSequestrationTonnes = models.DecimalField(
         max_digits=14, decimal_places=4, null=True, blank=True
     )
-    MonitoringNotes = models.TextField(blank=True, null=True)
+    MonitoringNotes = models.TextField(blank=True)
 
     class Meta:
         db_table = "restorations"
@@ -197,6 +224,9 @@ class RestorationEcosystems(models.Model):
     class Meta:
         db_table = "restoration_ecosystems"
 
+    def __str__(self):
+        return f"{self.RestorationId} / {self.EcosystemId}"
+
 
 class RestorationTags(models.Model):
     id = models.AutoField(primary_key=True)
@@ -205,6 +235,9 @@ class RestorationTags(models.Model):
 
     class Meta:
         db_table = "restoration_tags"
+
+    def __str__(self):
+        return f"{self.RestorationId} / {self.TagId}"
 
 
 class RestorationDevelopmentProjects(models.Model):
@@ -215,6 +248,9 @@ class RestorationDevelopmentProjects(models.Model):
     class Meta:
         db_table = "restoration_development_projects"
 
+    def __str__(self):
+        return f"{self.RestorationId} / {self.ProjectId}"
+
 
 class RestorationEntities(models.Model):
     id = models.AutoField(primary_key=True)
@@ -223,6 +259,9 @@ class RestorationEntities(models.Model):
 
     class Meta:
         db_table = "restoration_entities"
+
+    def __str__(self):
+        return f"{self.RestorationId} / {self.EntityId}"
 
 
 class RestorationSpecies(models.Model):
@@ -252,11 +291,11 @@ class RestorationSpecies(models.Model):
         help_text="Reversal risk (disclosed, not auto-deducted)",
     )
     AdditionalityAssessment = models.TextField(
-        null=True, blank=True,
+        blank=True,
         help_text="Narrative additionality assessment. Required for carbon-credit claims.",
     )
     SequestrationDataSource = models.CharField(
-        max_length=200, null=True, blank=True,
+        max_length=200, blank=True,
         help_text="Citation for sequestration rate used",
     )
     # ── Server-computed outputs ─────────────────────────────────────────────────
@@ -265,6 +304,9 @@ class RestorationSpecies(models.Model):
 
     class Meta:
         db_table = "restoration_species"
+
+    def __str__(self):
+        return f"{self.RestorationId} - {self.SpeciesId}"
 
     def save(self, *args, **kwargs):
         from apps.restorations.services import (
@@ -290,6 +332,9 @@ class RestorationLandParcels(models.Model):
     class Meta:
         db_table = "restoration_land_parcels"
 
+    def __str__(self):
+        return f"{self.RestorationId} / {self.LandParcelId}"
+
 
 class RestorationLocations(models.Model):
     id = models.AutoField(primary_key=True)
@@ -298,6 +343,9 @@ class RestorationLocations(models.Model):
 
     class Meta:
         db_table = "restoration_locations"
+
+    def __str__(self):
+        return f"{self.RestorationId} / {self.LocationId}"
 
 
 class RestorationContacts(models.Model):
@@ -308,6 +356,9 @@ class RestorationContacts(models.Model):
     class Meta:
         db_table = "restoration_contacts"
 
+    def __str__(self):
+        return f"{self.RestorationId} / {self.ContactId}"
+
 
 class RestorationDocuments(models.Model):
     id = models.AutoField(primary_key=True)
@@ -317,6 +368,9 @@ class RestorationDocuments(models.Model):
     class Meta:
         db_table = "restoration_documents"
 
+    def __str__(self):
+        return f"{self.RestorationId} / {self.DocumentId}"
+
 
 class RestorationImages(models.Model):
     id = models.AutoField(primary_key=True)
@@ -325,3 +379,6 @@ class RestorationImages(models.Model):
 
     class Meta:
         db_table = "restoration_images"
+
+    def __str__(self):
+        return f"{self.RestorationId} / {self.ImageId}"

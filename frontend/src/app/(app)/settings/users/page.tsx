@@ -10,8 +10,8 @@ interface User {
   UserId:    number;
   email:     string;
   username:  string;
-  FirstName: string | null;
-  LastName:  string | null;
+  FirstName: string;
+  LastName:  string;
   role:      string | null;
   is_active: boolean;
   Status:    number;

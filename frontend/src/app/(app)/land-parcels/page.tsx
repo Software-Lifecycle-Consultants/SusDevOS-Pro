@@ -29,11 +29,11 @@ const MapPicker = dynamic(() => import("@/components/land/MapPicker"), {
 interface LandParcel {
   LandParcelId:      number;
   ParcelName:        string;
-  ParcelReference:   string | null;
+  ParcelReference:   string;
   AreaHectares:      string | null;
-  LandUseType:       string | null;
-  Tenure:            string | null;
-  PlanningReference: string | null;
+  LandUseType:       string;
+  Tenure:            string;
+  PlanningReference: string;
   BoundaryGeoJSON:   object | null;
   Status:            number;
 }
@@ -82,12 +82,12 @@ function CreateParcelModal({ onClose, entityId }: { onClose: () => void; entityI
       }
       return axiosInstance.post("/api/land-parcels/", {
         ParcelName:        form.ParcelName,
-        ParcelReference:   form.ParcelReference   || null,
+        ParcelReference:   form.ParcelReference,
         AreaHectares:      form.AreaHectares       ? Number(form.AreaHectares) : null,
-        LandUseType:       form.LandUseType        || null,
-        Tenure:            form.Tenure             || null,
-        PlanningReference: form.PlanningReference  || null,
-        Description:       form.Description        || null,
+        LandUseType:       form.LandUseType,
+        Tenure:            form.Tenure,
+        PlanningReference: form.PlanningReference,
+        Description:       form.Description,
         BoundaryGeoJSON:   boundary,
       }, { headers });
     },
@@ -402,7 +402,7 @@ export default function LandParcelsPage() {
                 {parcels.map((p) => (
                   <tr key={p.LandParcelId}>
                     <td className="font-medium text-surface-900">{p.ParcelName}</td>
-                    <td className="text-surface-500 text-xs">{p.ParcelReference ?? "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.ParcelReference || "—"}</td>
                     <td className="text-right tabular-nums">
                       {p.AreaHectares ? parseFloat(p.AreaHectares).toFixed(2) : "—"}
                     </td>
@@ -411,8 +411,8 @@ export default function LandParcelsPage() {
                         ? <span className="badge badge-slate text-xs">{p.LandUseType}</span>
                         : <span className="text-surface-400 text-xs">—</span>}
                     </td>
-                    <td className="text-surface-500 text-xs">{p.Tenure ?? "—"}</td>
-                    <td className="text-surface-500 text-xs">{p.PlanningReference ?? "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.Tenure || "—"}</td>
+                    <td className="text-surface-500 text-xs">{p.PlanningReference || "—"}</td>
                     <td>
                       {p.BoundaryGeoJSON
                         ? <span className="badge badge-green text-xs">Mapped</span>

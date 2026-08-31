@@ -33,13 +33,9 @@ export interface TreeRemovalsDetailRequest {
   ApprovalStatus?: number;
   /** @nullable */
   DeletedAt?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  RemovalReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  RemovalReference?: string;
+  Description?: string;
   /** @nullable */
   RemovalDate?: string | null;
   /**
@@ -49,8 +45,7 @@ export interface TreeRemovalsDetailRequest {
    */
   TotalTreesRemoved?: number | null;
   HasMitigationPlan?: boolean;
-  /** @nullable */
-  MitigationNotes?: string | null;
+  MitigationNotes?: string;
   /** @nullable */
   ProjectId?: number | null;
 }

@@ -17,21 +17,12 @@ export interface UserCreateRequest {
    * @maxLength 150
    */
   username: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  FirstName?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  LastName?: string | null;
-  /**
-   * @maxLength 200
-   * @nullable
-   */
-  Designation?: string | null;
+  /** @maxLength 100 */
+  FirstName?: string;
+  /** @maxLength 100 */
+  LastName?: string;
+  /** @maxLength 200 */
+  Designation?: string;
   /** @minLength 1 */
   role_key: string;
 }

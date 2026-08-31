@@ -10,19 +10,19 @@ import { EmptyState } from "@/components/EmptyState";
 
 interface TreeRemoval {
   TreeRemovalId:     number;
-  RemovalReference:  string | null;
+  RemovalReference:  string;
   RemovalDate:       string | null;
   TotalTreesRemoved: number | null;
   TotalBiomassCarbon: string | null;
   HasMitigationPlan:  boolean;
-  Description:       string | null;
+  Description:       string;
   Status:            number;
 }
 
 interface Restoration {
   RestorationId:    number;
   RestorationName:  string;
-  RestorationReference: string | null;
+  RestorationReference: string;
   StartDate:        string | null;
   CompletionDate:   string | null;
   TotalAreaHectares: string | null;
@@ -47,13 +47,13 @@ function CreateRemovalModal({ onClose, entityId }: { onClose: () => void; entity
 
   const mutation = useMutation({
     mutationFn: () => axiosInstance.post("/api/tree-removals/", {
-      RemovalReference:  form.RemovalReference  || null,
-      Description:       form.Description       || null,
+      RemovalReference:  form.RemovalReference,
+      Description:       form.Description,
       RemovalDate:       form.RemovalDate        || null,
       TotalTreesRemoved: form.TotalTreesRemoved  ? Number(form.TotalTreesRemoved)  : null,
       TotalBiomassCarbon:form.TotalBiomassCarbon ? Number(form.TotalBiomassCarbon) : null,
       HasMitigationPlan: form.HasMitigationPlan === "true",
-      MitigationNotes:   form.MitigationNotes   || null,
+      MitigationNotes:   form.MitigationNotes,
     }, { headers }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tree-removals", entityId] });
@@ -147,8 +147,8 @@ function CreateRestorationModal({ onClose, entityId }: { onClose: () => void; en
   const mutation = useMutation({
     mutationFn: () => axiosInstance.post("/api/restorations/", {
       RestorationName:      form.RestorationName,
-      RestorationReference: form.RestorationReference || null,
-      Description:          form.Description          || null,
+      RestorationReference: form.RestorationReference,
+      Description:          form.Description,
       StartDate:            form.StartDate             || null,
       CompletionDate:       form.CompletionDate        || null,
       TotalAreaHectares:    form.TotalAreaHectares     ? Number(form.TotalAreaHectares)    : null,
@@ -156,7 +156,7 @@ function CreateRestorationModal({ onClose, entityId }: { onClose: () => void; en
       EstimatedCarbonSequestrationTonnes:
         form.EstimatedCarbonSequestrationTonnes
           ? Number(form.EstimatedCarbonSequestrationTonnes) : null,
-      MonitoringNotes:      form.MonitoringNotes       || null,
+      MonitoringNotes:      form.MonitoringNotes,
     }, { headers }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["restorations", entityId] });
@@ -368,7 +368,7 @@ export default function RestorationsPage() {
                         ? <span className="badge badge-green text-xs">Plan in place</span>
                         : <span className="badge badge-red text-xs">None</span>}
                     </td>
-                    <td className="text-surface-500 text-xs truncate max-w-[200px]">{r.Description ?? "—"}</td>
+                    <td className="text-surface-500 text-xs truncate max-w-[200px]">{r.Description || "—"}</td>
                   </tr>
                 ))}
               </tbody>

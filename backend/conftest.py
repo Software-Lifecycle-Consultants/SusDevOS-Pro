@@ -28,9 +28,9 @@ def gwp_dataset(db):
         defaults={"Name": "IPCC AR6 GWP100", "IsDefault": True, "PublishedYear": 2021},
     )
     defaults = [
-        ("CO2", None, "1.0000"),
+        ("CO2", "", "1.0000"),
         ("CH4", "fossil", "29.8000"),
-        ("N2O", None, "273.0000"),
+        ("N2O", "", "273.0000"),
     ]
     for gas, subtype, factor in defaults:
         GwpValues.objects.get_or_create(

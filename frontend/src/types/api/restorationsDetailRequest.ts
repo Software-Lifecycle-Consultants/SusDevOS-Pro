@@ -26,13 +26,9 @@ export interface RestorationsDetailRequest {
    * @maxLength 200
    */
   RestorationName: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  RestorationReference?: string | null;
-  /** @nullable */
-  Description?: string | null;
+  /** @maxLength 100 */
+  RestorationReference?: string;
+  Description?: string;
   /** @nullable */
   StartDate?: string | null;
   /** @nullable */
@@ -48,6 +44,5 @@ export interface RestorationsDetailRequest {
    * @nullable
    */
   TotalTreesPlanted?: number | null;
-  /** @nullable */
-  MonitoringNotes?: string | null;
+  MonitoringNotes?: string;
 }

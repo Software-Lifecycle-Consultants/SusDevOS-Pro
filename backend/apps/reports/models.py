@@ -26,10 +26,10 @@ class ReportJobs(models.Model):
     Format = models.CharField(max_length=10, choices=REPORT_FORMAT_CHOICES)
     Parameters = models.JSONField(default=dict)
     JobStatus = models.PositiveSmallIntegerField(default=1, choices=REPORT_STATUS_CHOICES)
-    CeleryTaskId = models.CharField(max_length=255, blank=True, null=True)
-    S3Key = models.TextField(blank=True, null=True)
+    CeleryTaskId = models.CharField(max_length=255, blank=True)
+    S3Key = models.TextField(blank=True)
     FileSizeBytes = models.BigIntegerField(null=True, blank=True)
-    ErrorMessage = models.TextField(blank=True, null=True)
+    ErrorMessage = models.TextField(blank=True)
     QueuedAt = models.DateTimeField(auto_now_add=True)
     StartedAt = models.DateTimeField(null=True, blank=True)
     CompletedAt = models.DateTimeField(null=True, blank=True)
@@ -43,10 +43,10 @@ class ReportJobs(models.Model):
             models.Index(fields=["PurgeAfter"], name="idx_report_purge"),
         ]
 
+    def __str__(self):
+        return f"{self.ReportType} ({self.get_JobStatus_display()})"
+
     def save(self, *args, **kwargs):
         if not self.PurgeAfter:
             self.PurgeAfter = timezone.now() + timedelta(days=90)
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.ReportType} ({self.get_JobStatus_display()})"

@@ -343,7 +343,7 @@ class TestStandaloneOffsetIntegrity:
         assert response.status_code == status.HTTP_200_OK, response.data
         offset.refresh_from_db()
         assert offset.RegistryValidationStatus == "unverified"
-        assert offset.RegistryProjectName is None
+        assert offset.RegistryProjectName == ""
         assert offset.RegistryVintageYear is None
 
     def test_offset_cannot_be_reparented(

@@ -16,12 +16,10 @@ export interface ReportJob {
   Parameters?: unknown;
   readonly JobStatus: JobStatusEnum;
   readonly status_label: string;
-  /** @nullable */
-  readonly CeleryTaskId: string | null;
+  readonly CeleryTaskId: string;
   /** @nullable */
   readonly FileSizeBytes: number | null;
-  /** @nullable */
-  readonly ErrorMessage: string | null;
+  readonly ErrorMessage: string;
   readonly QueuedAt: string;
   /** @nullable */
   readonly StartedAt: string | null;

@@ -138,4 +138,4 @@ def sync_oer_fx_rates(self):
         logger.info("OER FX sync: %d rates upserted", created)
         return {"created": created}
     except Exception as exc:
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc

@@ -14,7 +14,7 @@ interface ReportJob {
   status_label: string;
   QueuedAt:     string;
   CompletedAt:  string | null;
-  ErrorMessage: string | null;
+  ErrorMessage: string;
   FileSizeBytes: number | null;
 }
 

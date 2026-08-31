@@ -18,9 +18,11 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -33,14 +35,32 @@ from apps.shared.permissions import (
 from apps.shared.views import EntityScopeInitialMixin
 
 from .authentication import clear_refresh_cookie, issue_tokens, set_refresh_cookie
-from .models import PasswordResetTokens, RevokedTokens, Users
+from .models import (
+    Interfaces,
+    Modules,
+    PasswordResetTokens,
+    RevokedTokens,
+    RolePrivileges,
+    Roles,
+    UserPrivilegeOverrides,
+    UserRoles,
+    Users,
+)
 from .serializers import (
     ForgotPasswordSerializer,
+    InterfacesSerializer,
     LoginSerializer,
+    ModulesSerializer,
     OnboardSerializer,
+    PrivilegeOverrideSerializer,
     ResetPasswordSerializer,
+    RolePrivilegesSerializer,
+    RolesSerializer,
     SignupSerializer,
+    UserCreateSerializer,
     UserProfileSerializer,
+    UsersDetailSerializer,
+    UsersListSerializer,
 )
 
 
@@ -283,21 +303,6 @@ class MePasswordView(APIView):
 
 # ── Users CRUD ────────────────────────────────────────────────────────────────
 
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
-from .models import Interfaces, Modules, RolePrivileges, Roles, UserPrivilegeOverrides, UserRoles
-from .serializers import (
-    InterfacesSerializer,
-    ModulesSerializer,
-    PrivilegeOverrideSerializer,
-    RolePrivilegesSerializer,
-    RolesSerializer,
-    UserCreateSerializer,
-    UsersDetailSerializer,
-    UsersListSerializer,
-)
-
 
 class UsersViewSet(EntityScopeInitialMixin, ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -415,7 +420,7 @@ class RolesViewSet(ReadOnlyModelViewSet):
     lookup_field = "RoleId"
 
     @action(detail=True, methods=["get"], url_path="privileges")
-    def role_privileges(self, request, RoleId=None):
+    def role_privileges(self, request, RoleId=None):  # noqa: N803 — URL kwarg name is set by lookup_field
         role = self.get_object()
         privs = RolePrivileges.objects.filter(RoleId=role, Status=1)
         return Response(RolePrivilegesSerializer(privs, many=True).data)
@@ -428,7 +433,7 @@ class ModulesViewSet(ReadOnlyModelViewSet):
     lookup_field = "ModuleId"
 
     @action(detail=True, methods=["get"], url_path="interfaces")
-    def interfaces(self, request, ModuleId=None):
+    def interfaces(self, request, ModuleId=None):  # noqa: N803 — URL kwarg name is set by lookup_field
         module = self.get_object()
         ifaces = Interfaces.objects.filter(ModuleId=module, Status=1)
         return Response(InterfacesSerializer(ifaces, many=True).data)

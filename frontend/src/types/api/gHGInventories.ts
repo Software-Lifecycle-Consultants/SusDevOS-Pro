@@ -62,11 +62,8 @@ export interface GHGInventories {
    * @nullable
    */
   ConsolidationApproach?: GHGInventoriesConsolidationApproach;
-  /**
-   * Included/excluded operations and rationale for the inventory boundary.
-   * @nullable
-   */
-  BoundaryNotes?: string | null;
+  /** Included/excluded operations and rationale for the inventory boundary. */
+  BoundaryNotes?: string;
   /**
    * @minimum 0
    * @maximum 32767
@@ -74,8 +71,7 @@ export interface GHGInventories {
   VerificationStatus?: VerificationStatusEnum;
   /** @nullable */
   readonly VerifiedAt: string | null;
-  /** @nullable */
-  VerificationNotes?: string | null;
+  VerificationNotes?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,12}(?:\.\d{0,6})?$

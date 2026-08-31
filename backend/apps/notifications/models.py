@@ -22,7 +22,7 @@ class Notifications(models.Model):
     Type = models.CharField(max_length=50, choices=NOTIFICATION_TYPE_CHOICES)
     Title = models.CharField(max_length=200)
     Body = models.TextField()
-    RelatedModule = models.CharField(max_length=50, blank=True, null=True)
+    RelatedModule = models.CharField(max_length=50, blank=True)
     RelatedRecordId = models.IntegerField(null=True, blank=True)
     IsRead = models.BooleanField(default=False)
     CreatedAt = models.DateTimeField(auto_now_add=True)

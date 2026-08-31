@@ -12,16 +12,10 @@ export interface UsersList {
   email: string;
   /** @maxLength 150 */
   username: string;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  FirstName?: string | null;
-  /**
-   * @maxLength 100
-   * @nullable
-   */
-  LastName?: string | null;
+  /** @maxLength 100 */
+  FirstName?: string;
+  /** @maxLength 100 */
+  LastName?: string;
   /** @nullable */
   EntityId?: number | null;
   readonly role: string;

@@ -41,14 +41,12 @@ export interface EmissionsDataRequest {
    * @nullable
    */
   Scope3Category?: number | null;
-  /** @nullable */
-  ActivityDescription?: string | null;
+  ActivityDescription?: string;
   /**
    * Supplier shown on the bill, contract, or source evidence.
    * @maxLength 200
-   * @nullable
    */
-  SupplierName?: string | null;
+  SupplierName?: string;
   /** @pattern ^-?\d{0,14}(?:\.\d{0,4})?$ */
   QuantityOrCost: string;
   /**
@@ -68,11 +66,8 @@ export interface EmissionsDataRequest {
    * @maxLength 50
    */
   Gas: string;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GasSubtype?: string | null;
+  /** @maxLength 50 */
+  GasSubtype?: string;
   /**
    * kg biogenic CO2 per canonical unit of fuel (combustion of biomass/biofuels).
    * @nullable
@@ -91,21 +86,15 @@ export interface EmissionsDataRequest {
    * @pattern ^-?\d{0,10}(?:\.\d{0,8})?$
    */
   EFMarketBased?: string | null;
-  /**
-   * @maxLength 3
-   * @nullable
-   */
-  SpendCurrency?: string | null;
+  /** @maxLength 3 */
+  SpendCurrency?: string;
   /**
    * @nullable
    * @pattern ^-?\d{0,16}(?:\.\d{0,2})?$
    */
   SpendAmountLocal?: string | null;
-  /**
-   * @maxLength 50
-   * @nullable
-   */
-  GridSubregion?: string | null;
+  /** @maxLength 50 */
+  GridSubregion?: string;
   /**
    * @minimum 0
    * @maximum 32767
@@ -127,8 +116,7 @@ export interface EmissionsDataRequest {
    * @maximum 32767
    */
   VerificationStatus?: number;
-  /** @nullable */
-  VerificationNotes?: string | null;
+  VerificationNotes?: string;
   /** @nullable */
   ProjectId?: number | null;
   /** @nullable */

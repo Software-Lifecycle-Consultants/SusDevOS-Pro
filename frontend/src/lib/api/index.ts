@@ -667,70 +667,6 @@ const {mutation: mutationOptions} = options ?
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesCreate = (
-    entityCreateRequest: EntityCreateRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EntityCreate>(
-      {url: `/api/entities/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: entityCreateRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEntitiesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext> => {
-
-const mutationKey = ['entitiesCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesCreate>>, {data: EntityCreateRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  entitiesCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EntitiesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesCreate>>>
-    export type EntitiesCreateMutationBody = EntityCreateRequest
-    export type EntitiesCreateMutationError = unknown
-
-    export const useEntitiesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesCreate>>,
-        TError,
-        {data: EntityCreateRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEntitiesCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * CRUD for Entities.
-SA sees all; Admin sees own + related branches.
-Creation is SA-only and also creates the initial admin user.
- */
 export const entitiesList = (
     params?: EntitiesListParams,
  signal?: AbortSignal
@@ -819,6 +755,70 @@ export function useEntitiesList<TData = Awaited<ReturnType<typeof entitiesList>>
 
 
 
+/**
+ * CRUD for Entities.
+SA sees all; Admin sees own + related branches.
+Creation is SA-only and also creates the initial admin user.
+ */
+export const entitiesCreate = (
+    entityCreateRequest: EntityCreateRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EntityCreate>(
+      {url: `/api/entities/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: entityCreateRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEntitiesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext> => {
+
+const mutationKey = ['entitiesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesCreate>>, {data: EntityCreateRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  entitiesCreate(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EntitiesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesCreate>>>
+    export type EntitiesCreateMutationBody = EntityCreateRequest
+    export type EntitiesCreateMutationError = unknown
+
+    export const useEntitiesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesCreate>>, TError,{data: EntityCreateRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof entitiesCreate>>,
+        TError,
+        {data: EntityCreateRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEntitiesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Entities the current user can switch into (primary + memberships).
 Drives the frontend entity switcher. SuperAdmin sees all active entities.
@@ -910,70 +910,6 @@ export function useEntitiesAccessibleRetrieve<TData = Awaited<ReturnType<typeof 
 
 
 
-/**
- * CRUD for Entities.
-SA sees all; Admin sees own + related branches.
-Creation is SA-only and also creates the initial admin user.
- */
-export const entitiesUpdate = (
-    entityId: number | undefined | null,
-    entitiesDetailRequest: EntitiesDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: entitiesDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getEntitiesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
-
-const mutationKey = ['entitiesUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
-          const {entityId,data} = props ?? {};
-
-          return  entitiesUpdate(entityId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EntitiesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesUpdate>>>
-    export type EntitiesUpdateMutationBody = EntitiesDetailRequest
-    export type EntitiesUpdateMutationError = unknown
-
-    export const useEntitiesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesUpdate>>,
-        TError,
-        {entityId: number | undefined | null;data: EntitiesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEntitiesUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * CRUD for Entities.
 SA sees all; Admin sees own + related branches.
@@ -1071,14 +1007,14 @@ export function useEntitiesRetrieve<TData = Awaited<ReturnType<typeof entitiesRe
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesPartialUpdate = (
+export const entitiesUpdate = (
     entityId: number | undefined | null,
     entitiesDetailRequest: EntitiesDetailRequest,
  ) => {
       
       
       return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/`, method: 'PATCH',
+      {url: `/api/entities/${entityId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: entitiesDetailRequest
     },
@@ -1087,11 +1023,11 @@ export const entitiesPartialUpdate = (
   
 
 
-export const getEntitiesPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+export const getEntitiesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
 
-const mutationKey = ['entitiesPartialUpdate'];
+const mutationKey = ['entitiesUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1101,10 +1037,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesPartialUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
           const {entityId,data} = props ?? {};
 
-          return  entitiesPartialUpdate(entityId,data,)
+          return  entitiesUpdate(entityId,data,)
         }
 
         
@@ -1112,20 +1048,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EntitiesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesPartialUpdate>>>
-    export type EntitiesPartialUpdateMutationBody = EntitiesDetailRequest
-    export type EntitiesPartialUpdateMutationError = unknown
+    export type EntitiesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesUpdate>>>
+    export type EntitiesUpdateMutationBody = EntitiesDetailRequest
+    export type EntitiesUpdateMutationError = unknown
 
-    export const useEntitiesPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+    export const useEntitiesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesPartialUpdate>>,
+        Awaited<ReturnType<typeof entitiesUpdate>>,
         TError,
         {entityId: number | undefined | null;data: EntitiesDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEntitiesPartialUpdateMutationOptions(options);
+      const mutationOptions = getEntitiesUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -1187,6 +1123,70 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getEntitiesDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * CRUD for Entities.
+SA sees all; Admin sees own + related branches.
+Creation is SA-only and also creates the initial admin user.
+ */
+export const entitiesPartialUpdate = (
+    entityId: number | undefined | null,
+    entitiesDetailRequest: EntitiesDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<EntitiesDetail>(
+      {url: `/api/entities/${entityId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: entitiesDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getEntitiesPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+
+const mutationKey = ['entitiesPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesPartialUpdate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+          const {entityId,data} = props ?? {};
+
+          return  entitiesPartialUpdate(entityId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EntitiesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesPartialUpdate>>>
+    export type EntitiesPartialUpdateMutationBody = EntitiesDetailRequest
+    export type EntitiesPartialUpdateMutationError = unknown
+
+    export const useEntitiesPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesPartialUpdate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof entitiesPartialUpdate>>,
+        TError,
+        {entityId: number | undefined | null;data: EntitiesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEntitiesPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -1288,71 +1288,6 @@ export function useEntitiesConsolidatedEmissionsRetrieve<TData = Awaited<ReturnT
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesContactsCreate = (
-    entityId: number | undefined | null,
-    entitiesDetailRequest: EntitiesDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/contacts/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: entitiesDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEntitiesContactsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
-
-const mutationKey = ['entitiesContactsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesContactsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
-          const {entityId,data} = props ?? {};
-
-          return  entitiesContactsCreate(entityId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EntitiesContactsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesContactsCreate>>>
-    export type EntitiesContactsCreateMutationBody = EntitiesDetailRequest
-    export type EntitiesContactsCreateMutationError = unknown
-
-    export const useEntitiesContactsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesContactsCreate>>,
-        TError,
-        {entityId: number | undefined | null;data: EntitiesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEntitiesContactsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * CRUD for Entities.
-SA sees all; Admin sees own + related branches.
-Creation is SA-only and also creates the initial admin user.
- */
 export const entitiesContactsRetrieve = (
     entityId: number | undefined | null,
  signal?: AbortSignal
@@ -1445,7 +1380,7 @@ export function useEntitiesContactsRetrieve<TData = Awaited<ReturnType<typeof en
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesDocumentsCreate = (
+export const entitiesContactsCreate = (
     entityId: number | undefined | null,
     entitiesDetailRequest: EntitiesDetailRequest,
  signal?: AbortSignal
@@ -1453,7 +1388,7 @@ export const entitiesDocumentsCreate = (
       
       
       return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/documents/`, method: 'POST',
+      {url: `/api/entities/${entityId}/contacts/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: entitiesDetailRequest, signal
     },
@@ -1462,11 +1397,11 @@ export const entitiesDocumentsCreate = (
   
 
 
-export const getEntitiesDocumentsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+export const getEntitiesContactsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
 
-const mutationKey = ['entitiesDocumentsCreate'];
+const mutationKey = ['entitiesContactsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1476,10 +1411,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesContactsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
           const {entityId,data} = props ?? {};
 
-          return  entitiesDocumentsCreate(entityId,data,)
+          return  entitiesContactsCreate(entityId,data,)
         }
 
         
@@ -1487,20 +1422,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EntitiesDocumentsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesDocumentsCreate>>>
-    export type EntitiesDocumentsCreateMutationBody = EntitiesDetailRequest
-    export type EntitiesDocumentsCreateMutationError = unknown
+    export type EntitiesContactsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesContactsCreate>>>
+    export type EntitiesContactsCreateMutationBody = EntitiesDetailRequest
+    export type EntitiesContactsCreateMutationError = unknown
 
-    export const useEntitiesDocumentsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+    export const useEntitiesContactsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesContactsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesDocumentsCreate>>,
+        Awaited<ReturnType<typeof entitiesContactsCreate>>,
         TError,
         {entityId: number | undefined | null;data: EntitiesDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEntitiesDocumentsCreateMutationOptions(options);
+      const mutationOptions = getEntitiesContactsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -1597,6 +1532,71 @@ export function useEntitiesDocumentsRetrieve<TData = Awaited<ReturnType<typeof e
 
 
 
+/**
+ * CRUD for Entities.
+SA sees all; Admin sees own + related branches.
+Creation is SA-only and also creates the initial admin user.
+ */
+export const entitiesDocumentsCreate = (
+    entityId: number | undefined | null,
+    entitiesDetailRequest: EntitiesDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EntitiesDetail>(
+      {url: `/api/entities/${entityId}/documents/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: entitiesDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEntitiesDocumentsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+
+const mutationKey = ['entitiesDocumentsCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+          const {entityId,data} = props ?? {};
+
+          return  entitiesDocumentsCreate(entityId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EntitiesDocumentsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesDocumentsCreate>>>
+    export type EntitiesDocumentsCreateMutationBody = EntitiesDetailRequest
+    export type EntitiesDocumentsCreateMutationError = unknown
+
+    export const useEntitiesDocumentsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesDocumentsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof entitiesDocumentsCreate>>,
+        TError,
+        {entityId: number | undefined | null;data: EntitiesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEntitiesDocumentsCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * CRUD for Entities.
 SA sees all; Admin sees own + related branches.
@@ -1758,71 +1758,6 @@ const {mutation: mutationOptions} = options ?
 SA sees all; Admin sees own + related branches.
 Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesLocationsCreate = (
-    entityId: number | undefined | null,
-    entitiesDetailRequest: EntitiesDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/locations/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: entitiesDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEntitiesLocationsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
-
-const mutationKey = ['entitiesLocationsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesLocationsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
-          const {entityId,data} = props ?? {};
-
-          return  entitiesLocationsCreate(entityId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EntitiesLocationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesLocationsCreate>>>
-    export type EntitiesLocationsCreateMutationBody = EntitiesDetailRequest
-    export type EntitiesLocationsCreateMutationError = unknown
-
-    export const useEntitiesLocationsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesLocationsCreate>>,
-        TError,
-        {entityId: number | undefined | null;data: EntitiesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEntitiesLocationsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * CRUD for Entities.
-SA sees all; Admin sees own + related branches.
-Creation is SA-only and also creates the initial admin user.
- */
 export const entitiesLocationsRetrieve = (
     entityId: number | undefined | null,
  signal?: AbortSignal
@@ -1911,9 +1846,11 @@ export function useEntitiesLocationsRetrieve<TData = Awaited<ReturnType<typeof e
 
 
 /**
- * GET: list members of this entity. POST (SuperAdmin): grant a user access.
+ * CRUD for Entities.
+SA sees all; Admin sees own + related branches.
+Creation is SA-only and also creates the initial admin user.
  */
-export const entitiesMembersCreate = (
+export const entitiesLocationsCreate = (
     entityId: number | undefined | null,
     entitiesDetailRequest: EntitiesDetailRequest,
  signal?: AbortSignal
@@ -1921,7 +1858,7 @@ export const entitiesMembersCreate = (
       
       
       return axiosInstance<EntitiesDetail>(
-      {url: `/api/entities/${entityId}/members/`, method: 'POST',
+      {url: `/api/entities/${entityId}/locations/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: entitiesDetailRequest, signal
     },
@@ -1930,11 +1867,11 @@ export const entitiesMembersCreate = (
   
 
 
-export const getEntitiesMembersCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+export const getEntitiesLocationsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
 
-const mutationKey = ['entitiesMembersCreate'];
+const mutationKey = ['entitiesLocationsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1944,10 +1881,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesMembersCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesLocationsCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
           const {entityId,data} = props ?? {};
 
-          return  entitiesMembersCreate(entityId,data,)
+          return  entitiesLocationsCreate(entityId,data,)
         }
 
         
@@ -1955,20 +1892,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EntitiesMembersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesMembersCreate>>>
-    export type EntitiesMembersCreateMutationBody = EntitiesDetailRequest
-    export type EntitiesMembersCreateMutationError = unknown
+    export type EntitiesLocationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesLocationsCreate>>>
+    export type EntitiesLocationsCreateMutationBody = EntitiesDetailRequest
+    export type EntitiesLocationsCreateMutationError = unknown
 
-    export const useEntitiesMembersCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+    export const useEntitiesLocationsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesLocationsCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof entitiesMembersCreate>>,
+        Awaited<ReturnType<typeof entitiesLocationsCreate>>,
         TError,
         {entityId: number | undefined | null;data: EntitiesDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEntitiesMembersCreateMutationOptions(options);
+      const mutationOptions = getEntitiesLocationsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -2063,6 +2000,69 @@ export function useEntitiesMembersRetrieve<TData = Awaited<ReturnType<typeof ent
 
 
 
+/**
+ * GET: list members of this entity. POST (SuperAdmin): grant a user access.
+ */
+export const entitiesMembersCreate = (
+    entityId: number | undefined | null,
+    entitiesDetailRequest: EntitiesDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EntitiesDetail>(
+      {url: `/api/entities/${entityId}/members/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: entitiesDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEntitiesMembersCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext> => {
+
+const mutationKey = ['entitiesMembersCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof entitiesMembersCreate>>, {entityId: number | undefined | null;data: EntitiesDetailRequest}> = (props) => {
+          const {entityId,data} = props ?? {};
+
+          return  entitiesMembersCreate(entityId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EntitiesMembersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof entitiesMembersCreate>>>
+    export type EntitiesMembersCreateMutationBody = EntitiesDetailRequest
+    export type EntitiesMembersCreateMutationError = unknown
+
+    export const useEntitiesMembersCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof entitiesMembersCreate>>, TError,{entityId: number | undefined | null;data: EntitiesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof entitiesMembersCreate>>,
+        TError,
+        {entityId: number | undefined | null;data: EntitiesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEntitiesMembersCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * CRUD for Entities.
 SA sees all; Admin sees own + related branches.
@@ -2395,74 +2395,6 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const usersCreate = (
-    userCreateRequest: UserCreateRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<UserCreate>(
-      {url: `/api/users/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: userCreateRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getUsersCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext> => {
-
-const mutationKey = ['usersCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersCreate>>, {data: UserCreateRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  usersCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof usersCreate>>>
-    export type UsersCreateMutationBody = UserCreateRequest
-    export type UsersCreateMutationError = unknown
-
-    export const useUsersCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof usersCreate>>,
-        TError,
-        {data: UserCreateRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getUsersCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Re-resolve ``request.entity_id`` after DRF authentication.
-
-Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
-but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
-bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
-Without this, ``request.entity_id`` is None for JWT requests and tenant
-scoping silently fails (empty reads, NOT-NULL violations on create).
- */
 export const usersList = (
     params?: UsersListParams,
  signal?: AbortSignal
@@ -2560,24 +2492,27 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const usersDestroy = (
-    userId: number | undefined | null,
- ) => {
+export const usersCreate = (
+    userCreateRequest: UserCreateRequest,
+ signal?: AbortSignal
+) => {
       
       
-      return axiosInstance<void>(
-      {url: `/api/users/${userId}/`, method: 'DELETE'
+      return axiosInstance<UserCreate>(
+      {url: `/api/users/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: userCreateRequest, signal
     },
       );
     }
   
 
 
-export const getUsersDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext> => {
+export const getUsersCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext> => {
 
-const mutationKey = ['usersDestroy'];
+const mutationKey = ['usersCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -2587,10 +2522,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersDestroy>>, {userId: number | undefined | null}> = (props) => {
-          const {userId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersCreate>>, {data: UserCreateRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  usersDestroy(userId,)
+          return  usersCreate(data,)
         }
 
         
@@ -2598,20 +2533,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type UsersDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof usersDestroy>>>
-    
-    export type UsersDestroyMutationError = unknown
+    export type UsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof usersCreate>>>
+    export type UsersCreateMutationBody = UserCreateRequest
+    export type UsersCreateMutationError = unknown
 
-    export const useUsersDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
+    export const useUsersCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: UserCreateRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof usersDestroy>>,
+        Awaited<ReturnType<typeof usersCreate>>,
         TError,
-        {userId: number | undefined | null},
+        {data: UserCreateRequest},
         TContext
       > => {
 
-      const mutationOptions = getUsersDestroyMutationOptions(options);
+      const mutationOptions = getUsersCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -2712,6 +2647,71 @@ export function useUsersRetrieve<TData = Awaited<ReturnType<typeof usersRetrieve
 
 
 
+/**
+ * Re-resolve ``request.entity_id`` after DRF authentication.
+
+Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
+but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
+bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
+Without this, ``request.entity_id`` is None for JWT requests and tenant
+scoping silently fails (empty reads, NOT-NULL violations on create).
+ */
+export const usersDestroy = (
+    userId: number | undefined | null,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/users/${userId}/`, method: 'DELETE'
+    },
+      );
+    }
+  
+
+
+export const getUsersDestroyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext> => {
+
+const mutationKey = ['usersDestroy'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersDestroy>>, {userId: number | undefined | null}> = (props) => {
+          const {userId} = props ?? {};
+
+          return  usersDestroy(userId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsersDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof usersDestroy>>>
+    
+    export type UsersDestroyMutationError = unknown
+
+    export const useUsersDestroy = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersDestroy>>, TError,{userId: number | undefined | null}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof usersDestroy>>,
+        TError,
+        {userId: number | undefined | null},
+        TContext
+      > => {
+
+      const mutationOptions = getUsersDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Re-resolve ``request.entity_id`` after DRF authentication.
 
@@ -3605,73 +3605,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const projectsCreate = (
-    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: developmentProjectsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getProjectsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext> => {
-
-const mutationKey = ['projectsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsCreate>>, {data: DevelopmentProjectsDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  projectsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProjectsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsCreate>>>
-    export type ProjectsCreateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsCreateMutationError = unknown
-
-    export const useProjectsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsCreate>>,
-        TError,
-        {data: DevelopmentProjectsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getProjectsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const projectsList = (
     params?: ProjectsListParams,
  signal?: AbortSignal
@@ -3768,27 +3701,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const projectsUpdate = (
-    projectId: number | undefined | null,
+export const projectsCreate = (
     developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/${projectId}/`, method: 'PUT',
+      {url: `/api/projects/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: developmentProjectsDetailRequest
+      data: developmentProjectsDetailRequest, signal
     },
       );
     }
   
 
 
-export const getProjectsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+export const getProjectsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext> => {
 
-const mutationKey = ['projectsUpdate'];
+const mutationKey = ['projectsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -3798,10 +3731,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
-          const {projectId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsCreate>>, {data: DevelopmentProjectsDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  projectsUpdate(projectId,data,)
+          return  projectsCreate(data,)
         }
 
         
@@ -3809,20 +3742,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ProjectsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsUpdate>>>
-    export type ProjectsUpdateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsUpdateMutationError = unknown
+    export type ProjectsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsCreate>>>
+    export type ProjectsCreateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsCreateMutationError = unknown
 
-    export const useProjectsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+    export const useProjectsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsCreate>>, TError,{data: DevelopmentProjectsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsUpdate>>,
+        Awaited<ReturnType<typeof projectsCreate>>,
         TError,
-        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
+        {data: DevelopmentProjectsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getProjectsUpdateMutationOptions(options);
+      const mutationOptions = getProjectsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -3930,14 +3863,14 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const projectsPartialUpdate = (
+export const projectsUpdate = (
     projectId: number | undefined | null,
     developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
  ) => {
       
       
       return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/${projectId}/`, method: 'PATCH',
+      {url: `/api/projects/${projectId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: developmentProjectsDetailRequest
     },
@@ -3946,11 +3879,11 @@ export const projectsPartialUpdate = (
   
 
 
-export const getProjectsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+export const getProjectsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
 
-const mutationKey = ['projectsPartialUpdate'];
+const mutationKey = ['projectsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -3960,10 +3893,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPartialUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
           const {projectId,data} = props ?? {};
 
-          return  projectsPartialUpdate(projectId,data,)
+          return  projectsUpdate(projectId,data,)
         }
 
         
@@ -3971,20 +3904,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ProjectsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPartialUpdate>>>
-    export type ProjectsPartialUpdateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsPartialUpdateMutationError = unknown
+    export type ProjectsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsUpdate>>>
+    export type ProjectsUpdateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsUpdateMutationError = unknown
 
-    export const useProjectsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+    export const useProjectsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsPartialUpdate>>,
+        Awaited<ReturnType<typeof projectsUpdate>>,
         TError,
         {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getProjectsPartialUpdateMutationOptions(options);
+      const mutationOptions = getProjectsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -4049,6 +3982,73 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getProjectsDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const projectsPartialUpdate = (
+    projectId: number | undefined | null,
+    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<DevelopmentProjectsDetail>(
+      {url: `/api/projects/${projectId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: developmentProjectsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getProjectsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+
+const mutationKey = ['projectsPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPartialUpdate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
+          const {projectId,data} = props ?? {};
+
+          return  projectsPartialUpdate(projectId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProjectsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPartialUpdate>>>
+    export type ProjectsPartialUpdateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsPartialUpdateMutationError = unknown
+
+    export const useProjectsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartialUpdate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof projectsPartialUpdate>>,
+        TError,
+        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getProjectsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -4156,74 +4156,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const projectsPartnersCreate = (
-    projectId: number | undefined | null,
-    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/${projectId}/partners/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: developmentProjectsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getProjectsPartnersCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
-
-const mutationKey = ['projectsPartnersCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPartnersCreate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
-          const {projectId,data} = props ?? {};
-
-          return  projectsPartnersCreate(projectId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProjectsPartnersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPartnersCreate>>>
-    export type ProjectsPartnersCreateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsPartnersCreateMutationError = unknown
-
-    export const useProjectsPartnersCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsPartnersCreate>>,
-        TError,
-        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getProjectsPartnersCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const projectsPartnersRetrieve = (
     projectId: number | undefined | null,
  signal?: AbortSignal
@@ -4311,6 +4243,74 @@ export function useProjectsPartnersRetrieve<TData = Awaited<ReturnType<typeof pr
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const projectsPartnersCreate = (
+    projectId: number | undefined | null,
+    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<DevelopmentProjectsDetail>(
+      {url: `/api/projects/${projectId}/partners/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: developmentProjectsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getProjectsPartnersCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+
+const mutationKey = ['projectsPartnersCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPartnersCreate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
+          const {projectId,data} = props ?? {};
+
+          return  projectsPartnersCreate(projectId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProjectsPartnersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPartnersCreate>>>
+    export type ProjectsPartnersCreateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsPartnersCreateMutationError = unknown
+
+    export const useProjectsPartnersCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPartnersCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof projectsPartnersCreate>>,
+        TError,
+        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getProjectsPartnersCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -4554,74 +4554,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const projectsPhasesCreate = (
-    projectId: number | undefined | null,
-    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<DevelopmentProjectsDetail>(
-      {url: `/api/projects/${projectId}/phases/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: developmentProjectsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getProjectsPhasesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
-
-const mutationKey = ['projectsPhasesCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPhasesCreate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
-          const {projectId,data} = props ?? {};
-
-          return  projectsPhasesCreate(projectId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ProjectsPhasesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPhasesCreate>>>
-    export type ProjectsPhasesCreateMutationBody = DevelopmentProjectsDetailRequest
-    export type ProjectsPhasesCreateMutationError = unknown
-
-    export const useProjectsPhasesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof projectsPhasesCreate>>,
-        TError,
-        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getProjectsPhasesCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const projectsPhasesRetrieve = (
     projectId: number | undefined | null,
  signal?: AbortSignal
@@ -4717,6 +4649,74 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
+export const projectsPhasesCreate = (
+    projectId: number | undefined | null,
+    developmentProjectsDetailRequest: DevelopmentProjectsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<DevelopmentProjectsDetail>(
+      {url: `/api/projects/${projectId}/phases/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: developmentProjectsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getProjectsPhasesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext> => {
+
+const mutationKey = ['projectsPhasesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof projectsPhasesCreate>>, {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}> = (props) => {
+          const {projectId,data} = props ?? {};
+
+          return  projectsPhasesCreate(projectId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProjectsPhasesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof projectsPhasesCreate>>>
+    export type ProjectsPhasesCreateMutationBody = DevelopmentProjectsDetailRequest
+    export type ProjectsPhasesCreateMutationError = unknown
+
+    export const useProjectsPhasesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof projectsPhasesCreate>>, TError,{projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof projectsPhasesCreate>>,
+        TError,
+        {projectId: number | undefined | null;data: DevelopmentProjectsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getProjectsPhasesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
 export const projectsPartnersDestroy = (
     projectId: number | undefined | null,
     partnerId: string | undefined | null,
@@ -4770,69 +4770,6 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getProjectsPartnersDestroyMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mix into a DRF APIView or ViewSet.
-Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
- */
-export const landParcelsCreate = (
-    landParcelsDetailRequest: LandParcelsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<LandParcelsDetail>(
-      {url: `/api/land-parcels/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: landParcelsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getLandParcelsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext> => {
-
-const mutationKey = ['landParcelsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsCreate>>, {data: LandParcelsDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  landParcelsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type LandParcelsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsCreate>>>
-    export type LandParcelsCreateMutationBody = LandParcelsDetailRequest
-    export type LandParcelsCreateMutationError = unknown
-
-    export const useLandParcelsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof landParcelsCreate>>,
-        TError,
-        {data: LandParcelsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getLandParcelsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -4933,27 +4870,27 @@ export function useLandParcelsList<TData = Awaited<ReturnType<typeof landParcels
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const landParcelsUpdate = (
-    landParcelId: number | undefined | null,
+export const landParcelsCreate = (
     landParcelsDetailRequest: LandParcelsDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<LandParcelsDetail>(
-      {url: `/api/land-parcels/${landParcelId}/`, method: 'PUT',
+      {url: `/api/land-parcels/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: landParcelsDetailRequest
+      data: landParcelsDetailRequest, signal
     },
       );
     }
   
 
 
-export const getLandParcelsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
+export const getLandParcelsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext> => {
 
-const mutationKey = ['landParcelsUpdate'];
+const mutationKey = ['landParcelsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -4963,10 +4900,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
-          const {landParcelId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsCreate>>, {data: LandParcelsDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  landParcelsUpdate(landParcelId,data,)
+          return  landParcelsCreate(data,)
         }
 
         
@@ -4974,24 +4911,119 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type LandParcelsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsUpdate>>>
-    export type LandParcelsUpdateMutationBody = LandParcelsDetailRequest
-    export type LandParcelsUpdateMutationError = unknown
+    export type LandParcelsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsCreate>>>
+    export type LandParcelsCreateMutationBody = LandParcelsDetailRequest
+    export type LandParcelsCreateMutationError = unknown
 
-    export const useLandParcelsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+    export const useLandParcelsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsCreate>>, TError,{data: LandParcelsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof landParcelsUpdate>>,
+        Awaited<ReturnType<typeof landParcelsCreate>>,
         TError,
-        {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
+        {data: LandParcelsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getLandParcelsUpdateMutationOptions(options);
+      const mutationOptions = getLandParcelsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
     
+/**
+ * Place-name search for the boundary map. GET ?q=<place>[&limit=n].
+
+Reference lookup, not tenant data, so it is not entity-scoped — same shape
+as the GBIF species search on SpeciesViewSet. Proxied rather than called
+from the browser so the provider sees our User-Agent and cache, not the
+tenant's IP.
+ */
+export const landParcelsGeocodeRetrieve = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<LandParcelsDetail>(
+      {url: `/api/land-parcels/geocode/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getLandParcelsGeocodeRetrieveQueryKey = () => {
+    return [
+    `/api/land-parcels/geocode/`
+    ] as const;
+    }
+
+    
+export const getLandParcelsGeocodeRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLandParcelsGeocodeRetrieveQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>> = ({ signal }) => landParcelsGeocodeRetrieve(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type LandParcelsGeocodeRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>>
+export type LandParcelsGeocodeRetrieveQueryError = unknown
+
+
+export function useLandParcelsGeocodeRetrieve<TData = Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useLandParcelsGeocodeRetrieve<TData = Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>,
+          TError,
+          Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useLandParcelsGeocodeRetrieve<TData = Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+
+export function useLandParcelsGeocodeRetrieve<TData = Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof landParcelsGeocodeRetrieve>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getLandParcelsGeocodeRetrieveQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
 /**
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
@@ -5087,14 +5119,14 @@ export function useLandParcelsRetrieve<TData = Awaited<ReturnType<typeof landPar
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const landParcelsPartialUpdate = (
+export const landParcelsUpdate = (
     landParcelId: number | undefined | null,
     landParcelsDetailRequest: LandParcelsDetailRequest,
  ) => {
       
       
       return axiosInstance<LandParcelsDetail>(
-      {url: `/api/land-parcels/${landParcelId}/`, method: 'PATCH',
+      {url: `/api/land-parcels/${landParcelId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: landParcelsDetailRequest
     },
@@ -5103,11 +5135,11 @@ export const landParcelsPartialUpdate = (
   
 
 
-export const getLandParcelsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
+export const getLandParcelsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
 
-const mutationKey = ['landParcelsPartialUpdate'];
+const mutationKey = ['landParcelsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5117,10 +5149,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
           const {landParcelId,data} = props ?? {};
 
-          return  landParcelsPartialUpdate(landParcelId,data,)
+          return  landParcelsUpdate(landParcelId,data,)
         }
 
         
@@ -5128,20 +5160,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type LandParcelsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsPartialUpdate>>>
-    export type LandParcelsPartialUpdateMutationBody = LandParcelsDetailRequest
-    export type LandParcelsPartialUpdateMutationError = unknown
+    export type LandParcelsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsUpdate>>>
+    export type LandParcelsUpdateMutationBody = LandParcelsDetailRequest
+    export type LandParcelsUpdateMutationError = unknown
 
-    export const useLandParcelsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+    export const useLandParcelsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof landParcelsPartialUpdate>>,
+        Awaited<ReturnType<typeof landParcelsUpdate>>,
         TError,
         {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getLandParcelsPartialUpdateMutationOptions(options);
+      const mutationOptions = getLandParcelsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -5210,28 +5242,27 @@ const {mutation: mutationOptions} = options ?
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const landParcelsEcosystemsCreate = (
+export const landParcelsPartialUpdate = (
     landParcelId: number | undefined | null,
     landParcelsDetailRequest: LandParcelsDetailRequest,
- signal?: AbortSignal
-) => {
+ ) => {
       
       
       return axiosInstance<LandParcelsDetail>(
-      {url: `/api/land-parcels/${landParcelId}/ecosystems/`, method: 'POST',
+      {url: `/api/land-parcels/${landParcelId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: landParcelsDetailRequest, signal
+      data: landParcelsDetailRequest
     },
       );
     }
   
 
 
-export const getLandParcelsEcosystemsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
+export const getLandParcelsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
 
-const mutationKey = ['landParcelsEcosystemsCreate'];
+const mutationKey = ['landParcelsPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5241,10 +5272,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
           const {landParcelId,data} = props ?? {};
 
-          return  landParcelsEcosystemsCreate(landParcelId,data,)
+          return  landParcelsPartialUpdate(landParcelId,data,)
         }
 
         
@@ -5252,20 +5283,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type LandParcelsEcosystemsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>>
-    export type LandParcelsEcosystemsCreateMutationBody = LandParcelsDetailRequest
-    export type LandParcelsEcosystemsCreateMutationError = unknown
+    export type LandParcelsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsPartialUpdate>>>
+    export type LandParcelsPartialUpdateMutationBody = LandParcelsDetailRequest
+    export type LandParcelsPartialUpdateMutationError = unknown
 
-    export const useLandParcelsEcosystemsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+    export const useLandParcelsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsPartialUpdate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>,
+        Awaited<ReturnType<typeof landParcelsPartialUpdate>>,
         TError,
         {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getLandParcelsEcosystemsCreateMutationOptions(options);
+      const mutationOptions = getLandParcelsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -5365,6 +5396,70 @@ export function useLandParcelsEcosystemsRetrieve<TData = Awaited<ReturnType<type
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
+export const landParcelsEcosystemsCreate = (
+    landParcelId: number | undefined | null,
+    landParcelsDetailRequest: LandParcelsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<LandParcelsDetail>(
+      {url: `/api/land-parcels/${landParcelId}/ecosystems/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: landParcelsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getLandParcelsEcosystemsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext> => {
+
+const mutationKey = ['landParcelsEcosystemsCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, {landParcelId: number | undefined | null;data: LandParcelsDetailRequest}> = (props) => {
+          const {landParcelId,data} = props ?? {};
+
+          return  landParcelsEcosystemsCreate(landParcelId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LandParcelsEcosystemsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>>
+    export type LandParcelsEcosystemsCreateMutationBody = LandParcelsDetailRequest
+    export type LandParcelsEcosystemsCreateMutationError = unknown
+
+    export const useLandParcelsEcosystemsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>, TError,{landParcelId: number | undefined | null;data: LandParcelsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof landParcelsEcosystemsCreate>>,
+        TError,
+        {landParcelId: number | undefined | null;data: LandParcelsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getLandParcelsEcosystemsCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
+ */
 export const landParcelsEcosystemsDestroy = (
     landParcelId: number | undefined | null,
     ecosystemId: string | undefined | null,
@@ -5418,69 +5513,6 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getLandParcelsEcosystemsDestroyMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,
-audit logging and soft-delete are provided by TenantViewSetMixin.
- */
-export const ecosystemsCreate = (
-    ecosystemDetailRequest: EcosystemDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EcosystemDetail>(
-      {url: `/api/ecosystems/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: ecosystemDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEcosystemsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext> => {
-
-const mutationKey = ['ecosystemsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsCreate>>, {data: EcosystemDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  ecosystemsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EcosystemsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsCreate>>>
-    export type EcosystemsCreateMutationBody = EcosystemDetailRequest
-    export type EcosystemsCreateMutationError = unknown
-
-    export const useEcosystemsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ecosystemsCreate>>,
-        TError,
-        {data: EcosystemDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEcosystemsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -5581,27 +5613,27 @@ export function useEcosystemsList<TData = Awaited<ReturnType<typeof ecosystemsLi
  * Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,
 audit logging and soft-delete are provided by TenantViewSetMixin.
  */
-export const ecosystemsUpdate = (
-    ecosystemId: number | undefined | null,
+export const ecosystemsCreate = (
     ecosystemDetailRequest: EcosystemDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<EcosystemDetail>(
-      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PUT',
+      {url: `/api/ecosystems/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: ecosystemDetailRequest
+      data: ecosystemDetailRequest, signal
     },
       );
     }
   
 
 
-export const getEcosystemsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
+export const getEcosystemsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext> => {
 
-const mutationKey = ['ecosystemsUpdate'];
+const mutationKey = ['ecosystemsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5611,10 +5643,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
-          const {ecosystemId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsCreate>>, {data: EcosystemDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  ecosystemsUpdate(ecosystemId,data,)
+          return  ecosystemsCreate(data,)
         }
 
         
@@ -5622,20 +5654,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EcosystemsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsUpdate>>>
-    export type EcosystemsUpdateMutationBody = EcosystemDetailRequest
-    export type EcosystemsUpdateMutationError = unknown
+    export type EcosystemsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsCreate>>>
+    export type EcosystemsCreateMutationBody = EcosystemDetailRequest
+    export type EcosystemsCreateMutationError = unknown
 
-    export const useEcosystemsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+    export const useEcosystemsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsCreate>>, TError,{data: EcosystemDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ecosystemsUpdate>>,
+        Awaited<ReturnType<typeof ecosystemsCreate>>,
         TError,
-        {ecosystemId: number | undefined | null;data: EcosystemDetailRequest},
+        {data: EcosystemDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEcosystemsUpdateMutationOptions(options);
+      const mutationOptions = getEcosystemsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -5735,14 +5767,14 @@ export function useEcosystemsRetrieve<TData = Awaited<ReturnType<typeof ecosyste
  * Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,
 audit logging and soft-delete are provided by TenantViewSetMixin.
  */
-export const ecosystemsPartialUpdate = (
+export const ecosystemsUpdate = (
     ecosystemId: number | undefined | null,
     ecosystemDetailRequest: EcosystemDetailRequest,
  ) => {
       
       
       return axiosInstance<EcosystemDetail>(
-      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PATCH',
+      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: ecosystemDetailRequest
     },
@@ -5751,11 +5783,11 @@ export const ecosystemsPartialUpdate = (
   
 
 
-export const getEcosystemsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
+export const getEcosystemsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
 
-const mutationKey = ['ecosystemsPartialUpdate'];
+const mutationKey = ['ecosystemsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5765,10 +5797,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
           const {ecosystemId,data} = props ?? {};
 
-          return  ecosystemsPartialUpdate(ecosystemId,data,)
+          return  ecosystemsUpdate(ecosystemId,data,)
         }
 
         
@@ -5776,20 +5808,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EcosystemsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>>
-    export type EcosystemsPartialUpdateMutationBody = EcosystemDetailRequest
-    export type EcosystemsPartialUpdateMutationError = unknown
+    export type EcosystemsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsUpdate>>>
+    export type EcosystemsUpdateMutationBody = EcosystemDetailRequest
+    export type EcosystemsUpdateMutationError = unknown
 
-    export const useEcosystemsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+    export const useEcosystemsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ecosystemsPartialUpdate>>,
+        Awaited<ReturnType<typeof ecosystemsUpdate>>,
         TError,
         {ecosystemId: number | undefined | null;data: EcosystemDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEcosystemsPartialUpdateMutationOptions(options);
+      const mutationOptions = getEcosystemsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -5855,30 +5887,30 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Species.EntityId is a real FK to entities.Entities; tenant scoping,
+ * Ecosystem.EntityId is a real FK to entities.Entities; tenant scoping,
 audit logging and soft-delete are provided by TenantViewSetMixin.
  */
-export const speciesCreate = (
-    speciesDetailRequest: SpeciesDetailRequest,
- signal?: AbortSignal
-) => {
+export const ecosystemsPartialUpdate = (
+    ecosystemId: number | undefined | null,
+    ecosystemDetailRequest: EcosystemDetailRequest,
+ ) => {
       
       
-      return axiosInstance<SpeciesDetail>(
-      {url: `/api/species/`, method: 'POST',
+      return axiosInstance<EcosystemDetail>(
+      {url: `/api/ecosystems/${ecosystemId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: speciesDetailRequest, signal
+      data: ecosystemDetailRequest
     },
       );
     }
   
 
 
-export const getSpeciesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext> => {
+export const getEcosystemsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext> => {
 
-const mutationKey = ['speciesCreate'];
+const mutationKey = ['ecosystemsPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5888,10 +5920,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesCreate>>, {data: SpeciesDetailRequest}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, {ecosystemId: number | undefined | null;data: EcosystemDetailRequest}> = (props) => {
+          const {ecosystemId,data} = props ?? {};
 
-          return  speciesCreate(data,)
+          return  ecosystemsPartialUpdate(ecosystemId,data,)
         }
 
         
@@ -5899,20 +5931,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type SpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesCreate>>>
-    export type SpeciesCreateMutationBody = SpeciesDetailRequest
-    export type SpeciesCreateMutationError = unknown
+    export type EcosystemsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>>
+    export type EcosystemsPartialUpdateMutationBody = EcosystemDetailRequest
+    export type EcosystemsPartialUpdateMutationError = unknown
 
-    export const useSpeciesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext>, }
+    export const useEcosystemsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ecosystemsPartialUpdate>>, TError,{ecosystemId: number | undefined | null;data: EcosystemDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof speciesCreate>>,
+        Awaited<ReturnType<typeof ecosystemsPartialUpdate>>,
         TError,
-        {data: SpeciesDetailRequest},
+        {ecosystemId: number | undefined | null;data: EcosystemDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getSpeciesCreateMutationOptions(options);
+      const mutationOptions = getEcosystemsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6010,6 +6042,69 @@ export function useSpeciesList<TData = Awaited<ReturnType<typeof speciesList>>, 
 
 
 /**
+ * Species.EntityId is a real FK to entities.Entities; tenant scoping,
+audit logging and soft-delete are provided by TenantViewSetMixin.
+ */
+export const speciesCreate = (
+    speciesDetailRequest: SpeciesDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<SpeciesDetail>(
+      {url: `/api/species/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: speciesDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getSpeciesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext> => {
+
+const mutationKey = ['speciesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesCreate>>, {data: SpeciesDetailRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  speciesCreate(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesCreate>>>
+    export type SpeciesCreateMutationBody = SpeciesDetailRequest
+    export type SpeciesCreateMutationError = unknown
+
+    export const useSpeciesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesCreate>>, TError,{data: SpeciesDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof speciesCreate>>,
+        TError,
+        {data: SpeciesDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getSpeciesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
  * GBIF taxonomy lookup. GET ?q=<common or scientific name> → top matches.
  */
 export const speciesSearchRetrieve = (
@@ -6099,69 +6194,6 @@ export function useSpeciesSearchRetrieve<TData = Awaited<ReturnType<typeof speci
 
 
 
-/**
- * Species.EntityId is a real FK to entities.Entities; tenant scoping,
-audit logging and soft-delete are provided by TenantViewSetMixin.
- */
-export const speciesUpdate = (
-    speciesId: number | undefined | null,
-    speciesDetailRequest: SpeciesDetailRequest,
- ) => {
-      
-      
-      return axiosInstance<SpeciesDetail>(
-      {url: `/api/species/${speciesId}/`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: speciesDetailRequest
-    },
-      );
-    }
-  
-
-
-export const getSpeciesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
-
-const mutationKey = ['speciesUpdate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
-          const {speciesId,data} = props ?? {};
-
-          return  speciesUpdate(speciesId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SpeciesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesUpdate>>>
-    export type SpeciesUpdateMutationBody = SpeciesDetailRequest
-    export type SpeciesUpdateMutationError = unknown
-
-    export const useSpeciesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof speciesUpdate>>,
-        TError,
-        {speciesId: number | undefined | null;data: SpeciesDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getSpeciesUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Species.EntityId is a real FK to entities.Entities; tenant scoping,
 audit logging and soft-delete are provided by TenantViewSetMixin.
@@ -6257,14 +6289,14 @@ export function useSpeciesRetrieve<TData = Awaited<ReturnType<typeof speciesRetr
  * Species.EntityId is a real FK to entities.Entities; tenant scoping,
 audit logging and soft-delete are provided by TenantViewSetMixin.
  */
-export const speciesPartialUpdate = (
+export const speciesUpdate = (
     speciesId: number | undefined | null,
     speciesDetailRequest: SpeciesDetailRequest,
  ) => {
       
       
       return axiosInstance<SpeciesDetail>(
-      {url: `/api/species/${speciesId}/`, method: 'PATCH',
+      {url: `/api/species/${speciesId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: speciesDetailRequest
     },
@@ -6273,11 +6305,11 @@ export const speciesPartialUpdate = (
   
 
 
-export const getSpeciesPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
+export const getSpeciesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
 
-const mutationKey = ['speciesPartialUpdate'];
+const mutationKey = ['speciesUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6287,10 +6319,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesPartialUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
           const {speciesId,data} = props ?? {};
 
-          return  speciesPartialUpdate(speciesId,data,)
+          return  speciesUpdate(speciesId,data,)
         }
 
         
@@ -6298,20 +6330,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type SpeciesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesPartialUpdate>>>
-    export type SpeciesPartialUpdateMutationBody = SpeciesDetailRequest
-    export type SpeciesPartialUpdateMutationError = unknown
+    export type SpeciesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesUpdate>>>
+    export type SpeciesUpdateMutationBody = SpeciesDetailRequest
+    export type SpeciesUpdateMutationError = unknown
 
-    export const useSpeciesPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
+    export const useSpeciesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof speciesPartialUpdate>>,
+        Awaited<ReturnType<typeof speciesUpdate>>,
         TError,
         {speciesId: number | undefined | null;data: SpeciesDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getSpeciesPartialUpdateMutationOptions(options);
+      const mutationOptions = getSpeciesUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6377,34 +6409,30 @@ const {mutation: mutationOptions} = options ?
     }
     
 /**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
+ * Species.EntityId is a real FK to entities.Entities; tenant scoping,
+audit logging and soft-delete are provided by TenantViewSetMixin.
  */
-export const emissionsCreate = (
-    emissionsDataRequest: EmissionsDataRequest,
- signal?: AbortSignal
-) => {
+export const speciesPartialUpdate = (
+    speciesId: number | undefined | null,
+    speciesDetailRequest: SpeciesDetailRequest,
+ ) => {
       
       
-      return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/`, method: 'POST',
+      return axiosInstance<SpeciesDetail>(
+      {url: `/api/species/${speciesId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: emissionsDataRequest, signal
+      data: speciesDetailRequest
     },
       );
     }
   
 
 
-export const getEmissionsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext> => {
+export const getSpeciesPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext> => {
 
-const mutationKey = ['emissionsCreate'];
+const mutationKey = ['speciesPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6414,10 +6442,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsCreate>>, {data: EmissionsDataRequest}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speciesPartialUpdate>>, {speciesId: number | undefined | null;data: SpeciesDetailRequest}> = (props) => {
+          const {speciesId,data} = props ?? {};
 
-          return  emissionsCreate(data,)
+          return  speciesPartialUpdate(speciesId,data,)
         }
 
         
@@ -6425,20 +6453,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsCreate>>>
-    export type EmissionsCreateMutationBody = EmissionsDataRequest
-    export type EmissionsCreateMutationError = unknown
+    export type SpeciesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof speciesPartialUpdate>>>
+    export type SpeciesPartialUpdateMutationBody = SpeciesDetailRequest
+    export type SpeciesPartialUpdateMutationError = unknown
 
-    export const useEmissionsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext>, }
+    export const useSpeciesPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speciesPartialUpdate>>, TError,{speciesId: number | undefined | null;data: SpeciesDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsCreate>>,
+        Awaited<ReturnType<typeof speciesPartialUpdate>>,
         TError,
-        {data: EmissionsDataRequest},
+        {speciesId: number | undefined | null;data: SpeciesDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsCreateMutationOptions(options);
+      const mutationOptions = getSpeciesPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6547,27 +6575,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const emissionsUpdate = (
-    emissionsId: number | undefined | null,
+export const emissionsCreate = (
     emissionsDataRequest: EmissionsDataRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/${emissionsId}/`, method: 'PUT',
+      {url: `/api/emissions/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: emissionsDataRequest
+      data: emissionsDataRequest, signal
     },
       );
     }
   
 
 
-export const getEmissionsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+export const getEmissionsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext> => {
 
-const mutationKey = ['emissionsUpdate'];
+const mutationKey = ['emissionsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6577,10 +6605,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
-          const {emissionsId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsCreate>>, {data: EmissionsDataRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  emissionsUpdate(emissionsId,data,)
+          return  emissionsCreate(data,)
         }
 
         
@@ -6588,20 +6616,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsUpdate>>>
-    export type EmissionsUpdateMutationBody = EmissionsDataRequest
-    export type EmissionsUpdateMutationError = unknown
+    export type EmissionsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsCreate>>>
+    export type EmissionsCreateMutationBody = EmissionsDataRequest
+    export type EmissionsCreateMutationError = unknown
 
-    export const useEmissionsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+    export const useEmissionsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsCreate>>, TError,{data: EmissionsDataRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsUpdate>>,
+        Awaited<ReturnType<typeof emissionsCreate>>,
         TError,
-        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
+        {data: EmissionsDataRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsUpdateMutationOptions(options);
+      const mutationOptions = getEmissionsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6709,14 +6737,14 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const emissionsPartialUpdate = (
+export const emissionsUpdate = (
     emissionsId: number | undefined | null,
     emissionsDataRequest: EmissionsDataRequest,
  ) => {
       
       
       return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/${emissionsId}/`, method: 'PATCH',
+      {url: `/api/emissions/${emissionsId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: emissionsDataRequest
     },
@@ -6725,11 +6753,11 @@ export const emissionsPartialUpdate = (
   
 
 
-export const getEmissionsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+export const getEmissionsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
 
-const mutationKey = ['emissionsPartialUpdate'];
+const mutationKey = ['emissionsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -6739,10 +6767,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsPartialUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
           const {emissionsId,data} = props ?? {};
 
-          return  emissionsPartialUpdate(emissionsId,data,)
+          return  emissionsUpdate(emissionsId,data,)
         }
 
         
@@ -6750,20 +6778,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsPartialUpdate>>>
-    export type EmissionsPartialUpdateMutationBody = EmissionsDataRequest
-    export type EmissionsPartialUpdateMutationError = unknown
+    export type EmissionsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsUpdate>>>
+    export type EmissionsUpdateMutationBody = EmissionsDataRequest
+    export type EmissionsUpdateMutationError = unknown
 
-    export const useEmissionsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+    export const useEmissionsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsPartialUpdate>>,
+        Awaited<ReturnType<typeof emissionsUpdate>>,
         TError,
         {emissionsId: number | undefined | null;data: EmissionsDataRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsPartialUpdateMutationOptions(options);
+      const mutationOptions = getEmissionsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6828,6 +6856,73 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getEmissionsDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const emissionsPartialUpdate = (
+    emissionsId: number | undefined | null,
+    emissionsDataRequest: EmissionsDataRequest,
+ ) => {
+      
+      
+      return axiosInstance<EmissionsData>(
+      {url: `/api/emissions/${emissionsId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsDataRequest
+    },
+      );
+    }
+  
+
+
+export const getEmissionsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+
+const mutationKey = ['emissionsPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsPartialUpdate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+          const {emissionsId,data} = props ?? {};
+
+          return  emissionsPartialUpdate(emissionsId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsPartialUpdate>>>
+    export type EmissionsPartialUpdateMutationBody = EmissionsDataRequest
+    export type EmissionsPartialUpdateMutationError = unknown
+
+    export const useEmissionsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsPartialUpdate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsPartialUpdate>>,
+        TError,
+        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6973,74 +7068,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const emissionsDetailsCreate = (
-    emissionsId: number | undefined | null,
-    emissionsDataRequest: EmissionsDataRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/${emissionsId}/details/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: emissionsDataRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEmissionsDetailsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
-
-const mutationKey = ['emissionsDetailsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsDetailsCreate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
-          const {emissionsId,data} = props ?? {};
-
-          return  emissionsDetailsCreate(emissionsId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmissionsDetailsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsDetailsCreate>>>
-    export type EmissionsDetailsCreateMutationBody = EmissionsDataRequest
-    export type EmissionsDetailsCreateMutationError = unknown
-
-    export const useEmissionsDetailsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsDetailsCreate>>,
-        TError,
-        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEmissionsDetailsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const emissionsDetailsRetrieve = (
     emissionsId: number | undefined | null,
  signal?: AbortSignal
@@ -7128,6 +7155,74 @@ export function useEmissionsDetailsRetrieve<TData = Awaited<ReturnType<typeof em
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const emissionsDetailsCreate = (
+    emissionsId: number | undefined | null,
+    emissionsDataRequest: EmissionsDataRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionsData>(
+      {url: `/api/emissions/${emissionsId}/details/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsDataRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEmissionsDetailsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+
+const mutationKey = ['emissionsDetailsCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsDetailsCreate>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+          const {emissionsId,data} = props ?? {};
+
+          return  emissionsDetailsCreate(emissionsId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsDetailsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsDetailsCreate>>>
+    export type EmissionsDetailsCreateMutationBody = EmissionsDataRequest
+    export type EmissionsDetailsCreateMutationError = unknown
+
+    export const useEmissionsDetailsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsDetailsCreate>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsDetailsCreate>>,
+        TError,
+        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsDetailsCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -7269,74 +7364,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const emissionsOffsetsCreate2 = (
-    emissionsId: number | undefined | null,
-    emissionsDataRequest: EmissionsDataRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<EmissionsData>(
-      {url: `/api/emissions/${emissionsId}/offsets/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: emissionsDataRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEmissionsOffsetsCreate2MutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
-
-const mutationKey = ['emissionsOffsetsCreate2'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
-          const {emissionsId,data} = props ?? {};
-
-          return  emissionsOffsetsCreate2(emissionsId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmissionsOffsetsCreate2MutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>>
-    export type EmissionsOffsetsCreate2MutationBody = EmissionsDataRequest
-    export type EmissionsOffsetsCreate2MutationError = unknown
-
-    export const useEmissionsOffsetsCreate2 = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsCreate2>>,
-        TError,
-        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEmissionsOffsetsCreate2MutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const emissionsOffsetsRetrieve2 = (
     emissionsId: number | undefined | null,
  signal?: AbortSignal
@@ -7424,6 +7451,74 @@ export function useEmissionsOffsetsRetrieve2<TData = Awaited<ReturnType<typeof e
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const emissionsOffsetsCreate2 = (
+    emissionsId: number | undefined | null,
+    emissionsDataRequest: EmissionsDataRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EmissionsData>(
+      {url: `/api/emissions/${emissionsId}/offsets/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: emissionsDataRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getEmissionsOffsetsCreate2MutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext> => {
+
+const mutationKey = ['emissionsOffsetsCreate2'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, {emissionsId: number | undefined | null;data: EmissionsDataRequest}> = (props) => {
+          const {emissionsId,data} = props ?? {};
+
+          return  emissionsOffsetsCreate2(emissionsId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsOffsetsCreate2MutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>>
+    export type EmissionsOffsetsCreate2MutationBody = EmissionsDataRequest
+    export type EmissionsOffsetsCreate2MutationError = unknown
+
+    export const useEmissionsOffsetsCreate2 = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate2>>, TError,{emissionsId: number | undefined | null;data: EmissionsDataRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsOffsetsCreate2>>,
+        TError,
+        {emissionsId: number | undefined | null;data: EmissionsDataRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsOffsetsCreate2MutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -7566,71 +7661,6 @@ Lists all offsets for the entity regardless of which emissions record they
 belong to, so the sustainability manager has a single place to review them.
 The nested actions on EmissionsDataViewSet remain for record-level access.
  */
-export const emissionsOffsetsCreate = (
-    standaloneEmissionsOffsetsRequest: StandaloneEmissionsOffsetsRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<StandaloneEmissionsOffsets>(
-      {url: `/api/emissions-offsets/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: standaloneEmissionsOffsetsRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getEmissionsOffsetsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext> => {
-
-const mutationKey = ['emissionsOffsetsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, {data: StandaloneEmissionsOffsetsRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  emissionsOffsetsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmissionsOffsetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate>>>
-    export type EmissionsOffsetsCreateMutationBody = StandaloneEmissionsOffsetsRequest
-    export type EmissionsOffsetsCreateMutationError = unknown
-
-    export const useEmissionsOffsetsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsCreate>>,
-        TError,
-        {data: StandaloneEmissionsOffsetsRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getEmissionsOffsetsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Standalone offset management — GET /api/emissions-offsets/
-Lists all offsets for the entity regardless of which emissions record they
-belong to, so the sustainability manager has a single place to review them.
-The nested actions on EmissionsDataViewSet remain for record-level access.
- */
 export const emissionsOffsetsList = (
     params?: EmissionsOffsetsListParams,
  signal?: AbortSignal
@@ -7725,24 +7755,27 @@ Lists all offsets for the entity regardless of which emissions record they
 belong to, so the sustainability manager has a single place to review them.
 The nested actions on EmissionsDataViewSet remain for record-level access.
  */
-export const emissionsOffsetsDestroy = (
-    offsetId: number | undefined | null,
- ) => {
+export const emissionsOffsetsCreate = (
+    standaloneEmissionsOffsetsRequest: StandaloneEmissionsOffsetsRequest,
+ signal?: AbortSignal
+) => {
       
       
-      return axiosInstance<void>(
-      {url: `/api/emissions-offsets/${offsetId}/`, method: 'DELETE'
+      return axiosInstance<StandaloneEmissionsOffsets>(
+      {url: `/api/emissions-offsets/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: standaloneEmissionsOffsetsRequest, signal
     },
       );
     }
   
 
 
-export const getEmissionsOffsetsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext> => {
+export const getEmissionsOffsetsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext> => {
 
-const mutationKey = ['emissionsOffsetsDestroy'];
+const mutationKey = ['emissionsOffsetsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -7752,10 +7785,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, {offsetId: number | undefined | null}> = (props) => {
-          const {offsetId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, {data: StandaloneEmissionsOffsetsRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  emissionsOffsetsDestroy(offsetId,)
+          return  emissionsOffsetsCreate(data,)
         }
 
         
@@ -7763,20 +7796,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type EmissionsOffsetsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>>
-    
-    export type EmissionsOffsetsDestroyMutationError = unknown
+    export type EmissionsOffsetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsCreate>>>
+    export type EmissionsOffsetsCreateMutationBody = StandaloneEmissionsOffsetsRequest
+    export type EmissionsOffsetsCreateMutationError = unknown
 
-    export const useEmissionsOffsetsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
+    export const useEmissionsOffsetsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsCreate>>, TError,{data: StandaloneEmissionsOffsetsRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emissionsOffsetsDestroy>>,
+        Awaited<ReturnType<typeof emissionsOffsetsCreate>>,
         TError,
-        {offsetId: number | undefined | null},
+        {data: StandaloneEmissionsOffsetsRequest},
         TContext
       > => {
 
-      const mutationOptions = getEmissionsOffsetsDestroyMutationOptions(options);
+      const mutationOptions = getEmissionsOffsetsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -7874,6 +7907,68 @@ export function useEmissionsOffsetsRetrieve<TData = Awaited<ReturnType<typeof em
 
 
 
+/**
+ * Standalone offset management — GET /api/emissions-offsets/
+Lists all offsets for the entity regardless of which emissions record they
+belong to, so the sustainability manager has a single place to review them.
+The nested actions on EmissionsDataViewSet remain for record-level access.
+ */
+export const emissionsOffsetsDestroy = (
+    offsetId: number | undefined | null,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/emissions-offsets/${offsetId}/`, method: 'DELETE'
+    },
+      );
+    }
+  
+
+
+export const getEmissionsOffsetsDestroyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext> => {
+
+const mutationKey = ['emissionsOffsetsDestroy'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, {offsetId: number | undefined | null}> = (props) => {
+          const {offsetId} = props ?? {};
+
+          return  emissionsOffsetsDestroy(offsetId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EmissionsOffsetsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>>
+    
+    export type EmissionsOffsetsDestroyMutationError = unknown
+
+    export const useEmissionsOffsetsDestroy = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emissionsOffsetsDestroy>>, TError,{offsetId: number | undefined | null}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof emissionsOffsetsDestroy>>,
+        TError,
+        {offsetId: number | undefined | null},
+        TContext
+      > => {
+
+      const mutationOptions = getEmissionsOffsetsDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Standalone offset management — GET /api/emissions-offsets/
 Lists all offsets for the entity regardless of which emissions record they
@@ -8124,69 +8219,6 @@ export function useGwpDatasetsRetrieve<TData = Awaited<ReturnType<typeof gwpData
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const ghgInventoriesCreate = (
-    gHGInventoriesRequest: GHGInventoriesRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<GHGInventories>(
-      {url: `/api/ghg-inventories/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: gHGInventoriesRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getGhgInventoriesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext> => {
-
-const mutationKey = ['ghgInventoriesCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesCreate>>, {data: GHGInventoriesRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  ghgInventoriesCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GhgInventoriesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesCreate>>>
-    export type GhgInventoriesCreateMutationBody = GHGInventoriesRequest
-    export type GhgInventoriesCreateMutationError = unknown
-
-    export const useGhgInventoriesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ghgInventoriesCreate>>,
-        TError,
-        {data: GHGInventoriesRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getGhgInventoriesCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mix into a DRF APIView or ViewSet.
-Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
- */
 export const ghgInventoriesList = (
     params?: GhgInventoriesListParams,
  signal?: AbortSignal
@@ -8279,27 +8311,27 @@ export function useGhgInventoriesList<TData = Awaited<ReturnType<typeof ghgInven
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const ghgInventoriesUpdate = (
-    inventoryId: number | undefined | null,
+export const ghgInventoriesCreate = (
     gHGInventoriesRequest: GHGInventoriesRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<GHGInventories>(
-      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PUT',
+      {url: `/api/ghg-inventories/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: gHGInventoriesRequest
+      data: gHGInventoriesRequest, signal
     },
       );
     }
   
 
 
-export const getGhgInventoriesUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
+export const getGhgInventoriesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext> => {
 
-const mutationKey = ['ghgInventoriesUpdate'];
+const mutationKey = ['ghgInventoriesCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -8309,10 +8341,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
-          const {inventoryId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesCreate>>, {data: GHGInventoriesRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  ghgInventoriesUpdate(inventoryId,data,)
+          return  ghgInventoriesCreate(data,)
         }
 
         
@@ -8320,20 +8352,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type GhgInventoriesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesUpdate>>>
-    export type GhgInventoriesUpdateMutationBody = GHGInventoriesRequest
-    export type GhgInventoriesUpdateMutationError = unknown
+    export type GhgInventoriesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesCreate>>>
+    export type GhgInventoriesCreateMutationBody = GHGInventoriesRequest
+    export type GhgInventoriesCreateMutationError = unknown
 
-    export const useGhgInventoriesUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+    export const useGhgInventoriesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesCreate>>, TError,{data: GHGInventoriesRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ghgInventoriesUpdate>>,
+        Awaited<ReturnType<typeof ghgInventoriesCreate>>,
         TError,
-        {inventoryId: number | undefined | null;data: GHGInventoriesRequest},
+        {data: GHGInventoriesRequest},
         TContext
       > => {
 
-      const mutationOptions = getGhgInventoriesUpdateMutationOptions(options);
+      const mutationOptions = getGhgInventoriesCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -8433,14 +8465,14 @@ export function useGhgInventoriesRetrieve<TData = Awaited<ReturnType<typeof ghgI
  * Mix into a DRF APIView or ViewSet.
 Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
  */
-export const ghgInventoriesPartialUpdate = (
+export const ghgInventoriesUpdate = (
     inventoryId: number | undefined | null,
     gHGInventoriesRequest: GHGInventoriesRequest,
  ) => {
       
       
       return axiosInstance<GHGInventories>(
-      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PATCH',
+      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: gHGInventoriesRequest
     },
@@ -8449,11 +8481,11 @@ export const ghgInventoriesPartialUpdate = (
   
 
 
-export const getGhgInventoriesPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
+export const getGhgInventoriesUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
 
-const mutationKey = ['ghgInventoriesPartialUpdate'];
+const mutationKey = ['ghgInventoriesUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -8463,10 +8495,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
           const {inventoryId,data} = props ?? {};
 
-          return  ghgInventoriesPartialUpdate(inventoryId,data,)
+          return  ghgInventoriesUpdate(inventoryId,data,)
         }
 
         
@@ -8474,20 +8506,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type GhgInventoriesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>>
-    export type GhgInventoriesPartialUpdateMutationBody = GHGInventoriesRequest
-    export type GhgInventoriesPartialUpdateMutationError = unknown
+    export type GhgInventoriesUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesUpdate>>>
+    export type GhgInventoriesUpdateMutationBody = GHGInventoriesRequest
+    export type GhgInventoriesUpdateMutationError = unknown
 
-    export const useGhgInventoriesPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+    export const useGhgInventoriesUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>,
+        Awaited<ReturnType<typeof ghgInventoriesUpdate>>,
         TError,
         {inventoryId: number | undefined | null;data: GHGInventoriesRequest},
         TContext
       > => {
 
-      const mutationOptions = getGhgInventoriesPartialUpdateMutationOptions(options);
+      const mutationOptions = getGhgInventoriesUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -8548,6 +8580,69 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getGhgInventoriesDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Mix into a DRF APIView or ViewSet.
+Set ``required_feature`` to the feature key string (from PlanFeatures.FeatureKey).
+ */
+export const ghgInventoriesPartialUpdate = (
+    inventoryId: number | undefined | null,
+    gHGInventoriesRequest: GHGInventoriesRequest,
+ ) => {
+      
+      
+      return axiosInstance<GHGInventories>(
+      {url: `/api/ghg-inventories/${inventoryId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: gHGInventoriesRequest
+    },
+      );
+    }
+  
+
+
+export const getGhgInventoriesPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext> => {
+
+const mutationKey = ['ghgInventoriesPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, {inventoryId: number | undefined | null;data: GHGInventoriesRequest}> = (props) => {
+          const {inventoryId,data} = props ?? {};
+
+          return  ghgInventoriesPartialUpdate(inventoryId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GhgInventoriesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>>
+    export type GhgInventoriesPartialUpdateMutationBody = GHGInventoriesRequest
+    export type GhgInventoriesPartialUpdateMutationError = unknown
+
+    export const useGhgInventoriesPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>, TError,{inventoryId: number | undefined | null;data: GHGInventoriesRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof ghgInventoriesPartialUpdate>>,
+        TError,
+        {inventoryId: number | undefined | null;data: GHGInventoriesRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getGhgInventoriesPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -8847,73 +8942,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const targetsCreate = (
-    targetsRequest: TargetsRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<Targets>(
-      {url: `/api/targets/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: targetsRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getTargetsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext> => {
-
-const mutationKey = ['targetsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsCreate>>, {data: TargetsRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  targetsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TargetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsCreate>>>
-    export type TargetsCreateMutationBody = TargetsRequest
-    export type TargetsCreateMutationError = unknown
-
-    export const useTargetsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof targetsCreate>>,
-        TError,
-        {data: TargetsRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getTargetsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const targetsList = (
     params?: TargetsListParams,
  signal?: AbortSignal
@@ -9010,27 +9038,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const targetsUpdate = (
-    targetId: number | undefined | null,
+export const targetsCreate = (
     targetsRequest: TargetsRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<Targets>(
-      {url: `/api/targets/${targetId}/`, method: 'PUT',
+      {url: `/api/targets/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: targetsRequest
+      data: targetsRequest, signal
     },
       );
     }
   
 
 
-export const getTargetsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
+export const getTargetsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext> => {
 
-const mutationKey = ['targetsUpdate'];
+const mutationKey = ['targetsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -9040,10 +9068,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
-          const {targetId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsCreate>>, {data: TargetsRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  targetsUpdate(targetId,data,)
+          return  targetsCreate(data,)
         }
 
         
@@ -9051,20 +9079,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TargetsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsUpdate>>>
-    export type TargetsUpdateMutationBody = TargetsRequest
-    export type TargetsUpdateMutationError = unknown
+    export type TargetsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsCreate>>>
+    export type TargetsCreateMutationBody = TargetsRequest
+    export type TargetsCreateMutationError = unknown
 
-    export const useTargetsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+    export const useTargetsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsCreate>>, TError,{data: TargetsRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof targetsUpdate>>,
+        Awaited<ReturnType<typeof targetsCreate>>,
         TError,
-        {targetId: number | undefined | null;data: TargetsRequest},
+        {data: TargetsRequest},
         TContext
       > => {
 
-      const mutationOptions = getTargetsUpdateMutationOptions(options);
+      const mutationOptions = getTargetsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -9172,14 +9200,14 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const targetsPartialUpdate = (
+export const targetsUpdate = (
     targetId: number | undefined | null,
     targetsRequest: TargetsRequest,
  ) => {
       
       
       return axiosInstance<Targets>(
-      {url: `/api/targets/${targetId}/`, method: 'PATCH',
+      {url: `/api/targets/${targetId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: targetsRequest
     },
@@ -9188,11 +9216,11 @@ export const targetsPartialUpdate = (
   
 
 
-export const getTargetsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
+export const getTargetsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
 
-const mutationKey = ['targetsPartialUpdate'];
+const mutationKey = ['targetsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -9202,10 +9230,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsPartialUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
           const {targetId,data} = props ?? {};
 
-          return  targetsPartialUpdate(targetId,data,)
+          return  targetsUpdate(targetId,data,)
         }
 
         
@@ -9213,20 +9241,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TargetsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsPartialUpdate>>>
-    export type TargetsPartialUpdateMutationBody = TargetsRequest
-    export type TargetsPartialUpdateMutationError = unknown
+    export type TargetsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsUpdate>>>
+    export type TargetsUpdateMutationBody = TargetsRequest
+    export type TargetsUpdateMutationError = unknown
 
-    export const useTargetsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+    export const useTargetsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof targetsPartialUpdate>>,
+        Awaited<ReturnType<typeof targetsUpdate>>,
         TError,
         {targetId: number | undefined | null;data: TargetsRequest},
         TContext
       > => {
 
-      const mutationOptions = getTargetsPartialUpdateMutationOptions(options);
+      const mutationOptions = getTargetsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -9303,28 +9331,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const targetsMilestonesCreate = (
+export const targetsPartialUpdate = (
     targetId: number | undefined | null,
     targetsRequest: TargetsRequest,
- signal?: AbortSignal
-) => {
+ ) => {
       
       
       return axiosInstance<Targets>(
-      {url: `/api/targets/${targetId}/milestones/`, method: 'POST',
+      {url: `/api/targets/${targetId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: targetsRequest, signal
+      data: targetsRequest
     },
       );
     }
   
 
 
-export const getTargetsMilestonesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
+export const getTargetsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
 
-const mutationKey = ['targetsMilestonesCreate'];
+const mutationKey = ['targetsPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -9334,10 +9361,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsMilestonesCreate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsPartialUpdate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
           const {targetId,data} = props ?? {};
 
-          return  targetsMilestonesCreate(targetId,data,)
+          return  targetsPartialUpdate(targetId,data,)
         }
 
         
@@ -9345,20 +9372,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TargetsMilestonesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsMilestonesCreate>>>
-    export type TargetsMilestonesCreateMutationBody = TargetsRequest
-    export type TargetsMilestonesCreateMutationError = unknown
+    export type TargetsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsPartialUpdate>>>
+    export type TargetsPartialUpdateMutationBody = TargetsRequest
+    export type TargetsPartialUpdateMutationError = unknown
 
-    export const useTargetsMilestonesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+    export const useTargetsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsPartialUpdate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof targetsMilestonesCreate>>,
+        Awaited<ReturnType<typeof targetsPartialUpdate>>,
         TError,
         {targetId: number | undefined | null;data: TargetsRequest},
         TContext
       > => {
 
-      const mutationOptions = getTargetsMilestonesCreateMutationOptions(options);
+      const mutationOptions = getTargetsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -9458,6 +9485,74 @@ export function useTargetsMilestonesRetrieve<TData = Awaited<ReturnType<typeof t
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const targetsMilestonesCreate = (
+    targetId: number | undefined | null,
+    targetsRequest: TargetsRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<Targets>(
+      {url: `/api/targets/${targetId}/milestones/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: targetsRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getTargetsMilestonesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext> => {
+
+const mutationKey = ['targetsMilestonesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof targetsMilestonesCreate>>, {targetId: number | undefined | null;data: TargetsRequest}> = (props) => {
+          const {targetId,data} = props ?? {};
+
+          return  targetsMilestonesCreate(targetId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TargetsMilestonesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof targetsMilestonesCreate>>>
+    export type TargetsMilestonesCreateMutationBody = TargetsRequest
+    export type TargetsMilestonesCreateMutationError = unknown
+
+    export const useTargetsMilestonesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof targetsMilestonesCreate>>, TError,{targetId: number | undefined | null;data: TargetsRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof targetsMilestonesCreate>>,
+        TError,
+        {targetId: number | undefined | null;data: TargetsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getTargetsMilestonesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Read-only list of emission factor sets (DEFRA, EPA eGRID, Climatiq, etc.).
 GET /api/emission-factor-sets/
@@ -9850,73 +9945,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const treeRemovalsCreate = (
-    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: treeRemovalsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getTreeRemovalsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext> => {
-
-const mutationKey = ['treeRemovalsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsCreate>>, {data: TreeRemovalsDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  treeRemovalsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TreeRemovalsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsCreate>>>
-    export type TreeRemovalsCreateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsCreateMutationError = unknown
-
-    export const useTreeRemovalsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsCreate>>,
-        TError,
-        {data: TreeRemovalsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getTreeRemovalsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const treeRemovalsList = (
     params?: TreeRemovalsListParams,
  signal?: AbortSignal
@@ -10013,27 +10041,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const treeRemovalsUpdate = (
-    treeRemovalId: number | undefined | null,
+export const treeRemovalsCreate = (
     treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PUT',
+      {url: `/api/tree-removals/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: treeRemovalsDetailRequest
+      data: treeRemovalsDetailRequest, signal
     },
       );
     }
   
 
 
-export const getTreeRemovalsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+export const getTreeRemovalsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext> => {
 
-const mutationKey = ['treeRemovalsUpdate'];
+const mutationKey = ['treeRemovalsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -10043,10 +10071,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
-          const {treeRemovalId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsCreate>>, {data: TreeRemovalsDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  treeRemovalsUpdate(treeRemovalId,data,)
+          return  treeRemovalsCreate(data,)
         }
 
         
@@ -10054,20 +10082,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TreeRemovalsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsUpdate>>>
-    export type TreeRemovalsUpdateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsUpdateMutationError = unknown
+    export type TreeRemovalsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsCreate>>>
+    export type TreeRemovalsCreateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsCreateMutationError = unknown
 
-    export const useTreeRemovalsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+    export const useTreeRemovalsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsCreate>>, TError,{data: TreeRemovalsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsUpdate>>,
+        Awaited<ReturnType<typeof treeRemovalsCreate>>,
         TError,
-        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
+        {data: TreeRemovalsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getTreeRemovalsUpdateMutationOptions(options);
+      const mutationOptions = getTreeRemovalsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -10175,14 +10203,14 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const treeRemovalsPartialUpdate = (
+export const treeRemovalsUpdate = (
     treeRemovalId: number | undefined | null,
     treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
  ) => {
       
       
       return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PATCH',
+      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: treeRemovalsDetailRequest
     },
@@ -10191,11 +10219,11 @@ export const treeRemovalsPartialUpdate = (
   
 
 
-export const getTreeRemovalsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+export const getTreeRemovalsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
 
-const mutationKey = ['treeRemovalsPartialUpdate'];
+const mutationKey = ['treeRemovalsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -10205,10 +10233,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
           const {treeRemovalId,data} = props ?? {};
 
-          return  treeRemovalsPartialUpdate(treeRemovalId,data,)
+          return  treeRemovalsUpdate(treeRemovalId,data,)
         }
 
         
@@ -10216,20 +10244,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TreeRemovalsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>>
-    export type TreeRemovalsPartialUpdateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsPartialUpdateMutationError = unknown
+    export type TreeRemovalsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsUpdate>>>
+    export type TreeRemovalsUpdateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsUpdateMutationError = unknown
 
-    export const useTreeRemovalsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+    export const useTreeRemovalsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>,
+        Awaited<ReturnType<typeof treeRemovalsUpdate>>,
         TError,
         {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getTreeRemovalsPartialUpdateMutationOptions(options);
+      const mutationOptions = getTreeRemovalsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -10306,28 +10334,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const treeRemovalsAffectedSpeciesCreate = (
+export const treeRemovalsPartialUpdate = (
     treeRemovalId: number | undefined | null,
     treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
- signal?: AbortSignal
-) => {
+ ) => {
       
       
       return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/${treeRemovalId}/affected-species/`, method: 'POST',
+      {url: `/api/tree-removals/${treeRemovalId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: treeRemovalsDetailRequest, signal
+      data: treeRemovalsDetailRequest
     },
       );
     }
   
 
 
-export const getTreeRemovalsAffectedSpeciesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+export const getTreeRemovalsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
 
-const mutationKey = ['treeRemovalsAffectedSpeciesCreate'];
+const mutationKey = ['treeRemovalsPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -10337,10 +10364,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
           const {treeRemovalId,data} = props ?? {};
 
-          return  treeRemovalsAffectedSpeciesCreate(treeRemovalId,data,)
+          return  treeRemovalsPartialUpdate(treeRemovalId,data,)
         }
 
         
@@ -10348,20 +10375,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type TreeRemovalsAffectedSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>>
-    export type TreeRemovalsAffectedSpeciesCreateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsAffectedSpeciesCreateMutationError = unknown
+    export type TreeRemovalsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>>
+    export type TreeRemovalsPartialUpdateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsPartialUpdateMutationError = unknown
 
-    export const useTreeRemovalsAffectedSpeciesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+    export const useTreeRemovalsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>,
+        Awaited<ReturnType<typeof treeRemovalsPartialUpdate>>,
         TError,
         {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getTreeRemovalsAffectedSpeciesCreateMutationOptions(options);
+      const mutationOptions = getTreeRemovalsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -10461,6 +10488,74 @@ export function useTreeRemovalsAffectedSpeciesRetrieve<TData = Awaited<ReturnTyp
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const treeRemovalsAffectedSpeciesCreate = (
+    treeRemovalId: number | undefined | null,
+    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<TreeRemovalsDetail>(
+      {url: `/api/tree-removals/${treeRemovalId}/affected-species/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: treeRemovalsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getTreeRemovalsAffectedSpeciesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+
+const mutationKey = ['treeRemovalsAffectedSpeciesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
+          const {treeRemovalId,data} = props ?? {};
+
+          return  treeRemovalsAffectedSpeciesCreate(treeRemovalId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TreeRemovalsAffectedSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>>
+    export type TreeRemovalsAffectedSpeciesCreateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsAffectedSpeciesCreateMutationError = unknown
+
+    export const useTreeRemovalsAffectedSpeciesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof treeRemovalsAffectedSpeciesCreate>>,
+        TError,
+        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getTreeRemovalsAffectedSpeciesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -10602,74 +10697,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const treeRemovalsRemovedSpeciesCreate = (
-    treeRemovalId: number | undefined | null,
-    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<TreeRemovalsDetail>(
-      {url: `/api/tree-removals/${treeRemovalId}/removed-species/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: treeRemovalsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getTreeRemovalsRemovedSpeciesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
-
-const mutationKey = ['treeRemovalsRemovedSpeciesCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
-          const {treeRemovalId,data} = props ?? {};
-
-          return  treeRemovalsRemovedSpeciesCreate(treeRemovalId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TreeRemovalsRemovedSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>>
-    export type TreeRemovalsRemovedSpeciesCreateMutationBody = TreeRemovalsDetailRequest
-    export type TreeRemovalsRemovedSpeciesCreateMutationError = unknown
-
-    export const useTreeRemovalsRemovedSpeciesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>,
-        TError,
-        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getTreeRemovalsRemovedSpeciesCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const treeRemovalsRemovedSpeciesRetrieve = (
     treeRemovalId: number | undefined | null,
  signal?: AbortSignal
@@ -10757,6 +10784,74 @@ export function useTreeRemovalsRemovedSpeciesRetrieve<TData = Awaited<ReturnType
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const treeRemovalsRemovedSpeciesCreate = (
+    treeRemovalId: number | undefined | null,
+    treeRemovalsDetailRequest: TreeRemovalsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<TreeRemovalsDetail>(
+      {url: `/api/tree-removals/${treeRemovalId}/removed-species/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: treeRemovalsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getTreeRemovalsRemovedSpeciesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext> => {
+
+const mutationKey = ['treeRemovalsRemovedSpeciesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}> = (props) => {
+          const {treeRemovalId,data} = props ?? {};
+
+          return  treeRemovalsRemovedSpeciesCreate(treeRemovalId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TreeRemovalsRemovedSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>>
+    export type TreeRemovalsRemovedSpeciesCreateMutationBody = TreeRemovalsDetailRequest
+    export type TreeRemovalsRemovedSpeciesCreateMutationError = unknown
+
+    export const useTreeRemovalsRemovedSpeciesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>, TError,{treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof treeRemovalsRemovedSpeciesCreate>>,
+        TError,
+        {treeRemovalId: number | undefined | null;data: TreeRemovalsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getTreeRemovalsRemovedSpeciesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -10898,73 +10993,6 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const restorationsCreate = (
-    restorationsDetailRequest: RestorationsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<RestorationsDetail>(
-      {url: `/api/restorations/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: restorationsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getRestorationsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext> => {
-
-const mutationKey = ['restorationsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsCreate>>, {data: RestorationsDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  restorationsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RestorationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsCreate>>>
-    export type RestorationsCreateMutationBody = RestorationsDetailRequest
-    export type RestorationsCreateMutationError = unknown
-
-    export const useRestorationsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof restorationsCreate>>,
-        TError,
-        {data: RestorationsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getRestorationsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Mixin for tenant-scoped ModelViewSets.
-
-The Django middleware runs before DRF authentication, so request.user may
-still be anonymous when the middleware sets request.entity_id.  entity_id is
-re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
-authenticated the user.
- */
 export const restorationsList = (
     params?: RestorationsListParams,
  signal?: AbortSignal
@@ -11061,27 +11089,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const restorationsUpdate = (
-    restorationId: number | undefined | null,
+export const restorationsCreate = (
     restorationsDetailRequest: RestorationsDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<RestorationsDetail>(
-      {url: `/api/restorations/${restorationId}/`, method: 'PUT',
+      {url: `/api/restorations/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: restorationsDetailRequest
+      data: restorationsDetailRequest, signal
     },
       );
     }
   
 
 
-export const getRestorationsUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
+export const getRestorationsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext> => {
 
-const mutationKey = ['restorationsUpdate'];
+const mutationKey = ['restorationsCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -11091,10 +11119,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
-          const {restorationId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsCreate>>, {data: RestorationsDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  restorationsUpdate(restorationId,data,)
+          return  restorationsCreate(data,)
         }
 
         
@@ -11102,20 +11130,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RestorationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsUpdate>>>
-    export type RestorationsUpdateMutationBody = RestorationsDetailRequest
-    export type RestorationsUpdateMutationError = unknown
+    export type RestorationsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsCreate>>>
+    export type RestorationsCreateMutationBody = RestorationsDetailRequest
+    export type RestorationsCreateMutationError = unknown
 
-    export const useRestorationsUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+    export const useRestorationsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsCreate>>, TError,{data: RestorationsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof restorationsUpdate>>,
+        Awaited<ReturnType<typeof restorationsCreate>>,
         TError,
-        {restorationId: number | undefined | null;data: RestorationsDetailRequest},
+        {data: RestorationsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getRestorationsUpdateMutationOptions(options);
+      const mutationOptions = getRestorationsCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -11223,14 +11251,14 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const restorationsPartialUpdate = (
+export const restorationsUpdate = (
     restorationId: number | undefined | null,
     restorationsDetailRequest: RestorationsDetailRequest,
  ) => {
       
       
       return axiosInstance<RestorationsDetail>(
-      {url: `/api/restorations/${restorationId}/`, method: 'PATCH',
+      {url: `/api/restorations/${restorationId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: restorationsDetailRequest
     },
@@ -11239,11 +11267,11 @@ export const restorationsPartialUpdate = (
   
 
 
-export const getRestorationsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
+export const getRestorationsUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
 
-const mutationKey = ['restorationsPartialUpdate'];
+const mutationKey = ['restorationsUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -11253,10 +11281,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsPartialUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
           const {restorationId,data} = props ?? {};
 
-          return  restorationsPartialUpdate(restorationId,data,)
+          return  restorationsUpdate(restorationId,data,)
         }
 
         
@@ -11264,20 +11292,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RestorationsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsPartialUpdate>>>
-    export type RestorationsPartialUpdateMutationBody = RestorationsDetailRequest
-    export type RestorationsPartialUpdateMutationError = unknown
+    export type RestorationsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsUpdate>>>
+    export type RestorationsUpdateMutationBody = RestorationsDetailRequest
+    export type RestorationsUpdateMutationError = unknown
 
-    export const useRestorationsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+    export const useRestorationsUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof restorationsPartialUpdate>>,
+        Awaited<ReturnType<typeof restorationsUpdate>>,
         TError,
         {restorationId: number | undefined | null;data: RestorationsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getRestorationsPartialUpdateMutationOptions(options);
+      const mutationOptions = getRestorationsUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -11354,28 +11382,27 @@ still be anonymous when the middleware sets request.entity_id.  entity_id is
 re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
 authenticated the user.
  */
-export const restorationsSpeciesCreate = (
+export const restorationsPartialUpdate = (
     restorationId: number | undefined | null,
     restorationsDetailRequest: RestorationsDetailRequest,
- signal?: AbortSignal
-) => {
+ ) => {
       
       
       return axiosInstance<RestorationsDetail>(
-      {url: `/api/restorations/${restorationId}/species/`, method: 'POST',
+      {url: `/api/restorations/${restorationId}/`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: restorationsDetailRequest, signal
+      data: restorationsDetailRequest
     },
       );
     }
   
 
 
-export const getRestorationsSpeciesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
+export const getRestorationsPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
 
-const mutationKey = ['restorationsSpeciesCreate'];
+const mutationKey = ['restorationsPartialUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -11385,10 +11412,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsPartialUpdate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
           const {restorationId,data} = props ?? {};
 
-          return  restorationsSpeciesCreate(restorationId,data,)
+          return  restorationsPartialUpdate(restorationId,data,)
         }
 
         
@@ -11396,20 +11423,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RestorationsSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsSpeciesCreate>>>
-    export type RestorationsSpeciesCreateMutationBody = RestorationsDetailRequest
-    export type RestorationsSpeciesCreateMutationError = unknown
+    export type RestorationsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsPartialUpdate>>>
+    export type RestorationsPartialUpdateMutationBody = RestorationsDetailRequest
+    export type RestorationsPartialUpdateMutationError = unknown
 
-    export const useRestorationsSpeciesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+    export const useRestorationsPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsPartialUpdate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof restorationsSpeciesCreate>>,
+        Awaited<ReturnType<typeof restorationsPartialUpdate>>,
         TError,
         {restorationId: number | undefined | null;data: RestorationsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getRestorationsSpeciesCreateMutationOptions(options);
+      const mutationOptions = getRestorationsPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -11509,6 +11536,74 @@ export function useRestorationsSpeciesRetrieve<TData = Awaited<ReturnType<typeof
 
 
 
+/**
+ * Mixin for tenant-scoped ModelViewSets.
+
+The Django middleware runs before DRF authentication, so request.user may
+still be anonymous when the middleware sets request.entity_id.  entity_id is
+re-resolved in initial() (via EntityScopeInitialMixin) once DRF has
+authenticated the user.
+ */
+export const restorationsSpeciesCreate = (
+    restorationId: number | undefined | null,
+    restorationsDetailRequest: RestorationsDetailRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<RestorationsDetail>(
+      {url: `/api/restorations/${restorationId}/species/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: restorationsDetailRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getRestorationsSpeciesCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext> => {
+
+const mutationKey = ['restorationsSpeciesCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, {restorationId: number | undefined | null;data: RestorationsDetailRequest}> = (props) => {
+          const {restorationId,data} = props ?? {};
+
+          return  restorationsSpeciesCreate(restorationId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestorationsSpeciesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof restorationsSpeciesCreate>>>
+    export type RestorationsSpeciesCreateMutationBody = RestorationsDetailRequest
+    export type RestorationsSpeciesCreateMutationError = unknown
+
+    export const useRestorationsSpeciesCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restorationsSpeciesCreate>>, TError,{restorationId: number | undefined | null;data: RestorationsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof restorationsSpeciesCreate>>,
+        TError,
+        {restorationId: number | undefined | null;data: RestorationsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getRestorationsSpeciesCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Mixin for tenant-scoped ModelViewSets.
 
@@ -12060,74 +12155,6 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const blogCreate = (
-    blogsDetailRequest: BlogsDetailRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<BlogsDetail>(
-      {url: `/api/blog/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: blogsDetailRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getBlogCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext> => {
-
-const mutationKey = ['blogCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogCreate>>, {data: BlogsDetailRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  blogCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BlogCreateMutationResult = NonNullable<Awaited<ReturnType<typeof blogCreate>>>
-    export type BlogCreateMutationBody = BlogsDetailRequest
-    export type BlogCreateMutationError = unknown
-
-    export const useBlogCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blogCreate>>,
-        TError,
-        {data: BlogsDetailRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getBlogCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Re-resolve ``request.entity_id`` after DRF authentication.
-
-Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
-but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
-bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
-Without this, ``request.entity_id`` is None for JWT requests and tenant
-scoping silently fails (empty reads, NOT-NULL violations on create).
- */
 export const blogList = (
     params?: BlogListParams,
  signal?: AbortSignal
@@ -12225,27 +12252,27 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const blogUpdate = (
-    blogId: number | undefined | null,
+export const blogCreate = (
     blogsDetailRequest: BlogsDetailRequest,
- ) => {
+ signal?: AbortSignal
+) => {
       
       
       return axiosInstance<BlogsDetail>(
-      {url: `/api/blog/${blogId}/`, method: 'PUT',
+      {url: `/api/blog/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: blogsDetailRequest
+      data: blogsDetailRequest, signal
     },
       );
     }
   
 
 
-export const getBlogUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
+export const getBlogCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext> => {
 
-const mutationKey = ['blogUpdate'];
+const mutationKey = ['blogCreate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -12255,10 +12282,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
-          const {blogId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogCreate>>, {data: BlogsDetailRequest}> = (props) => {
+          const {data} = props ?? {};
 
-          return  blogUpdate(blogId,data,)
+          return  blogCreate(data,)
         }
 
         
@@ -12266,20 +12293,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type BlogUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogUpdate>>>
-    export type BlogUpdateMutationBody = BlogsDetailRequest
-    export type BlogUpdateMutationError = unknown
+    export type BlogCreateMutationResult = NonNullable<Awaited<ReturnType<typeof blogCreate>>>
+    export type BlogCreateMutationBody = BlogsDetailRequest
+    export type BlogCreateMutationError = unknown
 
-    export const useBlogUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+    export const useBlogCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogCreate>>, TError,{data: BlogsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blogUpdate>>,
+        Awaited<ReturnType<typeof blogCreate>>,
         TError,
-        {blogId: number | undefined | null;data: BlogsDetailRequest},
+        {data: BlogsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getBlogUpdateMutationOptions(options);
+      const mutationOptions = getBlogCreateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -12389,14 +12416,14 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const blogPartialUpdate = (
+export const blogUpdate = (
     blogId: number | undefined | null,
     blogsDetailRequest: BlogsDetailRequest,
  ) => {
       
       
       return axiosInstance<BlogsDetail>(
-      {url: `/api/blog/${blogId}/`, method: 'PATCH',
+      {url: `/api/blog/${blogId}/`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: blogsDetailRequest
     },
@@ -12405,11 +12432,11 @@ export const blogPartialUpdate = (
   
 
 
-export const getBlogPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
+export const getBlogUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
 
-const mutationKey = ['blogPartialUpdate'];
+const mutationKey = ['blogUpdate'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -12419,10 +12446,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogPartialUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
           const {blogId,data} = props ?? {};
 
-          return  blogPartialUpdate(blogId,data,)
+          return  blogUpdate(blogId,data,)
         }
 
         
@@ -12430,20 +12457,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type BlogPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogPartialUpdate>>>
-    export type BlogPartialUpdateMutationBody = BlogsDetailRequest
-    export type BlogPartialUpdateMutationError = unknown
+    export type BlogUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogUpdate>>>
+    export type BlogUpdateMutationBody = BlogsDetailRequest
+    export type BlogUpdateMutationError = unknown
 
-    export const useBlogPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+    export const useBlogUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blogPartialUpdate>>,
+        Awaited<ReturnType<typeof blogUpdate>>,
         TError,
         {blogId: number | undefined | null;data: BlogsDetailRequest},
         TContext
       > => {
 
-      const mutationOptions = getBlogPartialUpdateMutationOptions(options);
+      const mutationOptions = getBlogUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -12509,6 +12536,74 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getBlogDestroyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Re-resolve ``request.entity_id`` after DRF authentication.
+
+Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
+but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
+bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
+Without this, ``request.entity_id`` is None for JWT requests and tenant
+scoping silently fails (empty reads, NOT-NULL violations on create).
+ */
+export const blogPartialUpdate = (
+    blogId: number | undefined | null,
+    blogsDetailRequest: BlogsDetailRequest,
+ ) => {
+      
+      
+      return axiosInstance<BlogsDetail>(
+      {url: `/api/blog/${blogId}/`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: blogsDetailRequest
+    },
+      );
+    }
+  
+
+
+export const getBlogPartialUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext> => {
+
+const mutationKey = ['blogPartialUpdate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blogPartialUpdate>>, {blogId: number | undefined | null;data: BlogsDetailRequest}> = (props) => {
+          const {blogId,data} = props ?? {};
+
+          return  blogPartialUpdate(blogId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BlogPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof blogPartialUpdate>>>
+    export type BlogPartialUpdateMutationBody = BlogsDetailRequest
+    export type BlogPartialUpdateMutationError = unknown
+
+    export const useBlogPartialUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blogPartialUpdate>>, TError,{blogId: number | undefined | null;data: BlogsDetailRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof blogPartialUpdate>>,
+        TError,
+        {blogId: number | undefined | null;data: BlogsDetailRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getBlogPartialUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -12660,74 +12755,6 @@ bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
 Without this, ``request.entity_id`` is None for JWT requests and tenant
 scoping silently fails (empty reads, NOT-NULL violations on create).
  */
-export const reportsCreate = (
-    reportJobCreateRequest: ReportJobCreateRequest,
- signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<ReportJobCreate>(
-      {url: `/api/reports/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: reportJobCreateRequest, signal
-    },
-      );
-    }
-  
-
-
-export const getReportsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext> => {
-
-const mutationKey = ['reportsCreate'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsCreate>>, {data: ReportJobCreateRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  reportsCreate(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReportsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof reportsCreate>>>
-    export type ReportsCreateMutationBody = ReportJobCreateRequest
-    export type ReportsCreateMutationError = unknown
-
-    export const useReportsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof reportsCreate>>,
-        TError,
-        {data: ReportJobCreateRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getReportsCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * Re-resolve ``request.entity_id`` after DRF authentication.
-
-Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
-but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
-bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
-Without this, ``request.entity_id`` is None for JWT requests and tenant
-scoping silently fails (empty reads, NOT-NULL violations on create).
- */
 export const reportsList = (
     params?: ReportsListParams,
  signal?: AbortSignal
@@ -12816,6 +12843,74 @@ export function useReportsList<TData = Awaited<ReturnType<typeof reportsList>>, 
 
 
 
+/**
+ * Re-resolve ``request.entity_id`` after DRF authentication.
+
+Mix into any tenant-scoped APIView/ViewSet that reads ``request.entity_id``
+but cannot use the full :class:`TenantViewSetMixin` — e.g. views with a
+bespoke ``get_queryset`` that doesn't fit the mixin's standard filtering.
+Without this, ``request.entity_id`` is None for JWT requests and tenant
+scoping silently fails (empty reads, NOT-NULL violations on create).
+ */
+export const reportsCreate = (
+    reportJobCreateRequest: ReportJobCreateRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<ReportJobCreate>(
+      {url: `/api/reports/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: reportJobCreateRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getReportsCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext> => {
+
+const mutationKey = ['reportsCreate'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsCreate>>, {data: ReportJobCreateRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  reportsCreate(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof reportsCreate>>>
+    export type ReportsCreateMutationBody = ReportJobCreateRequest
+    export type ReportsCreateMutationError = unknown
+
+    export const useReportsCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsCreate>>, TError,{data: ReportJobCreateRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reportsCreate>>,
+        TError,
+        {data: ReportJobCreateRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getReportsCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Re-resolve ``request.entity_id`` after DRF authentication.
 
