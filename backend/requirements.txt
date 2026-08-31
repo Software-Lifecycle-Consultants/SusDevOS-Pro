@@ -47,6 +47,7 @@ python-decouple==3.8                      # Read .env variables cleanly
 Pillow==11.0.0                            # Image processing (thumbnails, validation)
 python-dateutil==2.9.0                    # Date parsing utilities
 PyYAML==6.0.2                             # YAML parsing for fixture files (seed_modules)
+openpyxl==3.1.5                           # Parse the DEFRA GHG conversion-factor flat file (import_defra_factors)
 python-json-logger==3.2.1                 # Structured JSON logging in production
 
 # ─── Testing ───────────────────────────────────────────────────────────────────

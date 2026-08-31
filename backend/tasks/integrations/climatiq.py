@@ -2,9 +2,30 @@
 Climatiq emission-factor sync — weekly (Sunday 02:00 UTC).
 
 Refreshes locally-cached Climatiq emission factors whose ExternalSyncedAt is
-older than 7 days (per api_integrations.md §1 caching strategy). On-demand
-single-factor lookup is also exposed via fetch_climatiq_factor() for the
-emissions calculation fallback path.
+older than 7 days (per api_integrations.md §1 caching strategy).
+
+This is a *supplementary* path, not the way the library gets populated
+-------------------------------------------------------------------------
+sync_climatiq_emission_factors selects rows that already carry a
+ClimatiqActivityId, so on an empty database it matches nothing and exits
+having done nothing. It cannot bootstrap a factor library, and for a long
+time nothing else could either — production ran with zero factors, which made
+the emissions form impossible to submit.
+
+The library now comes from tasks/integrations/defra.py, which imports the UK
+Government conversion factors and needs no API key. Anything here is an
+optional refresh layer on top of that.
+
+Note also that DEFRA rows deliberately leave ClimatiqActivityId empty, which
+is what keeps them out of the queryset below. Do not start writing a foreign
+identifier into that field.
+
+fetch_climatiq_factor() / lookup_or_fetch_factor() are the on-demand path from
+api_integrations.md §1. They are implemented and tested but currently have no
+callers: nothing in the request path resolves a factor on demand, because the
+UI picks from the local library instead. Kept rather than deleted because the
+spec describes this fallback, but treat it as unwired — wiring it up needs a
+calling site and a configured key, not just this module.
 
 Safe when unconfigured: if CLIMATIQ_API_KEY is unset the task logs and returns
 a "skipped" result rather than raising — so the beat schedule never crashes.

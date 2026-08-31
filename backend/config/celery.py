@@ -33,6 +33,7 @@ app.conf.imports = (
     "tasks.integrations.verra",
     "tasks.integrations.gold_standard",
     "tasks.integrations.climatiq",
+    "tasks.integrations.defra",
 )
 
 # ── Beat schedule ─────────────────────────────────────────────────────────────
@@ -50,6 +51,14 @@ app.conf.beat_schedule = {
     "sync-climatiq-weekly": {
         "task": "tasks.integrations.sync_climatiq_emission_factors",
         "schedule": crontab(hour=2, minute=0, day_of_week="sunday"),
+        "options": {"expires": 86400},
+    },
+    # DEFRA publishes each June and revises within a month or two, so this runs
+    # mid-July. It is the only factor source that needs no API key, and the only
+    # one that can populate an empty library.
+    "import-defra-factors-annually": {
+        "task": "tasks.integrations.sync_defra_emission_factors",
+        "schedule": crontab(hour=4, minute=0, day_of_month=15, month_of_year=7),
         "options": {"expires": 86400},
     },
     "sync-verra-registry-daily": {

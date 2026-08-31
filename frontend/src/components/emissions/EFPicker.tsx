@@ -43,6 +43,11 @@ export function EFPicker({ scope, value, onChange, disabled }: Props) {
   const [open,   setOpen]   = useState(false);
   const [query,  setQuery]  = useState("");
   const [items,  setItems]  = useState<EmissionFactor[]>([]);
+  // An unsearched fetch returning nothing means the library holds no factors at
+  // all — a different problem from a search that matched nothing, and one the
+  // user cannot fix by rephrasing. Production shipped with an empty library and
+  // told everyone to try a different search term.
+  const [libraryEmpty, setLibraryEmpty] = useState(false);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +66,11 @@ export function EFPicker({ scope, value, onChange, disabled }: Props) {
       .get<{ results: EmissionFactor[] }>(`/api/emission-factors/?${params}`, {
         headers: activeEntityId ? { "X-Entity-ID": String(activeEntityId) } : {},
       })
-      .then((r) => setItems(r.data.results ?? []))
+      .then((r) => {
+        const results = r.data.results ?? [];
+        setItems(results);
+        if (!debouncedQuery) setLibraryEmpty(results.length === 0);
+      })
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, [debouncedQuery, scope, open, activeEntityId]);
@@ -145,7 +154,19 @@ export function EFPicker({ scope, value, onChange, disabled }: Props) {
             <div className="px-4 py-3 text-xs text-surface-400">Searching…</div>
           )}
 
-          {!loading && items.length === 0 && (
+          {!loading && items.length === 0 && libraryEmpty && (
+            <div className="px-4 py-3">
+              <p className="text-xs font-medium text-surface-700">
+                No emission factors are loaded.
+              </p>
+              <p className="mt-1 text-xs text-surface-400">
+                Emissions cannot be recorded until an administrator loads the factor
+                library. This is a one-off setup step, not something you can fix here.
+              </p>
+            </div>
+          )}
+
+          {!loading && items.length === 0 && !libraryEmpty && (
             <div className="px-4 py-3 text-xs text-surface-400">
               {query ? "No factors found. Try a different search term." : "Start typing to search the emission factor library."}
             </div>

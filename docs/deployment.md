@@ -123,7 +123,7 @@ Any SMTP provider works — adjust `EMAIL_HOST` and `EMAIL_PORT` to match.
 
 | Value | Effect if unset |
 |-------|-----------------|
-| `CLIMATIQ_API_KEY` | Weekly emission-factor sync skips; seeded factors still work |
+| `CLIMATIQ_API_KEY` | Weekly Climatiq refresh skips. The DEFRA library is unaffected — it needs no key (see §4 `import_defra_factors`) |
 | `COMPANIES_HOUSE_API_KEY` | Company lookup returns an error to the caller |
 | `IUCN_API_KEY` | Species enrichment skips the Red List status |
 | `OPEN_EXCHANGE_RATES_API_KEY` | ECB remains the only FX source; the fallback no-ops |
@@ -448,9 +448,44 @@ docker compose -f docker-compose.prod.yml exec api python manage.py seed_modules
 docker compose -f docker-compose.prod.yml exec api python manage.py seed_plans
 docker compose -f docker-compose.prod.yml exec api python manage.py seed_superadmins
 
+# Emission factor library. Without these two the factor picker is empty and the
+# emissions form refuses to submit — users cannot record emissions at all.
+# seed_units must run first; the importer refuses to start if a unit is missing
+# rather than silently dropping those factors.
+docker compose -f docker-compose.prod.yml exec api python manage.py seed_units
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors
+
 # Collect Django static files (served by Nginx directly)
 docker compose -f docker-compose.prod.yml exec api python manage.py collectstatic --no-input
 ```
+
+### Emission factors
+
+`import_defra_factors` downloads the UK Government GHG conversion factors published by
+DEFRA/DESNZ and imports the aggregate CO₂e factors — about 2,600 rows covering Scopes 1, 2
+and 3. It needs **no API key**: the data is published under the Open Government Licence
+v3.0, free to reuse commercially with attribution.
+
+It resolves the download from the GOV.UK content API rather than a hard-coded link, because
+the asset URL carries a content hash and changes whenever the file is revised. Override with
+`--url` or `--file` for a pinned or offline import, or set `DEFRA_EF_SPREADSHEET_URL`.
+
+```bash
+# What would be imported, writing nothing
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --dry-run
+
+# A specific edition, or a pinned local copy
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --year 2026
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --file ./factors.xlsx
+```
+
+Re-running is safe — the import is idempotent and updates in place. A scheduled task
+(`import-defra-factors-annually`) repeats it each July, after DEFRA's June publication and
+the revisions that usually follow.
+
+The Climatiq integration is a *separate, optional* path. It only refreshes rows that already
+carry a `ClimatiqActivityId`, so it cannot populate an empty library and is not a substitute
+for this step.
 
 ### If something 500s after §4
 
