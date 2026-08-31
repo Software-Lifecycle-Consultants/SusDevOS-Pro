@@ -75,6 +75,14 @@ jobs:
         working-directory: backend
         run: ruff check .
 
+      # Catches a model edited without its migration. Runs before the DB steps so
+      # drift fails in seconds rather than after migrate/seed/pytest. Distinct from
+      # "Check for unapplied migrations" below: that asks whether the migrations on
+      # disk have been applied, this asks whether they still describe the models.
+      - name: Check for model/migration drift
+        working-directory: backend
+        run: python manage.py makemigrations --check --dry-run
+
       - name: Run migrations
         working-directory: backend
         run: python manage.py migrate --no-input
