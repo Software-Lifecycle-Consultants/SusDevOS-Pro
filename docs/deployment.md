@@ -123,7 +123,7 @@ Any SMTP provider works — adjust `EMAIL_HOST` and `EMAIL_PORT` to match.
 
 | Value | Effect if unset |
 |-------|-----------------|
-| `CLIMATIQ_API_KEY` | Weekly emission-factor sync skips; seeded factors still work |
+| `CLIMATIQ_API_KEY` | Weekly Climatiq refresh skips. The DEFRA library is unaffected — it needs no key (see §4 `import_defra_factors`) |
 | `COMPANIES_HOUSE_API_KEY` | Company lookup returns an error to the caller |
 | `IUCN_API_KEY` | Species enrichment skips the Red List status |
 | `OPEN_EXCHANGE_RATES_API_KEY` | ECB remains the only FX source; the fallback no-ops |
@@ -328,6 +328,52 @@ NEXT_PUBLIC_API_URL=http://api:8000
 EOF
 ```
 
+### Enabling the GitHub Actions deploy
+
+The `deploy` job in `.github/workflows/ci.yml` runs on every push to `main`, but only after
+the backend and frontend jobs pass (`needs: [backend, frontend]`). It is gated on three repo
+secrets; until they exist the job fails rather than deploying.
+
+Give CI its **own** key rather than reusing a personal one — it can then be revoked without
+locking you out. On your laptop:
+
+```bash
+ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/susdevos_deploy -N ""
+
+# Authorise the public half on the VPS, for the same user that owns /opt/susdevos
+ssh-copy-id -i ~/.ssh/susdevos_deploy.pub deploy@217.76.54.215
+
+# Confirm it works before wiring CI to it
+ssh -i ~/.ssh/susdevos_deploy deploy@217.76.54.215 'cd /opt/susdevos && git status --short'
+```
+
+Then set the secrets — **Settings → Secrets and variables → Actions → New repository secret**,
+or from the CLI:
+
+```bash
+gh secret set VPS_HOST    --body "217.76.54.215"
+gh secret set VPS_USER    --body "deploy"
+gh secret set VPS_SSH_KEY < ~/.ssh/susdevos_deploy   # the PRIVATE key, whole file
+```
+
+| Secret | Value | Notes |
+|--------|-------|-------|
+| `VPS_HOST` | `217.76.54.215` | Or the DNS name once it resolves to the box |
+| `VPS_USER` | `deploy` | Must own `/opt/susdevos` and be able to run `docker` |
+| `VPS_SSH_KEY` | contents of `~/.ssh/susdevos_deploy` | The **private** key, including the BEGIN/END lines |
+
+`VPS_SSH_KEY` is the private key and is the one that matters. Paste the whole file — a
+truncated key fails with a confusing authentication error rather than a parse error.
+
+What the job does, in order: pull, rebuild images, migrate, seed reference data, ensure the
+factor library is populated, collectstatic, restart app services (never the database or
+Redis), wait for `/health/`, reload Nginx, prune old images. It uses a `deploy-production`
+concurrency group with `cancel-in-progress: false`, so two merges queue rather than racing
+each other onto the box.
+
+**First run is the risky one.** Watch it rather than assuming: `gh run watch`, and keep an SSH
+session open so you can look at `docker compose -f docker-compose.prod.yml ps` if it stalls.
+
 ### Why these secrets live on the server, not in GitHub Secrets
 
 Both files are gitignored (`backend/.env.prod` and `.env`), and the CI deploy step only runs
@@ -448,9 +494,50 @@ docker compose -f docker-compose.prod.yml exec api python manage.py seed_modules
 docker compose -f docker-compose.prod.yml exec api python manage.py seed_plans
 docker compose -f docker-compose.prod.yml exec api python manage.py seed_superadmins
 
+# Emission factor library. Without these two the factor picker is empty and the
+# emissions form refuses to submit — users cannot record emissions at all.
+# seed_units must run first; the importer refuses to start if a unit is missing
+# rather than silently dropping those factors.
+docker compose -f docker-compose.prod.yml exec api python manage.py seed_units
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors
+
+# Note: from the CI deploy job onwards these run automatically on every deploy
+# (seed_gwp, seed_modules, seed_plans, seed_units, then import_defra_factors
+# --if-empty). You only need them by hand for the very first bring-up, or if you
+# are deploying manually. seed_superadmins stays manual either way — it needs the
+# six SUPERADMIN_* variables and errors without them.
+
 # Collect Django static files (served by Nginx directly)
 docker compose -f docker-compose.prod.yml exec api python manage.py collectstatic --no-input
 ```
+
+### Emission factors
+
+`import_defra_factors` downloads the UK Government GHG conversion factors published by
+DEFRA/DESNZ and imports the aggregate CO₂e factors — about 2,600 rows covering Scopes 1, 2
+and 3. It needs **no API key**: the data is published under the Open Government Licence
+v3.0, free to reuse commercially with attribution.
+
+It resolves the download from the GOV.UK content API rather than a hard-coded link, because
+the asset URL carries a content hash and changes whenever the file is revised. Override with
+`--url` or `--file` for a pinned or offline import, or set `DEFRA_EF_SPREADSHEET_URL`.
+
+```bash
+# What would be imported, writing nothing
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --dry-run
+
+# A specific edition, or a pinned local copy
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --year 2026
+docker compose -f docker-compose.prod.yml exec api python manage.py import_defra_factors --file ./factors.xlsx
+```
+
+Re-running is safe — the import is idempotent and updates in place. A scheduled task
+(`import-defra-factors-annually`) repeats it each July, after DEFRA's June publication and
+the revisions that usually follow.
+
+The Climatiq integration is a *separate, optional* path. It only refreshes rows that already
+carry a `ClimatiqActivityId`, so it cannot populate an empty library and is not a substitute
+for this step.
 
 ### If something 500s after §4
 

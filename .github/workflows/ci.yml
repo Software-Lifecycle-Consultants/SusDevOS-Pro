@@ -181,7 +181,33 @@ jobs:
       cancel-in-progress: false
 
     steps:
+      # Without this the job fails on every merge with 'missing server host' when the
+      # secrets are absent, which is indistinguishable from a real deploy failure and
+      # trains everyone to ignore a red main. Warn and skip instead.
+      #
+      # The trade-off is that a deleted secret would silently stop deploys, so the
+      # warning is deliberately loud and names the file that explains the fix.
+      - name: Check deploy configuration
+        id: deploy-configured
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          missing=""
+          [ -z "$VPS_HOST" ]    && missing="$missing VPS_HOST"
+          [ -z "$VPS_USER" ]    && missing="$missing VPS_USER"
+          [ -z "$VPS_SSH_KEY" ] && missing="$missing VPS_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Deploy skipped::Missing repository secret(s):$missing."\
+                 "Nothing was deployed. See docs/deployment.md, 'Enabling the GitHub Actions deploy'."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy via SSH
+        if: steps.deploy-configured.outputs.ready == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.VPS_HOST }}
@@ -203,6 +229,29 @@ jobs:
             echo "==> Running migrations (new image, before switching traffic)"
             docker compose -f docker-compose.prod.yml run --rm api \
               python manage.py migrate --no-input
+
+            # Reference data the app cannot function without. All idempotent, so
+            # re-running on every deploy is safe and cheap. seed_superadmins is
+            # deliberately absent: it requires six SUPERADMIN_* variables and errors
+            # without them, so it stays a one-off bootstrap rather than a deploy step.
+            echo "==> Seeding reference data"
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py seed_gwp
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py seed_modules
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py seed_plans
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py seed_units
+
+            # --if-empty short-circuits before any network call, so a deploy of an
+            # already-populated instance never depends on GOV.UK being reachable.
+            # Refreshing to a new DEFRA edition is the annual Celery task's job.
+            # Without this the factor picker is empty and no one can record an
+            # emission at all, which is exactly how production shipped.
+            echo "==> Ensuring the emission factor library is populated"
+            docker compose -f docker-compose.prod.yml run --rm api \
+              python manage.py import_defra_factors --if-empty
 
             echo "==> Collecting static files"
             docker compose -f docker-compose.prod.yml run --rm api \
