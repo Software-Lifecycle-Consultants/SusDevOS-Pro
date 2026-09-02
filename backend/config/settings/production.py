@@ -108,6 +108,7 @@ REST_FRAMEWORK.update({  # noqa: F405
         "anon":        config("RATE_LIMIT_UNAUTHENTICATED", default="10/min"),   # noqa: F405
         "user":        config("RATE_LIMIT_AUTHENTICATED",   default="100/min"),  # noqa: F405
         "public_read": config("RATE_LIMIT_PUBLIC_READ",     default="60/min"),   # noqa: F405 — crawlers + readers
+        "founding_application": config("RATE_LIMIT_FOUNDING_APPLICATION", default="5/hour"),  # noqa: F405
     },
 })
 

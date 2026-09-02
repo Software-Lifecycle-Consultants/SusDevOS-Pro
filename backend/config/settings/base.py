@@ -158,6 +158,7 @@ REST_FRAMEWORK = {
         # Map place-search proxies Nominatim, whose policy is 1 req/sec. Per-user
         # ceiling so one tenant typing fast cannot burn the shared allowance.
         "geocode":     "30/min",
+        "founding_application": "5/hour",
     },
 }
 
@@ -328,6 +329,7 @@ EMAIL_USE_TLS  = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER     = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL  = config("DEFAULT_FROM_EMAIL", default="noreply@susdevos.com")
+FOUNDING_APPLICATION_EMAIL = config("FOUNDING_APPLICATION_EMAIL", default="hello@susdevos.com")
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 

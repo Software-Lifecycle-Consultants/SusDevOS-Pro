@@ -1,5 +1,46 @@
 # Pricing Model Specification — SusDevOS
 
+## Founding 10 launch programme — approved 1 September 2026
+
+Founding 10 is a selective customer-development programme, separate from the
+self-serve Free plan and the historical paid lineup documented below.
+
+| Dimension | Founding 10 term |
+|---|---|
+| Availability | Ten qualified and activated organisations |
+| Platform fee | £0 for 24 months from activation; agreement records a 100% Founding Partner Credit |
+| Organisation | 1 entity |
+| Users | 10 named users; 2 named support contacts |
+| Projects | 10 active projects |
+| Reporting years | 5 |
+| File storage | 500 MB |
+| Onboarding | Two 60-minute sessions |
+| Support | Email, two-business-day response target; monthly group clinic; no SLA |
+| Exit | Structured export, deployment guide, two hours of handover, and 30 days of migration questions |
+
+Selection requires a live in-scope workflow, a named champion, onboarding within
+30 days, usable data within 45 days, monthly feedback for the first three months,
+and quarterly reviews after that. A participant is never required to endorse
+SusDevOS. Any named case study, quotation, or logo use needs separate approval.
+
+Excluded: custom development, bespoke integrations, historical data cleansing,
+consultancy or assurance, dedicated infrastructure, SSO, formal SLA, premium
+third-party datasets and commercial API licences, customer cloud costs, and
+bespoke migration work.
+
+At the end of the term, the participant chooses a current hosted plan,
+self-hosting under the applicable SusDevOS licence, or export and closure.
+Standard support is intentionally bounded; the programme is not an unlimited
+consulting retainer.
+
+Operational note: the public application is persisted in
+`FoundingPartnerApplication` and surfaced in Django admin. Programme allowances
+are contractual until the corresponding project and storage quota fields and
+all quantitative enforcement paths are implemented. Do not describe the limits
+as automatically enforced before that work is complete.
+
+---
+
 > **STATUS: per-capability gating is OFF. This document is partly superseded.**
 >
 > Packaging is moving to **service and hosting tiers** — how much of the platform

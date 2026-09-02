@@ -1,6 +1,12 @@
 ﻿from django.contrib import admin
 
-from .models import EntitySubscriptions, PlanFeatures, Plans, UsageTracking
+from .models import (
+    EntitySubscriptions,
+    FoundingPartnerApplication,
+    PlanFeatures,
+    Plans,
+    UsageTracking,
+)
 
 
 class PlanFeaturesInline(admin.TabularInline):
@@ -28,3 +34,11 @@ class UsageTrackingAdmin(admin.ModelAdmin):
     raw_id_fields = ("EntityId",)
 
 admin.site.register(PlanFeatures)
+
+
+@admin.register(FoundingPartnerApplication)
+class FoundingPartnerApplicationAdmin(admin.ModelAdmin):
+    list_display = ("ApplicationId", "CompanyName", "FullName", "Email", "UseCase", "ExpectedUsers", "Status", "CreatedAt")
+    list_filter = ("Status", "UseCase", "CreatedAt")
+    search_fields = ("CompanyName", "FullName", "Email", "LiveProject")
+    readonly_fields = ("CreatedAt", "UpdatedAt")

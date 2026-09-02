@@ -45,7 +45,7 @@ const nextConfig = {
       { source: "/:path*", headers: SECURITY_HEADERS },
       // Cache static marketing pages at the CDN for 5 minutes, stale-while-revalidate 1 hour
       {
-        source: "/(|features|pricing|integrations|standards|about|contact|security)",
+        source: "/(|features|pricing|founding-10|integrations|standards|about|contact|security)",
         headers: [{ key: "Cache-Control", value: "public, s-maxage=300, stale-while-revalidate=3600" }],
       },
       // Blog list — 5-minute CDN cache

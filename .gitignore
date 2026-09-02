@@ -39,6 +39,10 @@ yarn-error.log*
 pnpm-debug.log*
 tsconfig.tsbuildinfo
 
+# ── Local marketing campaign working files ──────────────────────────────────
+/MARKETING.md
+/marketing/
+
 # ── Content engine — generated output (not source) ───────────────────────────
 content-engine/briefs/
 content-engine/posts/
