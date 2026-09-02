@@ -49,6 +49,7 @@ urlpatterns = [
 
     # Public blog endpoint (no auth)
     path("api/public/",        include("apps.blog.urls_public")),
+    path("api/public/",        include("apps.billing.urls_public")),
 
     # Integration endpoints
     path("api/integrations/",  include("apps.shared.urls_integrations")),

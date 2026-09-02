@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" lastUpdated="26 June 2026">
+    <LegalPage title="Terms of Service" lastUpdated="1 September 2026">
 
       <p>
         These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of the SusDevOS platform
@@ -71,7 +71,54 @@ export default function TermsPage() {
         accounts that have been inactive for 12 consecutive months may be deleted.
       </p>
 
-      <h2>5. Acceptable use</h2>
+      <h2>5. Founding 10 programme</h2>
+
+      <p>
+        The Founding 10 programme is available to up to ten organisations selected by SusDevOS.
+        Submitting an application does not reserve or guarantee a place. A place is confirmed only
+        after a fit review, execution of a Founding 10 programme agreement, and account activation.
+      </p>
+
+      <p>
+        An activated participant receives a 100% Founding Partner Credit against the SusDevOS
+        platform fee for 24 months from its activation date. The standard allowance is one
+        organisation, up to ten named users, ten active projects, five reporting years, and 500 MB
+        of file storage. The programme includes two 60-minute onboarding sessions, email support
+        with a two-business-day response target, a monthly group clinic, and the exit assistance
+        described below. Response targets are not a service-level agreement.
+      </p>
+
+      <p>
+        Participants agree to nominate an internal champion, begin onboarding within 30 days,
+        provide usable project or reporting data within 45 days, and participate in monthly
+        feedback during the first three months followed by quarterly reviews. Permission to publish
+        a participant&apos;s name, logo, quotation, or identifiable case study will always require
+        separate written approval. SusDevOS may use anonymised and aggregated product feedback and
+        usage insights that do not identify the participant or disclose its confidential data.
+      </p>
+
+      <p>
+        The programme does not include custom software development, bespoke integrations, historical
+        data cleansing, consultancy or assurance services, dedicated infrastructure, SSO, a formal
+        uptime SLA, premium third-party datasets or commercial API licences. Any separately agreed
+        work will be scoped and priced in writing before it begins.
+      </p>
+
+      <p>
+        At the end of the 24-month term, a participant may move to a then-current hosted plan,
+        export its data and close the account, or self-host SusDevOS for its own internal use under
+        the applicable software licence. Exit assistance includes a structured export, the standard
+        deployment guide, up to two hours of remote handover assistance, and responses to migration
+        questions for 30 days. The participant is responsible for its own cloud infrastructure,
+        operations, security, backups, third-party services, and any bespoke migration work.
+      </p>
+
+      <p>
+        If a Founding 10 programme agreement conflicts with these general Terms, the programme
+        agreement controls for that participant and programme term.
+      </p>
+
+      <h2>6. Acceptable use</h2>
 
       <p>You agree not to:</p>
 
@@ -85,7 +132,7 @@ export default function TermsPage() {
         <li>Resell or sublicence access to the platform without written agreement</li>
       </ul>
 
-      <h2>6. Your data</h2>
+      <h2>7. Your data</h2>
 
       <p>
         You own your emissions data, reports, and all content you enter into SusDevOS. We process
@@ -100,7 +147,7 @@ export default function TermsPage() {
         <a href="/legal/dpa">Data Processing Agreement</a> for full details.
       </p>
 
-      <h2>7. GHG calculations and accuracy</h2>
+      <h2>8. GHG calculations and accuracy</h2>
 
       <p>
         SusDevOS calculates GHG emissions using methodology derived from the GHG Protocol Corporate
@@ -116,7 +163,7 @@ export default function TermsPage() {
         tool, not a substitute for professional sustainability advice.
       </p>
 
-      <h2>8. Intellectual property</h2>
+      <h2>9. Intellectual property</h2>
 
       <p>
         The SusDevOS platform, its software, design, and content are owned by SusDevOS Ltd and
@@ -125,7 +172,7 @@ export default function TermsPage() {
         works from our platform without written permission.
       </p>
 
-      <h2>9. Confidentiality</h2>
+      <h2>10. Confidentiality</h2>
 
       <p>
         Each party agrees to keep the other party&apos;s confidential information confidential and not
@@ -134,7 +181,7 @@ export default function TermsPage() {
         are our confidential information.
       </p>
 
-      <h2>10. Warranties and disclaimers</h2>
+      <h2>11. Warranties and disclaimers</h2>
 
       <p>
         The service is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo;. To the maximum extent permitted by
@@ -144,7 +191,7 @@ export default function TermsPage() {
         will satisfy any specific regulatory or standard requirement.
       </p>
 
-      <h2>11. Limitation of liability</h2>
+      <h2>12. Limitation of liability</h2>
 
       <p>
         To the maximum extent permitted by law, SusDevOS&apos;s total liability to you for any claim
@@ -164,7 +211,7 @@ export default function TermsPage() {
         excluded by law.
       </p>
 
-      <h2>12. Term and termination</h2>
+      <h2>13. Term and termination</h2>
 
       <p>
         These Terms begin when you create an account and continue until terminated. Either party
@@ -174,12 +221,12 @@ export default function TermsPage() {
       </p>
 
       <p>
-        On termination, your right to use the service ends immediately. Sections 6 (Your data),
-        8 (Intellectual property), 10 (Warranties), 11 (Limitation of liability), and 13
+        On termination, your right to use the service ends immediately. Sections 7 (Your data),
+        9 (Intellectual property), 11 (Warranties), 12 (Limitation of liability), and 14
         (Governing law) survive termination.
       </p>
 
-      <h2>13. Governing law</h2>
+      <h2>14. Governing law</h2>
 
       <p>
         These Terms are governed by the laws of England and Wales. Any disputes arising from or
@@ -187,7 +234,7 @@ export default function TermsPage() {
         of England and Wales.
       </p>
 
-      <h2>14. Changes to these Terms</h2>
+      <h2>15. Changes to these Terms</h2>
 
       <p>
         We may update these Terms from time to time. We will provide at least 30 days&apos; notice
@@ -195,7 +242,7 @@ export default function TermsPage() {
         the updated Terms constitutes acceptance.
       </p>
 
-      <h2>15. Contact</h2>
+      <h2>16. Contact</h2>
 
       <p>
         For any questions about these Terms, contact us at{" "}

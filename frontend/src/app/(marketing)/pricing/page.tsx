@@ -183,6 +183,14 @@ const FEATURE_GROUPS: {
 
 const FAQ = [
   {
+    q: "What is the Founding 10 programme?",
+    a: "Ten qualified organisations receive full SusDevOS access for 24 months at no platform fee. It is a working partnership with guided onboarding, bounded support and regular product feedback—not a self-serve trial.",
+  },
+  {
+    q: "What happens after the 24-month Founding 10 term?",
+    a: "You can continue on a standard hosted plan, move SusDevOS to cloud infrastructure you manage, or take a structured export and close the account. The programme includes a deployment guide and a bounded migration handover; your infrastructure and bespoke migration costs remain yours.",
+  },
+  {
     q: "What counts as an entity?",
     a: "A legal entity: a company, subsidiary, or branch with its own GHG inventory boundary. Most companies need just one. Subsidiaries with separate reporting obligations each need their own entity record.",
   },
@@ -244,7 +252,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-surface-500">
-            Free for one entity. Paid plans from{" "}
+            Start free, join the Founding 10, or choose a hosted plan from{" "}
             {sym}{PRICES[currency].starter[0]}/month.
             No hidden fees, no per-seat surprises.
           </p>
@@ -288,6 +296,41 @@ export default function PricingPage() {
                   {flag} {symbol} {label}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Founding 10 */}
+      <section className="bg-white py-10 sm:py-14">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-3xl bg-surface-950 p-7 text-white sm:p-10" style={{ background: "#0a0f0a" }}>
+            <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(ellipse 60% 130% at 100% 0%, rgba(22,163,74,0.26), transparent 70%)" }} />
+            <div className="relative grid gap-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+              <div>
+                <div className="mb-4 inline-flex rounded-full border border-brand-400/30 bg-brand-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-300">
+                  10 qualified organisations only
+                </div>
+                <h2 className="text-3xl font-black sm:text-4xl">Full SusDevOS. £0 for 24 months.</h2>
+                <p className="mt-4 max-w-2xl leading-relaxed text-surface-300">
+                  Founding 10 is for organisations with a live climate, nature, MRV, property or infrastructure workflow and a team ready to help shape the product.
+                </p>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Link href="/founding-10#apply" className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-400">
+                    Apply for a place <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/founding-10" className="inline-flex items-center rounded-xl border border-white/15 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/5">
+                    Read the programme terms
+                  </Link>
+                </div>
+              </div>
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {["1 organisation · 10 users", "10 active projects · 5 reporting years", "500 MB file storage", "Guided onboarding and email support", "Self-hosting exit handover", "No credit card required"].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-surface-200">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-brand-400" />{item}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -368,51 +411,22 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Feature comparison */}
+      {/* Shared platform access */}
       <section className="border-t border-surface-100 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="mb-8 text-center text-2xl font-bold text-surface-900">
-            Full feature comparison
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm">
-              <thead>
-                <tr className="border-b border-surface-200">
-                  <th className="w-48 py-3 pr-4 text-left font-medium text-surface-500">Feature</th>
-                  {PLANS.map(({ id, name, highlight }) => (
-                    <th
-                      key={id}
-                      className={`px-3 py-3 text-center font-semibold ${
-                        highlight ? "text-brand-700" : "text-surface-700"
-                      }`}
-                    >
-                      {name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {FEATURE_GROUPS.map(({ group, rows }) => (
-                  <>
-                    <tr key={group} className="bg-surface-50">
-                      <td colSpan={6} className="py-2 pt-5 text-xs font-semibold uppercase tracking-wider text-surface-500">
-                        {group}
-                      </td>
-                    </tr>
-                    {rows.map(({ label, plans }) => (
-                      <tr key={label} className="border-b border-surface-100 hover:bg-surface-50">
-                        <td className="py-2.5 pr-4 text-surface-600">{label}</td>
-                        {PLANS.map(({ id }) => (
-                          <td key={id} className="px-3 py-2.5 text-center">
-                            <CellValue val={plans[id]} />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </>
-                ))}
-              </tbody>
-            </table>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-600">Capabilities stay together</p>
+            <h2 className="mt-3 text-2xl font-bold text-surface-900 sm:text-3xl">Plans scale service and usage—not the integrity of your reporting.</h2>
+            <p className="mt-4 leading-relaxed text-surface-500">
+              Authenticated organisations can use the core GHG, project, land, ecosystem, MRV and reporting workflows. Hosted plans vary by entity, user and reporting allowances, support level and enterprise hosting requirements.
+            </p>
+          </div>
+          <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {["Scope 1, 2 and 3 accounting", "Versioned inventories and audit trail", "Projects, land and ecosystem records", "Targets and carbon-credit records", "PDF, CSV and JSON reporting", "Role-based access and verification workflow"].map((item) => (
+              <div key={item} className="flex items-center gap-3 rounded-xl border border-surface-200 p-4 text-sm font-medium text-surface-700">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-brand-600" />{item}
+              </div>
+            ))}
           </div>
         </div>
       </section>

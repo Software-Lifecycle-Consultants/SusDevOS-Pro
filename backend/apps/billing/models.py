@@ -108,3 +108,38 @@ class UsageTracking(models.Model):
 
     def __str__(self):
         return f"{self.EntityId} usage {self.PeriodStart} to {self.PeriodEnd}"
+
+
+class FoundingPartnerApplication(models.Model):
+    """A durable lead record for the invitation-only Founding 10 programme."""
+
+    STATUS_CHOICES = [
+        ("new", "New"),
+        ("reviewing", "Reviewing"),
+        ("accepted", "Accepted"),
+        ("declined", "Declined"),
+    ]
+
+    ApplicationId = models.AutoField(primary_key=True)
+    FullName = models.CharField(max_length=150)
+    Email = models.EmailField(db_index=True)
+    CompanyName = models.CharField(max_length=200)
+    Role = models.CharField(max_length=150)
+    Website = models.URLField(blank=True)
+    UseCase = models.CharField(max_length=100)
+    LiveProject = models.TextField()
+    ExpectedUsers = models.PositiveSmallIntegerField()
+    CurrentTooling = models.CharField(max_length=200, blank=True)
+    Message = models.TextField(blank=True)
+    ConsentToFollowUp = models.BooleanField(default=False)
+    Status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new", db_index=True)
+    InternalNotes = models.TextField(blank=True)
+    CreatedAt = models.DateTimeField(auto_now_add=True, db_index=True)
+    UpdatedAt = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "founding_partner_applications"
+        ordering = ["-CreatedAt"]
+
+    def __str__(self):
+        return f"{self.CompanyName} — {self.FullName}"

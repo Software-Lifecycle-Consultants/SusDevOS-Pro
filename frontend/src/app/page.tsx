@@ -635,40 +635,40 @@ const PLANS = [
     highlight: false,
     features:  [
       "1 entity · 1 user",
-      "Scope 1 + 2 (location-based)",
-      "DEFRA emission factors",
-      "Watermarked PDF report",
-      "30-day audit log",
+      "Full climate and nature workflows",
+      "Current reporting year",
+      "Self-service documentation",
+      "No credit card required",
     ],
     cta: { label: "Start for free", href: "/register" },
   },
   {
-    name:      "Starter",
-    price:     "£49",
-    note:      "/ month",
+    name:      "Founding 10",
+    price:     "£0",
+    note:      "for 24 months",
     highlight: true,
     features:  [
-      "1 entity · 5 users",
-      "All scopes — full Scope 3",
-      "All emission factor libraries",
-      "Formal inventory + carbon goals",
-      "CSV / JSON export",
+      "1 organisation · 10 users",
+      "10 projects · 5 reporting years",
+      "Guided onboarding and support",
+      "Monthly product clinic",
+      "Self-hosting exit handover",
     ],
-    cta: { label: "Start 14-day trial", href: "/register?plan=starter" },
+    cta: { label: "Apply for one of 10 places", href: "/founding-10#apply" },
   },
   {
-    name:      "Professional",
-    price:     "£199",
-    note:      "/ month",
+    name:      "Hosted plans",
+    price:     "£49",
+    note:      "from / month",
     highlight: false,
     features:  [
-      "5 entities · 20 users",
-      "Verification workflow + TNFD",
-      "GIS land parcel mapping",
-      "IPCC Tier 2/3 biomass",
-      "Bulk CSV import",
+      "Full product capabilities",
+      "Higher user and entity allowances",
+      "Longer reporting history",
+      "Service level matched to your team",
+      "Enterprise hosting available",
     ],
-    cta: { label: "Start 14-day trial", href: "/register?plan=professional" },
+    cta: { label: "Compare hosted plans", href: "/pricing" },
   },
 ];
 
@@ -678,8 +678,8 @@ function PricingTeaser() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-400">Pricing</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Start free. Scale as you grow.</h2>
-          <p className="mt-4 text-surface-400">No credit card required for the free plan. 14-day trial on paid plans.</p>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Start free—or help shape what comes next.</h2>
+          <p className="mt-4 text-surface-400">Ten qualified organisations receive full SusDevOS access and guided support free for 24 months.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           {PLANS.map(({ name, price, note, highlight, features, cta }) => (
@@ -694,7 +694,7 @@ function PricingTeaser() {
             >
               {highlight && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border border-brand-400/30 bg-brand-500 px-3 py-1 text-xs font-bold text-white">
-                  Most popular
+                  10 places only
                 </div>
               )}
               <p className={`mb-2 text-xs font-bold uppercase tracking-widest ${highlight ? "text-brand-100" : "text-surface-400"}`}>
@@ -731,7 +731,7 @@ function PricingTeaser() {
             href="/pricing"
             className="inline-flex items-center gap-1.5 text-sm text-surface-400 transition-colors hover:text-white"
           >
-            See full pricing including Agency and Enterprise plans
+            See full hosted pricing and Founding 10 terms
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </p>
@@ -771,22 +771,22 @@ function CTABanner() {
           Your first GHG inventory starts today.
         </h2>
         <p className="mx-auto mb-10 max-w-lg text-lg text-brand-100">
-          Free for one entity, one user, one reporting year. No credit card required.
-          Upgrade when you&apos;re ready.
+          Start with the free plan, or apply for one of ten Founding 10 places with
+          guided onboarding and 24 months at no platform fee.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
-            href="/register"
+            href="/founding-10#apply"
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-brand-700 shadow-lg transition-colors hover:bg-brand-50"
           >
-            Start for free — no credit card
+            Apply for Founding 10
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/demo"
+            href="/register"
             className="inline-flex items-center gap-2 rounded-xl border border-brand-400/50 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-brand-700"
           >
-            Book a demo
+            Start free
           </Link>
         </div>
         <p className="mt-6 text-sm text-brand-200">

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" lastUpdated="26 June 2026">
+    <LegalPage title="Privacy Policy" lastUpdated="1 September 2026">
 
       <p>
         SusDevOS Ltd (&ldquo;SusDevOS&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) is committed to protecting your personal data.
@@ -51,8 +51,9 @@ export default function PrivacyPage() {
 
       <h3>Marketing and lead data</h3>
       <p>
-        If you contact us, subscribe to our newsletter, or use the carbon estimator tool, we collect
-        your email address and any information you provide. We use this to respond to enquiries and,
+        If you contact us, apply to the Founding 10 programme, subscribe to our newsletter, or use
+        the carbon estimator tool, we collect your contact details, organisation, role and any
+        project or use-case information you provide. We use this to assess applications, respond to enquiries and,
         where you have opted in, to send product updates. The legal basis is <strong>consent</strong>{" "}
         (Article 6(1)(a)) for newsletter subscriptions, and <strong>legitimate interest</strong>{" "}
         (Article 6(1)(f)) for follow-up to existing customer enquiries.
@@ -83,6 +84,8 @@ export default function PrivacyPage() {
           <tr><td>Audit logs — Enterprise plans</td><td>7 years</td></tr>
           <tr><td>GHG inventory and emissions data</td><td>Account lifetime; exported on request</td></tr>
           <tr><td>Marketing lead data</td><td>Until unsubscribe + 6 months</td></tr>
+          <tr><td>Unsuccessful Founding 10 applications</td><td>12 months after the selection decision</td></tr>
+          <tr><td>Accepted Founding 10 applications</td><td>Programme term + 7 years for contract records</td></tr>
           <tr><td>Billing records</td><td>7 years (UK financial records requirement)</td></tr>
         </tbody>
       </table>
